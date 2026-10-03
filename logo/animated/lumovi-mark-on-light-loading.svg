@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 60 60" width="128" height="128" role="img">
+  <title>Lumovi</title>
+  <defs>
+    <radialGradient id="lumovi-mark-on-light-loading-l" cx="33" cy="15" r="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0.553" stop-color="#5ea2f0"/>
+      <stop offset="0.76" stop-color="#2675d3"/>
+      <stop offset="1" stop-color="#1c5cab"/>
+    </radialGradient>
+    <radialGradient id="lumovi-mark-on-light-loading-orb" cx="0.36" cy="0.32" r="0.78">
+      <stop offset="0" stop-color="#bfdcff"/>
+      <stop offset="0.5" stop-color="#5ea2f0"/>
+      <stop offset="1" stop-color="#2675d3"/>
+    </radialGradient>
+    <radialGradient id="lumovi-mark-on-light-loading-glow"><stop offset="0" stop-color="#5ea2f0" stop-opacity="0.55"/><stop offset="1" stop-color="#5ea2f0" stop-opacity="0"/></radialGradient>
+    <style>
+    .lumovi-mark-on-light-loading-orb { transform-origin: 33px 15px; animation: lumovi-mark-on-light-loading-breathe 2.2s ease-in-out infinite; }
+    .lumovi-mark-on-light-loading-glow { transform-origin: 33px 15px; animation: lumovi-mark-on-light-loading-glow 2.2s ease-in-out infinite; }
+    @keyframes lumovi-mark-on-light-loading-breathe { 50% { transform: scale(0.86); } }
+    @keyframes lumovi-mark-on-light-loading-glow { 50% { opacity: 0.25; transform: scale(0.8); } }
+    @media (prefers-reduced-motion: reduce) { .lumovi-mark-on-light-loading-orb, .lumovi-mark-on-light-loading-glow { animation: none; } }
+    </style>
+  </defs>
+  <circle class="lumovi-mark-on-light-loading-glow" cx="33" cy="15" r="21" fill="url(#lumovi-mark-on-light-loading-glow)"/>
+  <path class="lumovi-mark-on-light-loading-l" d="M0 15V6A6 6 0 0 1 12 6V15A21 21 0 0 0 33 36H42A6 6 0 0 1 42 48H21A21 21 0 0 1 0 27Z" fill="url(#lumovi-mark-on-light-loading-l)"/>
+  <circle class="lumovi-mark-on-light-loading-orb" cx="33" cy="15" r="15" fill="url(#lumovi-mark-on-light-loading-orb)"/>
+</svg>

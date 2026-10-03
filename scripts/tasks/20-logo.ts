@@ -1,4 +1,6 @@
-// logo/: the mark, the wordmark and the lockups, as SVG and as PNG, in every version.
+// logo/: the mark, the wordmark and the lockups, as SVG and as PNG, in every version, and the
+// mark animated.
+import { intro, loading } from '../../src/animation.ts'
 import {
   document,
   horizontal,
@@ -37,6 +39,11 @@ export default {
   name: 'logo',
   outputs: ['logo'],
   async build(ctx) {
+    for (const background of ['dark', 'light'] as const) {
+      const name = `lumovi-mark-${background === 'dark' ? 'on-dark' : 'on-light'}`
+      ctx.text(`logo/animated/${name}-intro.svg`, intro(background, `${name}-intro`))
+      ctx.text(`logo/animated/${name}-loading.svg`, loading(background, `${name}-loading`))
+    }
     for (const kind of KINDS) {
       for (const v of kind.variants) {
         const name = `lumovi-${kind.name}-${v.name}`
