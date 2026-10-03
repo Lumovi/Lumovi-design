@@ -1,0 +1,153 @@
+/*
+ * Lumovi's colors. Built from src/colors.ts by `npm run build`: change it there.
+ *
+ * The palette is --lumovi-*. The semantic tokens (--surface, --text-1, --accent, …) have the
+ * names the app uses. They're light, and dark when the system is, unless data-theme on <html>
+ * says light; data-theme="dark" makes them dark whatever the system.
+ */
+
+:root {
+  /* Blue */
+  --lumovi-blue-50: #eff7ff;
+  --lumovi-blue-100: #dcebfe;
+  --lumovi-blue-200: #bfdcff;
+  --lumovi-blue-300: #8cc2ff;
+  --lumovi-blue-400: #5ea2f0;
+  --lumovi-blue-500: #3987e5;
+  --lumovi-blue-600: #2675d3;
+  --lumovi-blue-700: #1c5cab;
+  --lumovi-blue-800: #184789;
+  --lumovi-blue-900: #153365;
+  --lumovi-blue-950: #112242;
+
+  /* Night */
+  --lumovi-night-500: #3e517c;
+  --lumovi-night-600: #2d3e67;
+  --lumovi-night-700: #1d2b4f;
+  --lumovi-night-800: #131d37;
+  --lumovi-night-900: #0a0f1f;
+  --lumovi-night-950: #040610;
+
+  /* Gray */
+  --lumovi-gray-50: #fafafb;
+  --lumovi-gray-100: #f5f5f6;
+  --lumovi-gray-150: #f0f0f2;
+  --lumovi-gray-200: #e4e4e7;
+  --lumovi-gray-300: #d4d4d8;
+  --lumovi-gray-400: #a1a1aa;
+  --lumovi-gray-500: #8b8b94;
+  --lumovi-gray-600: #71717a;
+  --lumovi-gray-700: #52525b;
+  --lumovi-gray-750: #3f3f46;
+  --lumovi-gray-800: #212126;
+  --lumovi-gray-850: #18181c;
+  --lumovi-gray-900: #121215;
+  --lumovi-gray-950: #0c0c0e;
+}
+
+:root {
+  color-scheme: light;
+  --app-bg: #f5f5f6;
+  --surface: #ffffff;
+  --surface-2: #fafafb;
+  --surface-3: #f0f0f2;
+  --line: rgb(12 12 20 / 0.08);
+  --line-strong: rgb(12 12 20 / 0.14);
+  --text-1: #0b0b0f;
+  --text-2: #52525b;
+  --text-3: #71717a;
+  --accent: #2675d3;
+  --accent-strong: #1c5cab;
+  --accent-soft: rgb(38 117 211 / 0.1);
+  --accent-track: #dcebfe;
+  --good-text: #1a7f37;
+  --warn-text: #8a5a00;
+  --serious-text: #b4501f;
+  --critical-text: #b42318;
+  --good: #0ca30c;
+  --warn: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --neutral: #898781;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+  --series-8: #e34948;
+  --series-other: #a3a29d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --app-bg: #0c0c0e;
+    --surface: #121215;
+    --surface-2: #18181c;
+    --surface-3: #212126;
+    --line: rgb(255 255 255 / 0.07);
+    --line-strong: rgb(255 255 255 / 0.12);
+    --text-1: #f2f2f4;
+    --text-2: #a1a1aa;
+    --text-3: #8b8b94;
+    --accent: #3987e5;
+    --accent-strong: #5ea2f0;
+    --accent-soft: rgb(57 135 229 / 0.16);
+    --accent-track: rgb(57 135 229 / 0.2);
+    --good-text: #3fb950;
+    --warn-text: #e3a008;
+    --serious-text: #f0883e;
+    --critical-text: #f85149;
+    --good: #0ca30c;
+    --warn: #fab219;
+    --serious: #ec835a;
+    --critical: #d03b3b;
+    --neutral: #898781;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+    --series-8: #e66767;
+    --series-other: #5f5e5a;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --app-bg: #0c0c0e;
+  --surface: #121215;
+  --surface-2: #18181c;
+  --surface-3: #212126;
+  --line: rgb(255 255 255 / 0.07);
+  --line-strong: rgb(255 255 255 / 0.12);
+  --text-1: #f2f2f4;
+  --text-2: #a1a1aa;
+  --text-3: #8b8b94;
+  --accent: #3987e5;
+  --accent-strong: #5ea2f0;
+  --accent-soft: rgb(57 135 229 / 0.16);
+  --accent-track: rgb(57 135 229 / 0.2);
+  --good-text: #3fb950;
+  --warn-text: #e3a008;
+  --serious-text: #f0883e;
+  --critical-text: #f85149;
+  --good: #0ca30c;
+  --warn: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --neutral: #898781;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+  --series-other: #5f5e5a;
+}
