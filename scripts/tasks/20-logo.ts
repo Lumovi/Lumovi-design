@@ -1,5 +1,15 @@
-// logo/: the logo, as SVG and as PNG, in every version.
-import { document, mark, VARIANTS, type Logo, type Variant } from '../../src/logo.ts'
+// logo/: the mark, the wordmark and the lockups, as SVG and as PNG, in every version.
+import {
+  document,
+  horizontal,
+  mark,
+  stacked,
+  VARIANTS,
+  WORDMARK_VARIANTS,
+  wordmarkOnly,
+  type Logo,
+  type Variant,
+} from '../../src/logo.ts'
 import { renderSvg } from '../lib/render.ts'
 import type { Task } from '../lib/task.ts'
 
@@ -12,7 +22,15 @@ interface Kind {
 }
 
 const KINDS: Kind[] = [
+  { name: 'logo', variants: VARIANTS, logo: horizontal, height: { svg: 48, png: 512 } },
+  { name: 'logo-stacked', variants: VARIANTS, logo: stacked, height: { svg: 160, png: 1024 } },
   { name: 'mark', variants: VARIANTS, logo: mark, height: { svg: 128, png: 1024 } },
+  {
+    name: 'wordmark',
+    variants: WORDMARK_VARIANTS,
+    logo: (v) => wordmarkOnly(v),
+    height: { svg: 40, png: 512 },
+  },
 ]
 
 export default {
