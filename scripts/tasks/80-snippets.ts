@@ -1,6 +1,7 @@
 // snippets/: the mark as components for the app (React) and the website (Astro), and the
 // <head> tags for the icons. The components follow the theme the way the app and the website
 // do: the system's, unless data-theme on <html> says otherwise.
+import { address, description, name, site, tagline } from '../../src/brand.ts'
 import { night } from '../../src/colors.ts'
 import { GRID, litStops, orbStops, REACH, shapes, type Background } from '../../src/mark.ts'
 import { n, type Stop } from '../../src/svg.ts'
@@ -113,17 +114,17 @@ ${gradients(id, false)
 }
 
 function head(): string {
-  return `<!-- Lumovi's icons and link previews. Copy icons/web/ to the site's root, and
-     social/og/lumovi.png to /og.png. -->
+  return `<!-- Lumovi's icons and link previews, for ${address(site.website)}. Copy icons/web/ to the
+     site's root, and social/og/lumovi.png to /og.png. -->
 <link rel="icon" href="/favicon.ico" sizes="48x48" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
 <meta name="theme-color" content="${night[900]}" />
-<meta property="og:image" content="https://YOUR-SITE/og.png" />
+<meta property="og:image" content="${site.website}/og.png" />
 <meta property="og:image:width" content="2400" />
 <meta property="og:image:height" content="1260" />
-<meta property="og:image:alt" content="Lumovi: your clusters, at a glance." />
+<meta property="og:image:alt" content="${name}. ${tagline.join(' ')} ${description}" />
 <meta name="twitter:card" content="summary_large_image" />
 `
 }
