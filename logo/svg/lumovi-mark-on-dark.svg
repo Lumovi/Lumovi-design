@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="128" height="128" role="img">
+  <title>Lumovi</title>
+  <defs>
+    <radialGradient id="lumovi-mark-on-dark-l" cx="33" cy="15" r="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0.553" stop-color="#8cc2ff"/>
+      <stop offset="0.76" stop-color="#3987e5"/>
+      <stop offset="1" stop-color="#1c5cab"/>
+    </radialGradient>
+    <radialGradient id="lumovi-mark-on-dark-orb" cx="0.36" cy="0.32" r="0.78">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.3" stop-color="#eff7ff"/>
+      <stop offset="0.72" stop-color="#8cc2ff"/>
+      <stop offset="1" stop-color="#3987e5"/>
+    </radialGradient>
+  </defs>
+  <path d="M0 15V6A6 6 0 0 1 12 6V15A21 21 0 0 0 33 36H42A6 6 0 0 1 42 48H21A21 21 0 0 1 0 27Z" fill="url(#lumovi-mark-on-dark-l)"/>
+  <circle cx="33" cy="15" r="15" fill="url(#lumovi-mark-on-dark-orb)"/>
+</svg>
