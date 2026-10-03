@@ -15,12 +15,14 @@ docs.**
 [Colors](#colors) · [Social](#social-and-github) · [Media](#media) ·
 [Building](#building-the-assets)
 
+[lumovi.dev](https://lumovi.dev) · [docs.lumovi.dev](https://docs.lumovi.dev)
+
 </div>
 
 <img src="guidelines/images/cover.png" alt="The Lumovi logo, glowing over a floor of dots." />
 
-Lumovi is a beautiful, fast Kubernetes dashboard, on your desktop or in your cluster. It was
-called KubeStacks. This repository is the source of everything it looks like: every asset is
+[Lumovi](https://lumovi.dev) is a beautiful, fast Kubernetes dashboard, on your desktop or in
+your cluster. It was called KubeStacks. This repository is the source of everything it looks like: every asset is
 built from a few files in [`src/`](src), so they all agree, and you can grab whatever you need
 from the folders below.
 
@@ -107,24 +109,32 @@ nsis:
 ```
 
 `icons/app/macos/icon.icns` is there too, for anything that wants one. The app's window and
-dock in development use `build/icon.png`, and the Helm chart's `icon` can point at
-`icons/app/macos/icon.png` here.
+dock in development use `build/icon.png`. The Helm chart's `icon` can point here, once this
+repository is public:
+
+```yaml
+icon: https://raw.githubusercontent.com/Lumovi/Lumovi-design/main/icons/app/macos/icon.png
+```
 
 ### On the website and in the docs
 
-| File                                | Website                                 | Docs (Mintlify)  |
-| ----------------------------------- | --------------------------------------- | ---------------- |
-| `icons/web/*`                       | `public/`                               | `favicon.svg`    |
-| `social/og/lumovi.png`              | `public/og.png`                         |                  |
-| `snippets/astro/LumoviLogo.astro`   | `src/components/logos/LumoviLogo.astro` |                  |
-| `snippets/html/head.html`           | `src/layouts/Base.astro`                |                  |
-| `logo/svg/lumovi-logo-on-light.svg` |                                         | `logo/light.svg` |
-| `logo/svg/lumovi-logo-on-dark.svg`  |                                         | `logo/dark.svg`  |
+| File                                | [lumovi.dev](https://lumovi.dev)        | [docs.lumovi.dev](https://docs.lumovi.dev) (Mintlify) |
+| ----------------------------------- | --------------------------------------- | ----------------------------------------------------- |
+| `icons/web/*`                       | `public/`                               | `favicon.svg`                                         |
+| `social/og/lumovi.png`              | `public/og.png`                         |                                                       |
+| `social/og/lumovi-docs.png`         |                                         | `og.png`                                              |
+| `snippets/astro/LumoviLogo.astro`   | `src/components/logos/LumoviLogo.astro` |                                                       |
+| `snippets/html/head.html`           | `src/layouts/Base.astro`                |                                                       |
+| `logo/svg/lumovi-logo-on-light.svg` |                                         | `logo/light.svg`                                      |
+| `logo/svg/lumovi-logo-on-dark.svg`  |                                         | `logo/dark.svg`                                       |
 
-The docs' colors, in `docs.json`:
+And in the docs' `docs.json`:
 
 ```json
-"colors": { "primary": "#2675d3", "light": "#5ea2f0", "dark": "#2675d3" }
+"colors": { "primary": "#2675d3", "light": "#5ea2f0", "dark": "#2675d3" },
+"logo": { "light": "/logo/light.svg", "dark": "/logo/dark.svg", "href": "https://lumovi.dev" },
+"favicon": "/favicon.svg",
+"seo": { "metatags": { "og:image": "https://docs.lumovi.dev/og.png" } }
 ```
 
 ## Colors
@@ -150,8 +160,8 @@ The docs' colors, in `docs.json`:
 
 | File                                 | For                                                                     |
 | ------------------------------------ | ----------------------------------------------------------------------- |
-| `social/og/lumovi.png`               | The website's link preview (2400 × 1260)                                |
-| `social/og/lumovi-docs.png`          | The docs' link preview                                                  |
+| `social/og/lumovi.png`               | The link preview for lumovi.dev (2400 × 1260)                           |
+| `social/og/lumovi-docs.png`          | The link preview for docs.lumovi.dev                                    |
 | `social/github/<repository>.png`     | Each repository's social preview: _Settings → General → Social preview_ |
 | `social/github/profile-banner-*.png` | The organization's profile README, in light and dark                    |
 | `social/avatar.png`                  | The organization's avatar, and on X, Bluesky, Mastodon and Discord      |

@@ -176,6 +176,9 @@ For the product itself, show the product: real screenshots of the app, in light 
   "lumovi" is only for the wordmark.
 - Lumovi is **a Kubernetes dashboard** you run **on your desktop** (macOS, Windows and Linux),
   or **in your cluster** for your whole team.
+- Link to **[lumovi.dev](https://lumovi.dev)**, and to
+  **[docs.lumovi.dev](https://docs.lumovi.dev)** for how to use it. Write the addresses in
+  lowercase, without `https://` or `www.`
 - Write the way the app talks: plainly, calmly, and to the point. Say what something does, not
   how amazing it is.
 
