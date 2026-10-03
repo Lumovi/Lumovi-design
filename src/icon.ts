@@ -258,3 +258,73 @@ export function filled(size: number, markRatio: number, id = 'lumovi-icon'): str
     glow: true,
   })
 }
+
+/**
+ * macOS 26's Liquid Glass icon, for Icon Composer and Xcode: the night as the icon's fill, and
+ * the L and the orb as two glass layers the system lights, tints and shadows itself (in light,
+ * dark, clear and tinted appearances). The system masks the canvas to its shape, so the
+ * layers are drawn on the whole canvas, and the mark is the same share of it as of the
+ * plate in macos().
+ */
+export function liquidGlass(): { json: string; layers: Record<string, string> } {
+  const size = 1024
+  const markSize = (452 / 824) * size
+  const offset = (size - markSize) / 2
+  const k = markSize / GRID
+  const { l, orb } = shapes()
+  const layer = (defs: string[], shape: string) =>
+    svg({
+      box: { x: 0, y: 0, width: size, height: size },
+      width: size,
+      height: size,
+      defs,
+      body: [
+        `<g transform="translate(${n(offset)} ${n(offset)}) scale(${n(k, 5)})">`,
+        `  ${shape}`,
+        '</g>',
+      ],
+    })
+  const p = paint('color', 'dark', 'lumovi')
+  const [lDefs, orbDefs] = p.defs
+  const color = (hex: string) =>
+    `extended-srgb:${[1, 3, 5].map((i) => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(5)).join(',')},1.00000`
+  const group = (name: string, image: string, glass: boolean, translucency: number) => ({
+    layers: [{ 'image-name': image, name, glass }],
+    shadow: { kind: 'neutral', opacity: 0.5 },
+    translucency: { enabled: translucency > 0, value: translucency },
+  })
+  const json = {
+    fill: {
+      'linear-gradient': [color(PLATE_STOPS[0]), color(PLATE_STOPS[1])],
+      orientation: { start: { x: 0.5, y: 0 }, stop: { x: 0.5, y: 1 } },
+    },
+    // Front to back: the orb, solid so it stays bright; the L, glass; and the orb's light on
+    // the night behind them.
+    groups: [
+      group('Orb', 'orb.svg', true, 0),
+      group('L', 'l.svg', true, 0.4),
+      { ...group('Glow', 'glow.svg', false, 0), shadow: { kind: 'none', opacity: 0 } },
+    ],
+    'supported-platforms': { squares: ['macOS'] },
+  }
+  return {
+    json: JSON.stringify(json, null, 2),
+    layers: {
+      'l.svg': layer([lDefs!], `<path d="${l}" fill="${p.l}"/>`),
+      'orb.svg': layer(
+        [orbDefs!],
+        `<circle cx="${n(orb.cx)}" cy="${n(orb.cy)}" r="${n(orb.r)}" fill="${p.orb}"/>`,
+      ),
+      'glow.svg': layer(
+        [
+          radialGradient('lumovi-glow', { cx: 0.5, cy: 0.5, r: 0.5 }, [
+            [0, blue[400], 0.55],
+            [0.38, blue[500], 0.22],
+            [1, blue[500], 0],
+          ]),
+        ],
+        `<circle cx="${n(orb.cx)}" cy="${n(orb.cy)}" r="${n(orb.r * 3.4)}" fill="url(#lumovi-glow)"/>`,
+      ),
+    },
+  }
+}

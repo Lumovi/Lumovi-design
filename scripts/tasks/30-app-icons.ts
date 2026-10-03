@@ -1,5 +1,5 @@
 // icons/app/: the app's icons for macOS, Windows and Linux.
-import { macos, plated } from '../../src/icon.ts'
+import { liquidGlass, macos, plated } from '../../src/icon.ts'
 import { icns, ICNS_TYPES, ico } from '../lib/formats.ts'
 import { optimize, renderSvg } from '../lib/render.ts'
 import type { Task } from '../lib/task.ts'
@@ -13,8 +13,14 @@ export default {
   name: 'app-icons',
   outputs: ['icons/app'],
   async build(ctx) {
-    // macOS: the 1024 PNG electron-builder takes, and every size in an .icns.
+    // macOS: the 1024 PNG electron-builder takes, every size in an .icns, and the Liquid Glass
+    // icon for macOS 26 and later.
     ctx.text('icons/app/macos/icon.svg', macos(1024))
+    const glass = liquidGlass()
+    ctx.text('icons/app/macos/Lumovi.icon/icon.json', glass.json)
+    for (const [name, layer] of Object.entries(glass.layers)) {
+      ctx.text(`icons/app/macos/Lumovi.icon/Assets/${name}`, layer)
+    }
     ctx.text('icons/app/windows/icon.svg', plated(1024))
     ctx.text('icons/app/linux/icon.svg', plated(1024))
     if (!ctx.raster) return
