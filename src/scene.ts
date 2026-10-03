@@ -53,6 +53,7 @@ export const palette = {
     text: '#f2f2f4',
     muted: gray[500],
     lead: gray[400],
+    accent: blue[400],
   },
   light: {
     sky: ['#ffffff', '#f4f7fc', '#e9eef7'],
@@ -61,6 +62,7 @@ export const palette = {
     text: '#0b0b0f',
     muted: gray[600],
     lead: gray[700],
+    accent: blue[600],
   },
 } as const
 

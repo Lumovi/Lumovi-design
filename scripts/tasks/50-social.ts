@@ -1,5 +1,6 @@
 // social/: link previews (Open Graph), GitHub's social previews and profile banner, the
 // avatar, and a header for X, Bluesky and Mastodon.
+import { address, description, site, tagline } from '../../src/brand.ts'
 import { filled } from '../../src/icon.ts'
 import { document, VARIANTS, wordmarkOnly } from '../../src/logo.ts'
 import { headline, palette, scene, type Theme } from '../../src/scene.ts'
@@ -7,8 +8,8 @@ import { escape } from '../../src/svg.ts'
 import { renderHtml, renderSvg } from '../lib/render.ts'
 import type { Task } from '../lib/task.ts'
 
-const TAGLINE = ['Your clusters,', 'at a glance.']
-const LEAD = 'A beautiful, fast Kubernetes dashboard. On your desktop, or in your cluster.'
+const WEBSITE = address(site.website)
+const DOCS = address(site.docs)
 
 interface Card {
   width: number
@@ -18,6 +19,8 @@ interface Card {
   lead?: string
   /** The type size of the title, in pixels at this card's size. */
   titleSize: number
+  /** The address the card is for, as people read it. */
+  url: string
   /** Leave out the wordmark, and center the copy higher: for headers an avatar overlaps. */
   header?: boolean
 }
@@ -33,6 +36,7 @@ function card({
   title,
   lead,
   titleSize,
+  url,
   header,
 }: Card): string {
   const u = H / 630
@@ -50,6 +54,23 @@ function card({
     css: `
       .wordmark { position: absolute; left: ${pad}px; top: ${60 * u}px; }
       .wordmark svg { display: block; }
+      .url {
+        position: absolute;
+        right: ${pad + 16 * u}px;
+        top: ${77 * u}px;
+        transform: translateY(-50%);
+        font-size: ${19 * u}px;
+        font-weight: 500;
+        color: ${c.muted};
+      }
+      .copy .url {
+        position: static;
+        transform: none;
+        margin-top: ${24 * u}px;
+        font-size: ${34 * u}px;
+        letter-spacing: -0.01em;
+        color: ${c.accent};
+      }
       .copy {
         position: absolute;
         left: ${header ? W * 0.27 : pad}px;
@@ -75,26 +96,30 @@ function card({
         text-wrap: balance;
       }`,
     content: `
-      ${header ? '' : `<div class="wordmark">${wordmark}</div>`}
+      ${header ? '' : `<div class="wordmark">${wordmark}</div><div class="url">${escape(url)}</div>`}
       <div class="copy">
         <h1>${headline(title, theme)}</h1>
         ${lead ? `<p>${escape(lead)}</p>` : ''}
+        ${header ? `<div class="url">${escape(url)}</div>` : ''}
       </div>`,
   })
 }
 
 /** GitHub's social previews, one per repository: 1280 × 640, under 1 MB. */
-const REPOSITORIES: Record<string, Pick<Card, 'title' | 'lead'>> = {
-  lumovi: { title: TAGLINE, lead: LEAD },
+const REPOSITORIES: Record<string, Pick<Card, 'title' | 'lead' | 'url'>> = {
+  lumovi: { title: tagline, lead: description, url: WEBSITE },
   'lumovi-website': {
+    url: WEBSITE,
     title: ['Website'],
     lead: "The source of Lumovi's website: what Lumovi does, and where to get it.",
   },
   'lumovi-docs': {
+    url: DOCS,
     title: ['Documentation'],
     lead: 'Install Lumovi, connect your clusters, and make the most of every view.',
   },
   'lumovi-design': {
+    url: WEBSITE,
     title: ['Brand and design'],
     lead: 'The logo, app icons, colors and media for the app, the website and the docs.',
   },
@@ -112,7 +137,14 @@ export default {
     await ctx.png(
       'social/og/lumovi.png',
       await render(
-        card({ width: 1200, height: 630, title: TAGLINE, lead: LEAD, titleSize: 76 }),
+        card({
+          width: 1200,
+          height: 630,
+          title: tagline,
+          lead: description,
+          url: WEBSITE,
+          titleSize: 76,
+        }),
         1200,
         630,
         2,
@@ -140,7 +172,15 @@ export default {
       await ctx.png(
         `social/github/profile-banner-${theme}.png`,
         await render(
-          card({ width: 1280, height: 420, theme, title: TAGLINE, lead: LEAD, titleSize: 60 }),
+          card({
+            width: 1280,
+            height: 420,
+            theme,
+            title: tagline,
+            lead: description,
+            url: WEBSITE,
+            titleSize: 60,
+          }),
           1280,
           420,
           2,
@@ -152,7 +192,14 @@ export default {
     await ctx.png(
       'social/header.png',
       await render(
-        card({ width: 1500, height: 500, title: TAGLINE, titleSize: 66, header: true }),
+        card({
+          width: 1500,
+          height: 500,
+          title: tagline,
+          url: WEBSITE,
+          titleSize: 66,
+          header: true,
+        }),
         1500,
         500,
         2,
