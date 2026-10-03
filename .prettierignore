@@ -1,0 +1,9 @@
+package-lock.json
+# Built by npm run build.
+colors/
+logo/
+icons/
+social/
+media/
+guidelines/images/
+snippets/

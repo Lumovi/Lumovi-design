@@ -1,0 +1,18 @@
+* text=auto eol=lf
+*.png binary
+*.webp binary
+*.jpg binary
+*.ico binary
+*.icns binary
+*.bmp binary
+*.ase binary
+*.woff binary
+*.woff2 binary
+# Everything outside src/ and scripts/ is built from them (npm run build).
+colors/** linguist-generated=true
+logo/** linguist-generated=true
+icons/** linguist-generated=true
+social/** linguist-generated=true
+media/** linguist-generated=true
+guidelines/images/** linguist-generated=true
+snippets/** linguist-generated=true
