@@ -1,16 +1,15 @@
 /**
- * The brand's imagery, for social cards, banners, wallpapers and installers: night, a floor of
- * dots running off into the distance (a cluster's worth of pods, seen from above), and the
- * mark over it, its orb lighting the floor beneath.
+ * The brand's imagery, for social cards, banners, wallpapers and installers: graphite, a floor
+ * of dots running off into the distance (a cluster's worth of pods, seen from above), and the
+ * mark standing on it, its light falling on the floor in front.
  *
  * A scene is an HTML page, rendered with Chrome. The floor scales with the mark, so a small
  * mark on a big wallpaper stands in the same pool of light as a big one on a social card.
  */
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
-import { blue, gray, night } from './colors.ts'
+import { gray, INK, PAPER } from './colors.ts'
 import { icon } from './icon.ts'
-import { GRID, shapes } from './mark.ts'
 import { escape } from './svg.ts'
 
 const require = createRequire(import.meta.url)
@@ -47,22 +46,24 @@ export interface SceneOptions {
 
 export const palette = {
   dark: {
-    sky: [night[800], night[900], '#05070d'],
-    pool: 'rgb(57 135 229 / 0.22)',
-    dot: blue[300],
-    text: '#f2f2f4',
+    sky: [gray[850], gray[950], '#000000'],
+    pool: 'rgb(255 255 255 / 0.1)',
+    dot: PAPER,
+    dots: 0.5,
+    text: '#ededed',
     muted: gray[500],
     lead: gray[400],
-    accent: blue[400],
+    accent: '#ededed',
   },
   light: {
-    sky: ['#ffffff', '#f4f7fc', '#e9eef7'],
-    pool: 'rgb(94 162 240 / 0.18)',
-    dot: blue[600],
-    text: '#0b0b0f',
+    sky: [PAPER, gray[100], '#ebebeb'],
+    pool: 'rgb(0 0 0 / 0.035)',
+    dot: INK,
+    dots: 0.3,
+    text: INK,
     muted: gray[600],
     lead: gray[700],
-    accent: blue[600],
+    accent: INK,
   },
 } as const
 
@@ -71,9 +72,9 @@ export function scene(o: SceneOptions): string {
   const c = palette[theme]
   // The floor scales with the mark: 1 for a 330-pixel mark, as on a social card.
   const u = mark.size / 330
-  const { orb } = shapes()
-  const ox = mark.x + (orb.cx / GRID) * mark.size
-  const oy = mark.y + (orb.cy / GRID) * mark.size
+  // The middle of the mark: where the light pools.
+  const ox = mark.x + mark.size / 2
+  const oy = mark.y + mark.size / 2
   const markSvg = icon({ id: 'scene', size: W, height: H, mark, glow: true, background: theme })
 
   const floor =
@@ -84,7 +85,7 @@ export function scene(o: SceneOptions): string {
           const w = Math.max(W * 1.6, 1800 * u)
           const h = 1000 * u
           const left = ox - w / 2
-          const top = mark.y + mark.size * 0.86
+          const top = mark.y + mark.size * 0.97
           const fade = o.floor?.fadeLeft
             ? `, linear-gradient(to right, transparent ${((ox - W * 0.42 - left) / w) * 100}%, #000 ${((ox - W * 0.12 - left) / w) * 100}%)`
             : ''
@@ -114,12 +115,12 @@ body {
   background-image: radial-gradient(circle, ${c.dot} ${2.2 * u}px, transparent ${3 * u}px);
   background-size: ${40 * u}px ${40 * u}px;
   background-position: center top;
-  opacity: ${theme === 'dark' ? 1 : 0.55};
+  opacity: ${c.dots};
 }
 .pool {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle ${mark.size * 1.3}px at ${ox}px ${oy}px, ${c.pool}, transparent 70%);
+  background: radial-gradient(circle ${mark.size * 1.45}px at ${ox}px ${oy}px, ${c.pool}, transparent 70%);
 }
 .mark { position: absolute; inset: 0; }
 .mark svg { display: block; }

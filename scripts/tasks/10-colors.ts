@@ -1,11 +1,11 @@
 // colors/: the palette and the app's semantic tokens, for CSS, Tailwind, design tools (as
 // design tokens), and Adobe and GIMP swatches.
-import { blue, brand, gray, night, series, status, themes, type Scheme } from '../../src/colors.ts'
+import { blue, brand, gray, series, status, themes, type Scheme } from '../../src/colors.ts'
 import { ase } from '../lib/formats.ts'
 import type { Task } from '../lib/task.ts'
 
 const HEADER = 'Built from src/colors.ts by `npm run build`: change it there.'
-const scales = { blue, night, gray } as const
+const scales = { gray, blue } as const
 
 /** `rgb(12 12 20 / 0.08)` or `#rrggbb` as `#rrggbbaa`/`#rrggbb`, for formats without rgb(). */
 function hex(color: string): string {
@@ -100,9 +100,8 @@ function tokens(): string {
         brand: Object.fromEntries(
           Object.entries(brand).map(([k, b]) => [k, color(b.hex, `${b.name}. ${b.use}`)]),
         ),
-        blue: scale(blue),
-        night: scale(night),
         gray: scale(gray),
+        blue: scale(blue),
         status: scale(status),
       },
       theme: {

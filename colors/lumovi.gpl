@@ -3,12 +3,28 @@ Name: Lumovi
 Columns: 11
 # Built from src/colors.ts by `npm run build`: change it there.
 # Lumovi
- 38 117 211	Lumovi Blue
- 57 135 229	Daylight
-140 194 255	Lumen
- 10  15  31	Night
- 11  11  15	Ink
+ 10  10  10	Ink
+ 38  38  38	Graphite
+163 163 163	Silver
+212 212 212	Mist
 255 255 255	Paper
+ 38 117 211	Blue
+# Gray
+250 250 250	Gray 50
+245 245 245	Gray 100
+239 239 239	Gray 150
+229 229 229	Gray 200
+212 212 212	Gray 300
+163 163 163	Gray 400
+143 143 143	Gray 500
+115 115 115	Gray 600
+ 82  82  82	Gray 700
+ 64  64  64	Gray 750
+ 38  38  38	Gray 800
+ 33  33  33	Gray 850
+ 24  24  24	Gray 900
+ 18  18  18	Gray 925
+ 10  10  10	Gray 950
 # Blue
 239 247 255	Blue 50
 220 235 254	Blue 100
@@ -21,28 +37,6 @@ Columns: 11
  24  71 137	Blue 800
  21  51 101	Blue 900
  17  34  66	Blue 950
-# Night
- 62  81 124	Night 500
- 45  62 103	Night 600
- 29  43  79	Night 700
- 19  29  55	Night 800
- 10  15  31	Night 900
-  4   6  16	Night 950
-# Gray
-250 250 251	Gray 50
-245 245 246	Gray 100
-240 240 242	Gray 150
-228 228 231	Gray 200
-212 212 216	Gray 300
-161 161 170	Gray 400
-139 139 148	Gray 500
-113 113 122	Gray 600
- 82  82  91	Gray 700
- 63  63  70	Gray 750
- 33  33  38	Gray 800
- 24  24  28	Gray 850
- 18  18  21	Gray 900
- 12  12  14	Gray 950
 # Status
  12 163  12	Good
 250 178  25	Warn

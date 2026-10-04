@@ -6,6 +6,22 @@
  */
 
 @theme {
+  --color-lumovi-gray-50: #fafafa;
+  --color-lumovi-gray-100: #f5f5f5;
+  --color-lumovi-gray-150: #efefef;
+  --color-lumovi-gray-200: #e5e5e5;
+  --color-lumovi-gray-300: #d4d4d4;
+  --color-lumovi-gray-400: #a3a3a3;
+  --color-lumovi-gray-500: #8f8f8f;
+  --color-lumovi-gray-600: #737373;
+  --color-lumovi-gray-700: #525252;
+  --color-lumovi-gray-750: #404040;
+  --color-lumovi-gray-800: #262626;
+  --color-lumovi-gray-850: #212121;
+  --color-lumovi-gray-900: #181818;
+  --color-lumovi-gray-925: #121212;
+  --color-lumovi-gray-950: #0a0a0a;
+
   --color-lumovi-blue-50: #eff7ff;
   --color-lumovi-blue-100: #dcebfe;
   --color-lumovi-blue-200: #bfdcff;
@@ -17,26 +33,4 @@
   --color-lumovi-blue-800: #184789;
   --color-lumovi-blue-900: #153365;
   --color-lumovi-blue-950: #112242;
-
-  --color-lumovi-night-500: #3e517c;
-  --color-lumovi-night-600: #2d3e67;
-  --color-lumovi-night-700: #1d2b4f;
-  --color-lumovi-night-800: #131d37;
-  --color-lumovi-night-900: #0a0f1f;
-  --color-lumovi-night-950: #040610;
-
-  --color-lumovi-gray-50: #fafafb;
-  --color-lumovi-gray-100: #f5f5f6;
-  --color-lumovi-gray-150: #f0f0f2;
-  --color-lumovi-gray-200: #e4e4e7;
-  --color-lumovi-gray-300: #d4d4d8;
-  --color-lumovi-gray-400: #a1a1aa;
-  --color-lumovi-gray-500: #8b8b94;
-  --color-lumovi-gray-600: #71717a;
-  --color-lumovi-gray-700: #52525b;
-  --color-lumovi-gray-750: #3f3f46;
-  --color-lumovi-gray-800: #212126;
-  --color-lumovi-gray-850: #18181c;
-  --color-lumovi-gray-900: #121215;
-  --color-lumovi-gray-950: #0c0c0e;
 }

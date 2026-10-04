@@ -2,78 +2,50 @@
 // <head> tags for the icons. The components follow the theme the way the app and the website
 // do: the system's, unless data-theme on <html> says otherwise.
 import { address, description, name, site, tagline } from '../../src/brand.ts'
-import { night } from '../../src/colors.ts'
-import { GRID, litStops, orbStops, REACH, shapes, type Background } from '../../src/mark.ts'
-import { n, type Stop } from '../../src/svg.ts'
+import { gray } from '../../src/colors.ts'
+import { GRID, paint, shapes } from '../../src/mark.ts'
 import type { Task } from '../lib/task.ts'
 
-const { l, orb } = shapes()
-
-/** The light and dark paints' gradients, as JSX or HTML, with ids from `id`. */
-function gradients(id: (name: string) => string, jsx: boolean): string[] {
-  const attr = (name: string) =>
-    jsx ? name.replace(/-(\w)/g, (_, c: string) => c.toUpperCase()) : name
-  const close = jsx ? ' />' : '></stop>'
-  const stops = (list: Stop[]) =>
-    list.map(
-      ([offset, color]) => `  <stop offset="${n(offset)}" ${attr('stop-color')}="${color}"${close}`,
-    )
-  return (['light', 'dark'] as const).flatMap((background) => [
-    `<radialGradient id=${id(`l-${background}`)} cx="${orb.cx}" cy="${orb.cy}" r="${REACH}" gradientUnits="userSpaceOnUse">`,
-    ...stops(litStops(background)),
-    '</radialGradient>',
-    `<radialGradient id=${id(`orb-${background}`)} cx="0.36" cy="0.32" r="0.78">`,
-    ...stops(orbStops(background)),
-    '</radialGradient>',
-  ])
-}
+const { light, shade } = shapes()
+const onLight = paint('color', 'light')
+const onDark = paint('color', 'dark')
 
 /** CSS that paints the mark for the theme: light, or dark when the system or data-theme says. */
-function themeCss(cls: (name: string) => string, url: (name: string) => string): string {
-  const rules = (background: Background, scope = '') =>
+function themeCss(cls: (part: string) => string): string {
+  const rules = (p: { light: string; shade: string }, scope = '') =>
     [
-      `${scope}${cls('l')} { fill: ${url(`l-${background}`)}; }`,
-      `${scope}${cls('orb')} { fill: ${url(`orb-${background}`)}; }`,
+      `${scope}${cls('light')} { fill: ${p.light}; }`,
+      `${scope}${cls('shade')} { fill: ${p.shade}; }`,
     ].join('\n')
   return [
-    rules('light'),
+    rules(onLight),
     '@media (prefers-color-scheme: dark) {',
-    ...rules('dark', ":root:not([data-theme='light']) ")
+    ...rules(onDark, ":root:not([data-theme='light']) ")
       .split('\n')
       .map((line) => `  ${line}`),
     '}',
-    rules('dark', ":root[data-theme='dark'] "),
+    rules(onDark, ":root[data-theme='dark'] "),
   ].join('\n')
 }
 
 function react(): string {
-  const id = (name: string) => `{\`\${id}-${name}\`}`
-  const css = themeCss(
-    (name) => `.\${id}-${name}`,
-    (name) => `url(#\${id}-${name})`,
-  )
   return `// The Lumovi mark, for the app. Built by lumovi-design (npm run build): change it there.
 import { useId } from 'react'
 import { cn } from '@renderer/lib/cn'
 
 const css = (id: string) => \`
-${css}
+${themeCss((part) => `.\${id}-${part}`)}
 \`
 
-/** The Lumovi mark: an L that holds a light. It follows the app's theme. */
+/** The Lumovi mark: a square, and light sweeping across it. It follows the app's theme. */
 export function Logo({ className }: { className?: string }) {
   // useId() has colons, which CSS class names can't.
   const id = \`lumovi-\${useId().replace(/[^a-zA-Z0-9-]/g, '')}\`
   return (
     <svg viewBox="0 0 ${GRID} ${GRID}" aria-hidden className={cn('size-7', className)}>
-      <defs>
-${gradients(id, true)
-  .map((line) => `        ${line}`)
-  .join('\n')}
-      </defs>
       <style>{css(id)}</style>
-      <path className={\`\${id}-l\`} d="${l}" />
-      <circle className={\`\${id}-orb\`} cx="${orb.cx}" cy="${orb.cy}" r="${orb.r}" />
+      <path className={\`\${id}-shade\`} d="${shade}" />
+      <path className={\`\${id}-light\`} d="${light}" />
     </svg>
   )
 }
@@ -81,14 +53,9 @@ ${gradients(id, true)
 }
 
 function astro(): string {
-  const id = (name: string) => `{\`\${id}-${name}\`}`
-  const css = themeCss(
-    (name) => `.\${id}-${name}`,
-    (name) => `url(#\${id}-${name})`,
-  )
   return `---
 // The Lumovi mark, for the website. Built by lumovi-design (npm run build): change it there.
-/** The Lumovi mark: an L that holds a light. It follows the site's theme. */
+/** The Lumovi mark: a square, and light sweeping across it. It follows the site's theme. */
 interface Props {
   size?: number
   class?: string
@@ -96,19 +63,14 @@ interface Props {
 const { size = 28, class: className } = Astro.props
 const id = \`lumovi-\${Math.random().toString(36).slice(2, 8)}\`
 const css = \`
-${css}
+${themeCss((part) => `.\${id}-${part}`)}
 \`
 ---
 
 <svg viewBox="0 0 ${GRID} ${GRID}" width={size} height={size} aria-hidden="true" class={className}>
-  <defs>
-${gradients(id, false)
-  .map((line) => `    ${line}`)
-  .join('\n')}
-  </defs>
   <style set:html={css}></style>
-  <path class={\`\${id}-l\`} d="${l}"></path>
-  <circle class={\`\${id}-orb\`} cx="${orb.cx}" cy="${orb.cy}" r="${orb.r}"></circle>
+  <path class={\`\${id}-shade\`} d="${shade}"></path>
+  <path class={\`\${id}-light\`} d="${light}"></path>
 </svg>
 `
 }
@@ -120,7 +82,7 @@ function head(): string {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
-<meta name="theme-color" content="${night[900]}" />
+<meta name="theme-color" content="${gray[950]}" />
 <meta property="og:image" content="${site.website}/og.png" />
 <meta property="og:image:width" content="2400" />
 <meta property="og:image:height" content="1260" />

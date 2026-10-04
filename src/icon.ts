@@ -1,28 +1,17 @@
 /**
- * The app icon: the mark, lit, on a plate of night blue. The orb is the light in the scene:
- * it glows, lights up the night around it, and lights the inside of the L most.
+ * The app icon: the mark, lit, on a plate of graphite. The light glows white, and lights the
+ * shade beside it, brightest along the curve and fading toward the far corner.
  *
- * Icons are drawn in pixels at the size they're for, so small ones can put the mark on whole
- * pixels. On Windows and Linux, below 128 pixels, the glow is left out and the mark is larger.
+ * Icons are drawn in pixels at the size they're for. On Windows and Linux, below 128 pixels,
+ * the glow is left out and the mark is larger; at 16 and 20 pixels the gap narrows to a pixel.
  */
-import { blue, night } from './colors.ts'
-import {
-  GRID,
-  geometry as standard,
-  markShapes,
-  paint,
-  shapes,
-  type Background,
-  type Geometry,
-} from './mark.ts'
+import { gray, INK, PAPER } from './colors.ts'
+import { GRID, geometry as standard, shapes, type Background, type Geometry } from './mark.ts'
 import { squircle } from './squircle.ts'
 import { linearGradient, n, radialGradient, svg } from './svg.ts'
 
-/**
- * For the smallest sizes, a narrower gap: at 12 pixels (4 units a pixel), the bars are 3
- * pixels and the gap 1, where the standard gap would fall between pixels.
- */
-export const tiny: Geometry = { bar: 12, gap: 4, corner: 21 }
+/** For the smallest sizes, a narrower gap: one pixel when the mark is 12 pixels. */
+export const tiny: Geometry = { ...standard, gap: 4 }
 
 export interface Plate {
   x: number
@@ -36,26 +25,33 @@ export interface Plate {
 export interface IconOptions {
   /** A prefix for ids, so several icons can share a page. */
   id: string
-  /** The canvas, in pixels. */
+  /** The canvas's width, in pixels. */
   size: number
+  /** The canvas's height, if it isn't square. */
+  height?: number
   /** The plate, or none for the mark alone. */
   plate?: Plate
   /** The mark's top-left corner and size, in pixels. */
   mark: { x: number; y: number; size: number }
   geometry?: Geometry
-  /** The orb's glow, and the light it casts on the plate. */
+  /** The light's glow, and the light it casts around it. */
   glow?: boolean
   /** A soft shadow under the plate, as macOS icons have. */
   shadow?: boolean
   /** A hairline around the plate's edge, which keeps it apart from dark backgrounds. */
   edge?: boolean
-  /** A full square of night, for icons the platform masks itself (iOS, Android). */
+  /** A full square of graphite, for icons the platform masks itself (iOS, Android). */
   fill?: boolean
-  /** What the mark is on: night (the default), or a light background. */
+  /** What the mark is on: graphite (the default), or a light background, where it's flat. */
   background?: Background
-  /** A canvas that isn't square: `size` is then its width. */
-  height?: number
 }
+
+/** The plate's colors: graphite, a little lighter at the top. */
+export const PLATE_STOPS = [gray[750], gray[950]] as const
+/** From the light's center to the square's far corner, rounded up. */
+const REACH = 68
+/** The middle of the light, where its glow is centered. */
+const GLOW = { x: 13, y: 35, r: 46 }
 
 export function plateShape(p: Plate): string {
   return p.smoothing > 0
@@ -74,21 +70,47 @@ function roundedSquare(x: number, y: number, size: number, r: number): string {
   ].join('')
 }
 
-/** The plate's colors: night, a little lighter at the top. */
-export const PLATE_STOPS = [night[700], night[900]] as const
+/**
+ * The lit mark's gradients and shapes, in its 48-unit square: the light white, and the shade
+ * a veil of white, brightest along the curve.
+ */
+export function litMark(id: string, g: Geometry = standard, glow = true) {
+  const { light, shade, square, origin, cut } = shapes(g)
+  const defs = [
+    radialGradient(`${id}-light`, { cx: origin.x, cy: origin.y, r: g.light, userSpace: true }, [
+      [0, PAPER],
+      [1, gray[150]],
+    ]),
+    radialGradient(`${id}-shade`, { cx: origin.x, cy: origin.y, r: REACH, userSpace: true }, [
+      [cut / REACH, PAPER, 0.36],
+      [1, PAPER, 0.13],
+    ]),
+    `<filter id="${id}-bloom" x="-50%" y="-50%" width="200%" height="200%">\n  <feGaussianBlur stdDeviation="2.4"/>\n</filter>`,
+    // The glow stays inside the square, so its edges stay sharp.
+    `<clipPath id="${id}-square">\n  <path d="${square}"/>\n</clipPath>`,
+  ]
+  const body = [
+    `<path d="${shade}" fill="url(#${id}-shade)"/>`,
+    ...(glow
+      ? [
+          `<g clip-path="url(#${id}-square)">`,
+          `  <path d="${light}" fill="${PAPER}" fill-opacity="0.6" filter="url(#${id}-bloom)"/>`,
+          '</g>',
+        ]
+      : []),
+    `<path d="${light}" fill="url(#${id}-light)"/>`,
+  ]
+  return { defs, body }
+}
 
 export function icon(o: IconOptions): string {
   const { id, size, plate, mark } = o
+  const height = o.height ?? size
+  const background = o.background ?? 'dark'
   const g = o.geometry ?? standard
   const k = mark.size / GRID
-  const { orb } = shapes(g)
-  const orbX = mark.x + orb.cx * k
-  const orbY = mark.y + orb.cy * k
-  const background = o.background ?? 'dark'
-  const height = o.height ?? size
-  const p = paint('color', background, `${id}-mark`, background === 'dark' && mark.size < 48)
   const shape = plate ? plateShape(plate) : ''
-  const defs: string[] = [...p.defs]
+  const defs: string[] = []
   const body: string[] = []
 
   if (plate || o.fill) {
@@ -105,9 +127,8 @@ export function icon(o: IconOptions): string {
   }
   if (plate && o.shadow) {
     // A shadow as Apple's icon template has: down a little, soft, and faint.
-    const blur = (plate.size / 824) * 12
     defs.push(
-      `<filter id="${id}-shadow" x="-10%" y="-10%" width="120%" height="125%">\n  <feGaussianBlur stdDeviation="${n(blur)}"/>\n</filter>`,
+      `<filter id="${id}-shadow" x="-10%" y="-10%" width="120%" height="125%">\n  <feGaussianBlur stdDeviation="${n((plate.size / 824) * 12)}"/>\n</filter>`,
     )
     body.push(
       `<path d="${shape}" fill="#000000" fill-opacity="0.32" transform="translate(0 ${n((plate.size / 824) * 10)})" filter="url(#${id}-shadow)"/>`,
@@ -120,42 +141,32 @@ export function icon(o: IconOptions): string {
   }
 
   const scene: string[] = []
-  if (o.glow) {
-    // The light the orb casts on the plate, then a bloom right behind the orb.
-    const reach = orb.r * k * 3.4
+  if (o.glow && background === 'dark') {
+    // The light it casts, centered on the middle of the light and reaching past the mark.
+    const cx = mark.x + GLOW.x * k
+    const cy = mark.y + GLOW.y * k
+    const reach = GLOW.r * k
     defs.push(
-      radialGradient(
-        `${id}-halo`,
-        { cx: orbX, cy: orbY, r: reach, userSpace: true },
-        background === 'dark'
-          ? [
-              [0, blue[400], 0.5],
-              [0.38, blue[500], 0.2],
-              [1, blue[500], 0],
-            ]
-          : [
-              [0, blue[300], 0.45],
-              [0.38, blue[300], 0.16],
-              [1, blue[300], 0],
-            ],
-      ),
-      `<filter id="${id}-bloom" x="-1" y="-1" width="3" height="3">\n  <feGaussianBlur stdDeviation="${n(orb.r * 0.42)}"/>\n</filter>`,
+      radialGradient(`${id}-halo`, { cx, cy, r: reach, userSpace: true }, [
+        [0, PAPER, 0.17],
+        [0.45, PAPER, 0.05],
+        [1, PAPER, 0],
+      ]),
     )
-    scene.push(`<circle cx="${n(orbX)}" cy="${n(orbY)}" r="${n(reach)}" fill="url(#${id}-halo)"/>`)
+    scene.push(`<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(reach)}" fill="url(#${id}-halo)"/>`)
   }
-  const shapesInMark = markShapes(p, g)
-  const bloom = o.glow
-    ? [
-        `<circle cx="${n(orb.cx)}" cy="${n(orb.cy)}" r="${n(orb.r)}" fill="${blue[300]}" fill-opacity="${background === 'dark' ? 0.85 : 0.6}" filter="url(#${id}-bloom)"/>`,
-      ]
-    : []
-  // The L first, then the bloom over it, then the orb.
-  const [lShape, orbShape] = shapesInMark
+  let markBody: string[]
+  if (background === 'dark') {
+    const lit = litMark(`${id}-mark`, g, Boolean(o.glow))
+    defs.push(...lit.defs)
+    markBody = lit.body
+  } else {
+    const { light, shade } = shapes(g)
+    markBody = [`<path d="${shade}" fill="${gray[300]}"/>`, `<path d="${light}" fill="${INK}"/>`]
+  }
   scene.push(
     `<g transform="translate(${n(mark.x)} ${n(mark.y)}) scale(${n(k, 5)})">`,
-    `  ${lShape}`,
-    ...bloom.map((line) => `  ${line}`),
-    `  ${orbShape}`,
+    ...markBody.map((line) => `  ${line}`),
     '</g>',
   )
 
@@ -176,27 +187,23 @@ export function icon(o: IconOptions): string {
       radius: plate.radius - w / 2,
     }
     body.push(
-      `<path d="${plateShape(inset)}" stroke="#ffffff" stroke-opacity="0.12" stroke-width="${n(w)}" fill="none"/>`,
+      `<path d="${plateShape(inset)}" stroke="${PAPER}" stroke-opacity="0.12" stroke-width="${n(w)}" fill="none"/>`,
     )
   }
 
-  return svg({
-    box: { x: 0, y: 0, width: size, height },
-    width: size,
-    height,
-    defs,
-    body,
-  })
+  return svg({ box: { x: 0, y: 0, width: size, height }, width: size, height, defs, body })
 }
 
 /**
  * macOS: Apple's grid. On a 1024 canvas, an 824 plate with continuous corners and room for
- * its shadow; the mark is 55% of the plate.
+ * its shadow; the mark is 440, a little over half the plate.
  */
+export const MACOS_MARK = 440
+
 export function macos(size: number, id = 'lumovi-icon'): string {
   const s = size / 1024
   const plate: Plate = { x: 100 * s, y: 100 * s, size: 824 * s, radius: 185.4 * s, smoothing: 0.6 }
-  const markSize = 452 * s
+  const markSize = MACOS_MARK * s
   return icon({
     id,
     size,
@@ -209,9 +216,8 @@ export function macos(size: number, id = 'lumovi-icon'): string {
 }
 
 /**
- * How big the mark is on a full-size plate, per pixel size: on whole pixels at small sizes
- * (with the tiny geometry at 16 and 20), where it's larger, and 56.25% of the plate from 128
- * up (on whole pixels at 128 and 256 too).
+ * How big the mark is on a full-size plate, per pixel size: larger at small sizes (with the
+ * narrow gap at 16 and 20), and 56.25% of the plate from 128 up.
  */
 export function fittedMark(size: number): { size: number; geometry: Geometry } {
   const table: Record<number, [number, Geometry]> = {
@@ -230,7 +236,7 @@ export function fittedMark(size: number): { size: number; geometry: Geometry } {
 
 /**
  * Windows and Linux: a plate edge to edge, as icons there are, with continuous corners.
- * Small sizes put the mark on whole pixels and leave the glow out.
+ * Small sizes leave the glow out.
  */
 export function plated(size: number, id = 'lumovi-icon'): string {
   const fit = fittedMark(size)
@@ -246,33 +252,28 @@ export function plated(size: number, id = 'lumovi-icon'): string {
   })
 }
 
-/** A square of night with the mark: for iOS and Android, which round the corners themselves. */
+/** A square of graphite with the mark: for iOS and Android, which round the corners themselves. */
 export function filled(size: number, markRatio: number, id = 'lumovi-icon'): string {
   const markSize = size * markRatio
   const offset = (size - markSize) / 2
-  return icon({
-    id,
-    size,
-    fill: true,
-    mark: { x: offset, y: offset, size: markSize },
-    glow: true,
-  })
+  return icon({ id, size, fill: true, mark: { x: offset, y: offset, size: markSize }, glow: true })
 }
 
 /**
- * macOS 26's Liquid Glass icon, for Icon Composer and Xcode: the night as the icon's fill, and
- * the L and the orb as two glass layers the system lights, tints and shadows itself (in light,
- * dark, clear and tinted appearances). The system masks the canvas to its shape, so the
- * layers are drawn on the whole canvas, and the mark is the same share of it as of the
- * plate in macos().
+ * macOS 26's Liquid Glass icon, for Icon Composer and Xcode: graphite as the icon's fill, the
+ * light and the shade as glass layers the system lights, tints and shadows itself (in light,
+ * dark, clear and tinted appearances), and the light's glow behind them. The system masks the
+ * canvas to its shape, so the layers are drawn on the whole canvas, with the mark the same
+ * share of it as of the plate in macos().
  */
 export function liquidGlass(): { json: string; layers: Record<string, string> } {
   const size = 1024
-  const markSize = (452 / 824) * size
+  const markSize = (MACOS_MARK / 824) * size
   const offset = (size - markSize) / 2
   const k = markSize / GRID
-  const { l, orb } = shapes()
-  const layer = (defs: string[], shape: string) =>
+  const { light, shade } = shapes()
+  const lit = litMark('lumovi', standard, false)
+  const layer = (defs: string[], content: string) =>
     svg({
       box: { x: 0, y: 0, width: size, height: size },
       width: size,
@@ -280,12 +281,10 @@ export function liquidGlass(): { json: string; layers: Record<string, string> } 
       defs,
       body: [
         `<g transform="translate(${n(offset)} ${n(offset)}) scale(${n(k, 5)})">`,
-        `  ${shape}`,
+        `  ${content}`,
         '</g>',
       ],
     })
-  const p = paint('color', 'dark', 'lumovi')
-  const [lDefs, orbDefs] = p.defs
   const color = (hex: string) =>
     `extended-srgb:${[1, 3, 5].map((i) => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(5)).join(',')},1.00000`
   const group = (name: string, image: string, glass: boolean, translucency: number) => ({
@@ -298,11 +297,10 @@ export function liquidGlass(): { json: string; layers: Record<string, string> } 
       'linear-gradient': [color(PLATE_STOPS[0]), color(PLATE_STOPS[1])],
       orientation: { start: { x: 0.5, y: 0 }, stop: { x: 0.5, y: 1 } },
     },
-    // Front to back: the orb, solid so it stays bright; the L, glass; and the orb's light on
-    // the night behind them.
+    // Front to back: the light, solid so it stays bright; the shade, glass; and the glow.
     groups: [
-      group('Orb', 'orb.svg', true, 0),
-      group('L', 'l.svg', true, 0.4),
+      group('Light', 'light.svg', true, 0),
+      group('Shade', 'shade.svg', true, 0.4),
       { ...group('Glow', 'glow.svg', false, 0), shadow: { kind: 'none', opacity: 0 } },
     ],
     'supported-platforms': { squares: ['macOS'] },
@@ -310,20 +308,17 @@ export function liquidGlass(): { json: string; layers: Record<string, string> } 
   return {
     json: JSON.stringify(json, null, 2),
     layers: {
-      'l.svg': layer([lDefs!], `<path d="${l}" fill="${p.l}"/>`),
-      'orb.svg': layer(
-        [orbDefs!],
-        `<circle cx="${n(orb.cx)}" cy="${n(orb.cy)}" r="${n(orb.r)}" fill="${p.orb}"/>`,
-      ),
+      'light.svg': layer([lit.defs[0]!], `<path d="${light}" fill="url(#lumovi-light)"/>`),
+      'shade.svg': layer([lit.defs[1]!], `<path d="${shade}" fill="url(#lumovi-shade)"/>`),
       'glow.svg': layer(
         [
           radialGradient('lumovi-glow', { cx: 0.5, cy: 0.5, r: 0.5 }, [
-            [0, blue[400], 0.55],
-            [0.38, blue[500], 0.22],
-            [1, blue[500], 0],
+            [0, PAPER, 0.3],
+            [0.45, PAPER, 0.08],
+            [1, PAPER, 0],
           ]),
         ],
-        `<circle cx="${n(orb.cx)}" cy="${n(orb.cy)}" r="${n(orb.r * 3.4)}" fill="url(#lumovi-glow)"/>`,
+        `<circle cx="${GLOW.x}" cy="${GLOW.y}" r="${GLOW.r}" fill="url(#lumovi-glow)"/>`,
       ),
     },
   }

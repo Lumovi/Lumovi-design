@@ -2,7 +2,7 @@
 // avatar, and a header for X, Bluesky and Mastodon.
 import { address, description, site, tagline } from '../../src/brand.ts'
 import { filled } from '../../src/icon.ts'
-import { document, VARIANTS, wordmarkOnly } from '../../src/logo.ts'
+import { document, horizontal, VARIANTS } from '../../src/logo.ts'
 import { headline, palette, scene, type Theme } from '../../src/scene.ts'
 import { escape } from '../../src/svg.ts'
 import { renderHtml, renderSvg } from '../lib/render.ts'
@@ -21,12 +21,12 @@ interface Card {
   titleSize: number
   /** The address the card is for, as people read it. */
   url: string
-  /** Leave out the wordmark, and center the copy higher: for headers an avatar overlaps. */
+  /** Leave out the logo, and center the copy higher: for headers an avatar overlaps. */
   header?: boolean
 }
 
 /**
- * A card: the wordmark top left, a title and a line under it, and the mark on its floor to the
+ * A card: the logo top left, a title and a line under it, and the mark on its floor to the
  * right. Laid out from the card's height, so wide banners and social cards share proportions.
  */
 function card({
@@ -41,22 +41,22 @@ function card({
 }: Card): string {
   const u = H / 630
   const pad = 64 * u
-  const markSize = Math.min(330 * u, W * 0.3)
+  const markSize = Math.min(290 * u, W * 0.26)
   const variant = VARIANTS.find((v) => v.name === (theme === 'dark' ? 'on-dark' : 'on-light'))!
-  const wordmark = document(wordmarkOnly(variant), 34 * u)
+  const logo = document(horizontal(variant), 34 * u)
   const c = palette[theme]
   return scene({
     width: W,
     height: H,
     theme,
-    mark: { x: W - pad - markSize - 16 * u, y: (H - markSize) / 2 - 10 * u, size: markSize },
+    mark: { x: W - pad - markSize - 28 * u, y: (H - markSize) / 2 - 18 * u, size: markSize },
     floor: { fadeLeft: true },
     css: `
-      .wordmark { position: absolute; left: ${pad}px; top: ${60 * u}px; }
-      .wordmark svg { display: block; }
+      .logo { position: absolute; left: ${pad}px; top: ${60 * u}px; }
+      .logo svg { display: block; }
       .url {
         position: absolute;
-        right: ${pad + 16 * u}px;
+        right: ${pad + 28 * u}px;
         top: ${77 * u}px;
         transform: translateY(-50%);
         font-size: ${19 * u}px;
@@ -96,7 +96,7 @@ function card({
         text-wrap: balance;
       }`,
     content: `
-      ${header ? '' : `<div class="wordmark">${wordmark}</div><div class="url">${escape(url)}</div>`}
+      ${header ? '' : `<div class="logo">${logo}</div><div class="url">${escape(url)}</div>`}
       <div class="copy">
         <h1>${headline(title, theme)}</h1>
         ${lead ? `<p>${escape(lead)}</p>` : ''}

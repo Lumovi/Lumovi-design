@@ -1,79 +1,76 @@
 /**
- * The mark, moving: an intro (the L rises into place, then the orb lights up) for splash
- * screens and the website, and a loading mark (the orb breathes) for while the app waits.
+ * The mark, moving: an intro (the square settles, then the light sweeps across it from its
+ * corner) for splash screens and the website, and a loading mark (the light breathes) for
+ * while the app waits.
  *
  * Plain SVG with CSS animations, so they play in an <img> as well as inline. Both hold still
  * for people who ask for reduced motion: the intro shows its last frame, the loading mark a
- * steady orb.
+ * steady light.
  */
-import { blue } from './colors.ts'
-import { GRID, markShapes, paint, shapes, type Background } from './mark.ts'
-import { n, svg } from './svg.ts'
+import { PAPER } from './colors.ts'
+import { GRID, paint, shapes, type Background } from './mark.ts'
+import { svg } from './svg.ts'
 
 const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'
+/** The canvas reaches past the mark, so its glow has room. */
+const PAD = 6
+/** The middle of the light, and its glow: out to the canvas's edge, and no further. */
+const GLOW = { x: 13, y: 35, r: 13 + PAD }
 
-function base(background: Background, id: string, css: string, glow: boolean) {
-  const p = paint('color', background, id)
-  const [l, orb] = markShapes(p)
-  const { orb: o } = shapes()
-  // A soft light around the orb, out to the canvas's edge (and no further, or it shows one).
-  const pad = 6
-  const reach = Math.min(GRID + pad - o.cx, o.cy + pad)
+function base(background: Background, id: string, css: string): string {
+  const p = paint('color', background)
+  const { light, shade, origin } = shapes()
+  const glow = background === 'dark'
   return svg({
-    box: { x: -pad, y: -pad, width: GRID + pad * 2, height: GRID + pad * 2 },
+    box: { x: -PAD, y: -PAD, width: GRID + PAD * 2, height: GRID + PAD * 2 },
     width: 128,
     height: 128,
     title: 'Lumovi',
     defs: [
-      ...p.defs,
-      `<radialGradient id="${id}-glow"><stop offset="0" stop-color="${background === 'dark' ? blue[300] : blue[400]}" stop-opacity="0.55"/><stop offset="1" stop-color="${blue[400]}" stop-opacity="0"/></radialGradient>`,
+      `<radialGradient id="${id}-glow"><stop offset="0" stop-color="${PAPER}" stop-opacity="0.35"/><stop offset="1" stop-color="${PAPER}" stop-opacity="0"/></radialGradient>`,
       // Class and animation names start with the id, so the CSS can't reach other SVGs inline.
-      `<style>\n${css.trim().replaceAll('@ID', id)}\n</style>`,
+      `<style>\n${css
+        .trim()
+        .replaceAll('@ID', id)
+        .replaceAll('@ORIGIN', `${origin.x}px ${origin.y}px`)}\n</style>`,
     ],
     body: [
       ...(glow
         ? [
-            `<circle class="${id}-glow" cx="${n(o.cx)}" cy="${n(o.cy)}" r="${n(reach)}" fill="url(#${id}-glow)"/>`,
+            `<circle class="${id}-glow" cx="${GLOW.x}" cy="${GLOW.y}" r="${GLOW.r}" fill="url(#${id}-glow)"/>`,
           ]
         : []),
-      l!.replace('<path ', `<path class="${id}-l" `),
-      orb!.replace('<circle ', `<circle class="${id}-orb" `),
+      `<path class="${id}-shade" d="${shade}" fill="${p.shade}"/>`,
+      `<path class="${id}-light" d="${light}" fill="${p.light}"/>`,
     ],
   })
 }
 
 /** Plays once, in a little over a second. */
 export function intro(background: Background, id: string): string {
-  const { orb } = shapes()
-  const origin = `${n(orb.cx)}px ${n(orb.cy)}px`
   return base(
     background,
     id,
     `
-.@ID-l { animation: @ID-rise 900ms ${EASE_OUT} both; }
-.@ID-orb { transform-origin: ${origin}; animation: @ID-light 900ms ${EASE_OUT} 280ms both; }
-.@ID-glow { transform-origin: ${origin}; animation: @ID-bloom 1400ms ${EASE_OUT} 380ms both; }
-@keyframes @ID-rise { from { opacity: 0; transform: translate(-3px, 6px); } }
-@keyframes @ID-light { from { opacity: 0; transform: scale(0.6); } }
-@keyframes @ID-bloom { from { opacity: 0; transform: scale(0.4); } }
-@media (prefers-reduced-motion: reduce) { .@ID-l, .@ID-orb, .@ID-glow { animation: none; } }`,
-    true,
+.@ID-shade { transform-origin: 24px 24px; animation: @ID-settle 700ms ${EASE_OUT} both; }
+.@ID-light { transform-origin: @ORIGIN; animation: @ID-sweep 900ms ${EASE_OUT} 250ms both; }
+.@ID-glow { transform-origin: @ORIGIN; animation: @ID-sweep 1200ms ${EASE_OUT} 350ms both; }
+@keyframes @ID-settle { from { opacity: 0; transform: scale(0.94); } }
+@keyframes @ID-sweep { from { opacity: 0; transform: scale(0.2); } }
+@media (prefers-reduced-motion: reduce) { .@ID-shade, .@ID-light, .@ID-glow { animation: none; } }`,
   )
 }
 
-/** Loops: the orb breathes, about once every two seconds. */
+/** Loops: the light breathes, about once every two seconds. */
 export function loading(background: Background, id: string): string {
-  const { orb } = shapes()
-  const origin = `${n(orb.cx)}px ${n(orb.cy)}px`
   return base(
     background,
     id,
     `
-.@ID-orb { transform-origin: ${origin}; animation: @ID-breathe 2.2s ease-in-out infinite; }
-.@ID-glow { transform-origin: ${origin}; animation: @ID-glow 2.2s ease-in-out infinite; }
-@keyframes @ID-breathe { 50% { transform: scale(0.86); } }
-@keyframes @ID-glow { 50% { opacity: 0.25; transform: scale(0.8); } }
-@media (prefers-reduced-motion: reduce) { .@ID-orb, .@ID-glow { animation: none; } }`,
-    true,
+.@ID-light { transform-origin: @ORIGIN; animation: @ID-breathe 2.2s ease-in-out infinite; }
+.@ID-glow { transform-origin: @ORIGIN; animation: @ID-glow 2.2s ease-in-out infinite; }
+@keyframes @ID-breathe { 50% { transform: scale(0.8); } }
+@keyframes @ID-glow { 50% { opacity: 0.3; transform: scale(0.8); } }
+@media (prefers-reduced-motion: reduce) { .@ID-light, .@ID-glow { animation: none; } }`,
   )
 }

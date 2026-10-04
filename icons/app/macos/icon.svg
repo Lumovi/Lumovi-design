@@ -1,19 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
-    <radialGradient id="lumovi-icon-mark-l" cx="33" cy="15" r="38" gradientUnits="userSpaceOnUse">
-      <stop offset="0.553" stop-color="#8cc2ff"/>
-      <stop offset="0.76" stop-color="#3987e5"/>
-      <stop offset="1" stop-color="#1c5cab"/>
-    </radialGradient>
-    <radialGradient id="lumovi-icon-mark-orb" cx="0.36" cy="0.32" r="0.78">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.3" stop-color="#eff7ff"/>
-      <stop offset="0.72" stop-color="#8cc2ff"/>
-      <stop offset="1" stop-color="#3987e5"/>
-    </radialGradient>
     <linearGradient id="lumovi-icon-plate" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1d2b4f"/>
-      <stop offset="1" stop-color="#0a0f1f"/>
+      <stop offset="0" stop-color="#404040"/>
+      <stop offset="1" stop-color="#0a0a0a"/>
     </linearGradient>
     <filter id="lumovi-icon-shadow" x="-10%" y="-10%" width="120%" height="125%">
       <feGaussianBlur stdDeviation="12"/>
@@ -21,23 +10,36 @@
     <clipPath id="lumovi-icon-clip">
       <path d="M627.36 100c103.834 0 155.751 0 195.41 20.207a185.4 185.4 0 0 1 81.023 81.023c20.207 39.659 20.207 91.576 20.207 195.41L924 627.36c0 103.834 0 155.751 -20.207 195.41a185.4 185.4 0 0 1 -81.023 81.023c-39.659 20.207 -91.576 20.207 -195.41 20.207L396.64 924c-103.834 0 -155.751 0 -195.41 -20.207a185.4 185.4 0 0 1 -81.023 -81.023c-20.207 -39.659 -20.207 -91.576 -20.207 -195.41L100 396.64c0 -103.834 0 -155.751 20.207 -195.41a185.4 185.4 0 0 1 81.023 -81.023c39.659 -20.207 91.576 -20.207 195.41 -20.207Z"/>
     </clipPath>
-    <radialGradient id="lumovi-icon-halo" cx="596.75" cy="427.25" r="480.25" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#5ea2f0" stop-opacity="0.5"/>
-      <stop offset="0.38" stop-color="#3987e5" stop-opacity="0.2"/>
-      <stop offset="1" stop-color="#3987e5" stop-opacity="0"/>
+    <radialGradient id="lumovi-icon-halo" cx="411.167" cy="612.833" r="421.667" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.17"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
-    <filter id="lumovi-icon-bloom" x="-1" y="-1" width="3" height="3">
-      <feGaussianBlur stdDeviation="6.3"/>
+    <radialGradient id="lumovi-icon-mark-light" cx="0" cy="48" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#efefef"/>
+    </radialGradient>
+    <radialGradient id="lumovi-icon-mark-shade" cx="0" cy="48" r="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0.529" stop-color="#ffffff" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.13"/>
+    </radialGradient>
+    <filter id="lumovi-icon-mark-bloom" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.4"/>
     </filter>
+    <clipPath id="lumovi-icon-mark-square">
+      <path d="M12 0H36A12 12 0 0 1 48 12V36A12 12 0 0 1 36 48H12A12 12 0 0 1 0 36V12A12 12 0 0 1 12 0Z"/>
+    </clipPath>
   </defs>
   <path d="M627.36 100c103.834 0 155.751 0 195.41 20.207a185.4 185.4 0 0 1 81.023 81.023c20.207 39.659 20.207 91.576 20.207 195.41L924 627.36c0 103.834 0 155.751 -20.207 195.41a185.4 185.4 0 0 1 -81.023 81.023c-39.659 20.207 -91.576 20.207 -195.41 20.207L396.64 924c-103.834 0 -155.751 0 -195.41 -20.207a185.4 185.4 0 0 1 -81.023 -81.023c-20.207 -39.659 -20.207 -91.576 -20.207 -195.41L100 396.64c0 -103.834 0 -155.751 20.207 -195.41a185.4 185.4 0 0 1 81.023 -81.023c39.659 -20.207 91.576 -20.207 195.41 -20.207Z" fill="#000000" fill-opacity="0.32" transform="translate(0 10)" filter="url(#lumovi-icon-shadow)"/>
   <path d="M627.36 100c103.834 0 155.751 0 195.41 20.207a185.4 185.4 0 0 1 81.023 81.023c20.207 39.659 20.207 91.576 20.207 195.41L924 627.36c0 103.834 0 155.751 -20.207 195.41a185.4 185.4 0 0 1 -81.023 81.023c-39.659 20.207 -91.576 20.207 -195.41 20.207L396.64 924c-103.834 0 -155.751 0 -195.41 -20.207a185.4 185.4 0 0 1 -81.023 -81.023c-20.207 -39.659 -20.207 -91.576 -20.207 -195.41L100 396.64c0 -103.834 0 -155.751 20.207 -195.41a185.4 185.4 0 0 1 81.023 -81.023c39.659 -20.207 91.576 -20.207 195.41 -20.207Z" fill="url(#lumovi-icon-plate)"/>
   <g clip-path="url(#lumovi-icon-clip)">
-    <circle cx="596.75" cy="427.25" r="480.25" fill="url(#lumovi-icon-halo)"/>
-    <g transform="translate(286 286) scale(9.41667)">
-      <path d="M0 15V6A6 6 0 0 1 12 6V15A21 21 0 0 0 33 36H42A6 6 0 0 1 42 48H21A21 21 0 0 1 0 27Z" fill="url(#lumovi-icon-mark-l)"/>
-      <circle cx="33" cy="15" r="15" fill="#8cc2ff" fill-opacity="0.85" filter="url(#lumovi-icon-bloom)"/>
-      <circle cx="33" cy="15" r="15" fill="url(#lumovi-icon-mark-orb)"/>
+    <circle cx="411.167" cy="612.833" r="421.667" fill="url(#lumovi-icon-halo)"/>
+    <g transform="translate(292 292) scale(9.16667)">
+      <path d="M0 12A12 12 0 0 1 12 0H36A12 12 0 0 1 48 12V36A12 12 0 0 1 36 48A36 36 0 0 0 0 12Z" fill="url(#lumovi-icon-mark-shade)"/>
+      <g clip-path="url(#lumovi-icon-mark-square)">
+        <path d="M0 18V36A12 12 0 0 0 12 48H30A30 30 0 0 0 0 18Z" fill="#ffffff" fill-opacity="0.6" filter="url(#lumovi-icon-mark-bloom)"/>
+      </g>
+      <path d="M0 18V36A12 12 0 0 0 12 48H30A30 30 0 0 0 0 18Z" fill="url(#lumovi-icon-mark-light)"/>
     </g>
   </g>
   <path d="M628.184 101.373c103.065 0 154.597 0 193.962 20.058a184.027 184.027 0 0 1 80.423 80.423c20.058 39.365 20.058 90.898 20.058 193.962L922.627 628.184c0 103.065 0 154.597 -20.058 193.962a184.027 184.027 0 0 1 -80.423 80.423c-39.365 20.058 -90.898 20.058 -193.962 20.058L395.816 922.627c-103.065 0 -154.597 0 -193.962 -20.058a184.027 184.027 0 0 1 -80.423 -80.423c-20.058 -39.365 -20.058 -90.898 -20.058 -193.962L101.373 395.816c0 -103.065 0 -154.597 20.058 -193.962a184.027 184.027 0 0 1 80.423 -80.423c39.365 -20.058 90.898 -20.058 193.962 -20.058Z" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2.747" fill="none"/>
