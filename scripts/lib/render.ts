@@ -9,9 +9,17 @@ import sharp from 'sharp'
 let browser: Promise<Browser> | undefined
 const scratch = mkdtempSync(join(tmpdir(), 'lumovi-'))
 
+/**
+ * Rasterize on the CPU, in one thread: large pictures with blurs otherwise come out a little
+ * different from one run to the next, and the same source should make the same file.
+ */
+const ARGS = ['--disable-gpu', '--num-raster-threads=1', '--disable-partial-raster']
+
 /** The installed Google Chrome, or Playwright's Chromium where there's none (as in CI). */
 function launch(): Promise<Browser> {
-  browser ??= chromium.launch({ channel: 'chrome' }).catch(() => chromium.launch())
+  browser ??= chromium
+    .launch({ channel: 'chrome', args: ARGS })
+    .catch(() => chromium.launch({ args: ARGS }))
   return browser
 }
 

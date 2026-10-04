@@ -252,7 +252,7 @@ function misuse(): string {
     ${t(lockup('filter:drop-shadow(0 6px 6px rgb(0 0 0 / 0.45))'), 'Add shadows or effects')}
     ${t(outlined, 'Outline it')}
     ${t(logo('mark', 'on-light', 70, 'transform:scaleX(-1)'), 'Flip the mark')}
-    ${t(`<div style="display:flex;align-items:center;gap:12px">${logo('mark', 'on-light', 36)}<span style="font:italic 600 38px Georgia,serif;letter-spacing:-0.01em">Lumovi</span></div>`, 'Set the name in another type')}
+    ${t(`<div style="display:flex;align-items:center;gap:12px">${logo('mark', 'on-light', 36)}<span style="font-family:'JetBrains Mono';font-size:36px;font-weight:500;letter-spacing:-0.02em">Lumovi</span></div>`, 'Set the name in another type')}
     ${t(lockup('', 'on-light'), 'Put it where it gets lost', gray[600])}
   </div>`)
 }
