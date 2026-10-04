@@ -19,15 +19,16 @@ docs.**
 
 </div>
 
-<img src="guidelines/images/cover.png" alt="The Lumovi logo, glowing over a floor of dots." />
+<img src="guidelines/images/cover.png" alt="The Lumovi logo, its light glowing over a floor of dots." />
 
 [Lumovi](https://lumovi.dev) is a beautiful, fast Kubernetes dashboard, on your desktop or in
 your cluster. It was called KubeStacks. This repository is the source of everything it looks like: every asset is
 built from a few files in [`src/`](src), so they all agree, and you can grab whatever you need
 from the folders below.
 
-**The idea.** Lumovi is _lumen_ and _view_. The mark is the corner of a view, an **L**, holding
-an **orb of light**; together they're also **Lo**, the start of the name. Read more in the
+**The idea.** Lumovi is _lumen_ and _view_. The mark, **Sweep**, is a square with **light
+sweeping across it** from one corner, the way Lumovi takes in a whole cluster at a glance. It's
+drawn only from circles, in black, white and gray. Read more in the
 [brand guidelines](guidelines/README.md).
 
 ## What's here
@@ -50,14 +51,12 @@ an **orb of light**; together they're also **Lo**, the start of the name. Read m
 Files are named `lumovi-<kind>-<version>`, in [`logo/svg/`](logo/svg) and
 [`logo/png/`](logo/png):
 
-| Kind           | What                                      |     | Version         | For                                  |
-| -------------- | ----------------------------------------- | --- | --------------- | ------------------------------------ |
-| `logo`         | The mark beside the wordmark: the default |     | `on-dark`       | Color, on dark backgrounds           |
-| `logo-stacked` | The mark above the wordmark               |     | `on-light`      | Color, on light backgrounds          |
-| `mark`         | The mark alone                            |     | `flat-on-dark`  | Without gradients, on dark           |
-| `wordmark`     | The name alone                            |     | `flat-on-light` | Without gradients, on light          |
-|                |                                           |     | `white`         | One color, on photos and Lumovi Blue |
-|                |                                           |     | `black`         | One color, for print                 |
+| Kind           | What                                      |     | Version    | For                               |
+| -------------- | ----------------------------------------- | --- | ---------- | --------------------------------- |
+| `logo`         | The mark beside the wordmark: the default |     | `on-dark`  | Two tones, on dark backgrounds    |
+| `logo-stacked` | The mark above the wordmark               |     | `on-light` | Two tones, on light backgrounds   |
+| `mark`         | The mark alone                            |     | `white`    | One color, on photos and the blue |
+| `wordmark`     | The name alone (`white` and `black`)      |     | `black`    | One color, for print              |
 
 In a README, switch between them with the reader's theme:
 
@@ -69,7 +68,8 @@ In a README, switch between them with the reader's theme:
 ```
 
 [`logo/animated/`](logo/animated) has the mark moving, for splash screens and loading states:
-an intro that plays once, and a loading mark whose orb breathes. Both hold still for people who
+an intro that plays once (the square settles and the light sweeps across it), and a loading
+mark whose light breathes. Both hold still for people who
 ask for reduced motion.
 
 ## App icons
@@ -132,6 +132,7 @@ And in the docs' `docs.json`:
 
 ```json
 "colors": { "primary": "#2675d3", "light": "#5ea2f0", "dark": "#2675d3" },
+"background": { "color": { "light": "#ffffff", "dark": "#0a0a0a" } },
 "logo": { "light": "/logo/light.svg", "dark": "/logo/dark.svg", "href": "https://lumovi.dev" },
 "favicon": "/favicon.svg",
 "seo": { "metatags": { "og:image": "https://docs.lumovi.dev/og.png" } }
@@ -141,18 +142,20 @@ And in the docs' `docs.json`:
 
 <img src="guidelines/images/palette.png" alt="The palette." />
 
-| Color           | Hex       |     | Color     | Hex       |
-| --------------- | --------- | --- | --------- | --------- |
-| **Lumovi Blue** | `#2675d3` |     | **Night** | `#0a0f1f` |
-| **Daylight**    | `#3987e5` |     | **Ink**   | `#0b0b0f` |
-| **Lumen**       | `#8cc2ff` |     | **Paper** | `#ffffff` |
+| Color        | Hex       |     | Color     | Hex       |
+| ------------ | --------- | --- | --------- | --------- |
+| **Ink**      | `#0a0a0a` |     | **Mist**  | `#d4d4d4` |
+| **Graphite** | `#262626` |     | **Paper** | `#ffffff` |
+| **Silver**   | `#a3a3a3` |     | **Blue**  | `#2675d3` |
+
+Black, white and true neutral grays carry the brand. Blue is only for what you can act on.
 
 [`colors/`](colors) has them in every form:
 
-- **`tokens.css`**: the palette (`--lumovi-blue-600`, …) and the app's semantic tokens
+- **`tokens.css`**: the palette (`--lumovi-gray-950`, `--lumovi-blue-600`, …) and the app's semantic tokens
   (`--surface`, `--text-1`, `--accent`, …) for light and dark. Dark follows the system unless
   `data-theme` on `<html>` says otherwise, as in the app.
-- **`tailwind.css`**: the palette as Tailwind CSS v4 colors (`bg-lumovi-blue-600`).
+- **`tailwind.css`**: the palette as Tailwind CSS v4 colors (`bg-lumovi-gray-950`).
 - **`tokens.json`**: design tokens in the W3C format, for Figma plugins and Style Dictionary.
 - **`lumovi.ase`** and **`lumovi.gpl`**: swatches for Adobe apps, and for GIMP and Inkscape.
 
@@ -194,15 +197,15 @@ npm run check                  # whether those are up to date with src/, as CI c
 Images are rendered with Chrome, through Playwright: your Google Chrome if you have it, or
 Playwright's Chromium (`npx playwright install chromium`). Node.js 24 or later.
 
-| Source                               | What it defines                                              |
-| ------------------------------------ | ------------------------------------------------------------ |
-| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                      |
-| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                     |
-| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Outfit SemiBold, with its spacing and dot |
-| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                               |
-| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                    |
-| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers       |
-| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                                |
+| Source                               | What it defines                                             |
+| ------------------------------------ | ----------------------------------------------------------- |
+| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                     |
+| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                    |
+| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Inter Display Semibold, with its spacing |
+| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                              |
+| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                   |
+| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers      |
+| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                               |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to propose a change.
 
