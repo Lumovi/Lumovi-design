@@ -6,6 +6,10 @@ How Lumovi looks, and how to use its logo, colors and type, whether you're worki
 the website or the docs, or writing about Lumovi elsewhere. Every file mentioned here is in this
 repository; the [README](../README.md#whats-here) says where each one goes.
 
+**[The brand book (PDF, 64 pages)](lumovi-brand-guidelines.pdf)** has all of this in more detail,
+laid out to read on screen or to print: construction, proportions, every version, color
+values and contrast, the type scale, the app icon's anatomy, imagery, motion and voice.
+
 - [The idea](#the-idea)
 - [The logo](#the-logo)
 - [Using the logo](#using-the-logo)

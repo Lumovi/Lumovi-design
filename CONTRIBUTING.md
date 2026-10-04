@@ -35,6 +35,8 @@ commit both.
 - `src/icon.ts`: the app icons for each platform and size, and the Liquid Glass icon.
 - `src/scene.ts`: the brand's imagery: social cards, banners, wallpapers.
 - `src/animation.ts`: the animated marks.
+- `src/book/`: the brand book (the PDF in `guidelines/`), a module per section. Its pages are
+  HTML, printed with Chrome; render them to look at while you work on them.
 
 A new kind of asset is a new task: a file in `scripts/tasks/` that default-exports a `Task`
 (its name, the folders it owns, and a `build` function). Tasks run in file-name order.

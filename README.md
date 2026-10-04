@@ -11,7 +11,7 @@
 **Lumovi's brand: the logo, app icons, colors, type and media for the app, the website and the
 docs.**
 
-[**Guidelines**](guidelines/README.md) · [Logo](#logo) · [App icons](#app-icons) ·
+[**Guidelines**](guidelines/README.md) · [**Brand book (PDF)**](guidelines/lumovi-brand-guidelines.pdf) · [Logo](#logo) · [App icons](#app-icons) ·
 [Colors](#colors) · [Social](#social-and-github) · [Media](#media) ·
 [Building](#building-the-assets)
 
@@ -42,7 +42,7 @@ drawn only from circles, in black, white and gray. Read more in the
 | [`social/`](social)         | Link previews, GitHub's social previews and profile banner, an avatar and a header          |
 | [`media/`](media)           | Wallpapers, and the installers' artwork (macOS disk image, Windows installer)               |
 | [`snippets/`](snippets)     | The mark as a React and an Astro component, and the HTML `<head>` tags for the icons        |
-| [`guidelines/`](guidelines) | How to use all of it                                                                        |
+| [`guidelines/`](guidelines) | How to use all of it, online and as a 64-page brand book (PDF)                              |
 
 ## Logo
 
@@ -205,6 +205,7 @@ Playwright's Chromium (`npx playwright install chromium`). Node.js 24 or later.
 | [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                              |
 | [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                   |
 | [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers      |
+| [`src/book/`](src/book)              | The brand book, page by page                                |
 | [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                               |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to propose a change.
