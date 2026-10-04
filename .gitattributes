@@ -6,6 +6,7 @@
 *.icns binary
 *.bmp binary
 *.ase binary
+*.pdf binary
 *.woff binary
 *.woff2 binary
 # Everything outside src/ and scripts/ is built from them (npm run build).
@@ -15,4 +16,5 @@ icons/** linguist-generated=true
 social/** linguist-generated=true
 media/** linguist-generated=true
 guidelines/images/** linguist-generated=true
+guidelines/*.pdf linguist-generated=true
 snippets/** linguist-generated=true

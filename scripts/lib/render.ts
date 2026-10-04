@@ -36,6 +36,8 @@ export interface RenderOptions {
   scale?: number
   /** Keep transparency (the default); false renders on the page's own background. */
   transparent?: boolean
+  /** JavaScript to run in the page before it's captured, such as pausing its animations. */
+  prepare?: string
 }
 
 /** Renders an HTML page to PNG bytes. */
@@ -52,6 +54,7 @@ export async function renderHtml(html: string, options: RenderOptions): Promise<
     writeFileSync(file, html)
     await page.goto(`file://${file}`)
     await page.evaluate(() => document.fonts.ready)
+    if (options.prepare) await page.evaluate(options.prepare)
     if (options.height === 'fit') {
       return await page.screenshot({ omitBackground: transparent, fullPage: true })
     }
@@ -59,6 +62,35 @@ export async function renderHtml(html: string, options: RenderOptions): Promise<
       omitBackground: transparent,
       clip: { x: 0, y: 0, width, height: options.height },
     })
+  } finally {
+    await page.close()
+  }
+}
+
+/**
+ * Prints an HTML document to PDF, at the page size its CSS sets, with an outline from its
+ * headings. Chrome stamps the time it was made; that's set to a fixed date, so the same
+ * document makes the same file.
+ */
+export async function renderPdf(html: string): Promise<Buffer> {
+  const page = await (await launch()).newPage()
+  try {
+    const file = join(scratch, `${Math.random().toString(36).slice(2)}.html`)
+    writeFileSync(file, html)
+    await page.goto(`file://${file}`, { waitUntil: 'load' })
+    await page.evaluate(() => document.fonts.ready)
+    const pdf = await page.pdf({
+      preferCSSPageSize: true,
+      printBackground: true,
+      outline: true,
+      tagged: true,
+    })
+    return Buffer.from(
+      pdf
+        .toString('latin1')
+        .replace(/\(D:\d{14}[^)]*\)/g, (stamp) => stamp.replace(/\d{14}/, '20260101000000')),
+      'latin1',
+    )
   } finally {
     await page.close()
   }
