@@ -6,7 +6,7 @@ How Lumovi looks, and how to use its logo, colors and type, whether you're worki
 the website or the docs, or writing about Lumovi elsewhere. Every file mentioned here is in this
 repository; the [README](../README.md#whats-here) says where each one goes.
 
-**[The brand book (PDF, 64 pages)](lumovi-brand-guidelines.pdf)** has all of this in more detail,
+**[The brand book (PDF, 65 pages)](lumovi-brand-guidelines.pdf)** has all of this in more detail,
 laid out to read on screen or to print: construction, proportions, every version, color
 values and contrast, the type scale, the app icon's anatomy, imagery, motion and voice.
 
@@ -15,6 +15,7 @@ values and contrast, the type scale, the app icon's anatomy, imagery, motion and
 - [Using the logo](#using-the-logo)
 - [The app icon](#the-app-icon)
 - [Color](#color)
+- [Status](#status)
 - [Typography](#typography)
 - [Imagery](#imagery)
 - [Writing about Lumovi](#writing-about-lumovi)
@@ -131,7 +132,7 @@ running text.
 | ------------ | --------- | ---------------------------------------------------- |
 | **Ink**      | `#0a0a0a` | Text, the logo, and the light in the mark on light.  |
 | **Graphite** | `#262626` | Dark surfaces, and the app icon.                     |
-| **Silver**   | `#a3a3a3` | Quieter text, and the second line of headlines.      |
+| **Silver**   | `#a3a3a3` | Quieter text on dark backgrounds.                    |
 | **Mist**     | `#d4d4d4` | Lines, and the mark's shade on light.                |
 | **Paper**    | `#ffffff` | Light surfaces, and the logo on dark.                |
 | **Blue**     | `#2675d3` | Only for what you can act on: links, buttons, focus. |
@@ -140,15 +141,62 @@ The brand is black, white and gray: **true neutral grays**, without a tint, the 
 Apple present themselves. Color is kept for meaning.
 
 - **Blue** is for what you can act on (links, buttons, focus and selection), as in Apple's
-  interfaces. It isn't the brand: never color the logo with it. Text in it, and white text on
-  it, reach 4.5:1 on white (WCAG AA); for small text on tinted backgrounds, use Blue 700.
-- **Status colors** are the app's, and say how things are: good, warning, serious, critical.
-  They always come with a word or an icon, never alone, and never decorate.
+  interfaces. It isn't the brand: never color the logo with it. Blue 600 (`--accent`) is for
+  fills, rings and icons, and white text on it reaches 4.60:1. Blue words use `--accent-strong`
+  (Blue 700 on light, 400 on dark), which reaches 4.5:1 on every surface; Blue 600 is only
+  4.00:1 on gray 150.
+- **Text** reaches 4.5:1 on every surface of its theme (WCAG AA). Quiet text (`--text-3`) is
+  gray 650 on light (4.63:1 on gray 150, the darkest light surface) and gray 500 on dark.
+- **Status colors** say how things are, and nothing else. See [Status](#status).
 - The **data colors** for charts (`--series-1` to `--series-8`) are ordered so that neighbors
   stay apart for color-blind readers. Use them in that order.
 
 The palette, and the app's semantic tokens for light and dark, are in [`colors/`](../colors) as
 CSS custom properties, a Tailwind theme, design tokens (JSON), and Adobe and GIMP swatches.
+
+## Status
+
+<img src="images/status.png" alt="A list of five objects, one at each level, in light and dark: a red CrashLoopBackOff, an amber Degraded, a gray ContainerCreating, a green Running and a gray Completed, each with a dot and a pill with an icon." />
+
+Five levels of health, the same in the app, the docs and the website. Every object Lumovi
+shows has one, and lists sort by it, in this order, so what needs you is at the top.
+
+| Level           | Filter chip | Icon ([Lucide](https://lucide.dev)) | Color             | Means                                                                              |
+| --------------- | ----------- | ----------------------------------- | ----------------- | ---------------------------------------------------------------------------------- |
+| **Critical**    | Failing     | `circle-x`                          | `critical`        | Broken, and won't fix itself: a crash loop, a failed job, a node that isn't ready. |
+| **Warning**     | Warning     | `triangle-alert`                    | `warn`            | Working, but not as it should: degraded, under pressure, pending, terminating.     |
+| **Progressing** | In progress | `circle-dashed`                     | `neutral`, moving | On its way: creating containers, reconciling, running a job.                       |
+| **Healthy**     | Healthy     | `circle-check`                      | `good`            | Doing what it's meant to.                                                          |
+| **Neutral**     | Inactive    | `circle-minus`                      | `neutral`         | Nothing to worry about: completed, suspended, scaled to zero.                      |
+
+A list can name a level in its own words, like Running, Starting or Completed for pods. The
+level, and so its color and icon, stays the same.
+
+| Color      | Mark, light      | Mark, dark       | Words, light     | Words, dark      |
+| ---------- | ---------------- | ---------------- | ---------------- | ---------------- |
+| `critical` | `#d03b3b` 4.18:1 | `#d03b3b` 3.35:1 | `#b42318` 4.84:1 | `#fc554c` 4.56:1 |
+| `warn`     | `#bd7800` 3.12:1 | `#fab219` 8.78:1 | `#8a5a00` 4.56:1 | `#e3a008` 5.59:1 |
+| `good`     | `#009e00` 3.10:1 | `#009e00` 4.52:1 | `#00732b` 4.55:1 | `#3fb950` 5.54:1 |
+| `neutral`  | `#737373` 4.12:1 | `#737373` 3.40:1 | `#525252` 5.92:1 | `#a3a3a3` 5.61:1 |
+
+Each ratio is the lowest on any surface of its theme (`--surface`, `--surface-2`, `--app-bg`
+and `--surface-3`), and for words on the pill's fill over each of them too.
+
+- **Never color alone.** A dot sits beside a name, and a pill has its icon and its word.
+- **Marks and words.** Dots, bars and a pill's fill use the color's token (`--good`, `--warn`,
+  `--critical`, `--neutral`) and need 3:1 (WCAG 1.4.11). Words use its `*-text` token and need
+  4.5:1. Only warn differs between themes: amber as bright as the dark theme's can't reach 3:1
+  on white, so the light theme's is deeper.
+- **A pill** is its words on its mark at 12%, over whatever it's on.
+- **Progressing is neutral, moving.** Its dot pulses, to 45% opacity and back every 2 s
+  (ease-in-out), and the dashed circle on its pill turns once every 3 s (linear). Both hold
+  still for people who ask for reduced motion; the icon and the word still say it.
+- **Blue is never a status**, not even for something in progress. It's for what you can act on.
+- **Four colors, five levels.** There's no orange between warning and critical: the app has
+  nothing it would mean, and it's hard to tell from either, more so for color-blind readers.
+
+The levels, their icons and their motion are defined in [`src/health.ts`](../src/health.ts),
+and the colors in [`src/colors.ts`](../src/colors.ts).
 
 ## Typography
 
@@ -156,8 +204,9 @@ CSS custom properties, a Tailwind theme, design tokens (JSON), and Adobe and GIM
 
 - **[Inter](https://rsms.me/inter/)** for everything you read, and the wordmark: the app, the
   website and the docs. Headlines use its display optical size, semibold, tracked tight
-  (−0.045em), often with the line after the first in gray. Text is regular, at a comfortable
-  1.5 line height.
+  (−0.045em), often with the line after the first quieter: gray 600 on light (4.74:1 on Paper,
+  4.12:1 on gray 150) and gray 500 on dark (6.12:1 on Ink). Silver is too light for it on
+  light (2.52:1 on Paper). Text is regular, at a comfortable 1.5 line height.
 - **[JetBrains Mono](https://www.jetbrains.com/lp/mono/)** for code, commands, object names and
   numbers that line up.
 

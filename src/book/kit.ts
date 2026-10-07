@@ -3,7 +3,7 @@
  * made of (figures, spec lists, swatches, do and don't cards). Pages are HTML; the build prints
  * them to PDF with Chrome, so the logos stay vector and the fonts are embedded.
  */
-import { blue, gray, INK, PAPER, status } from '../colors.ts'
+import { blue, gray, INK, PAPER, status, themes } from '../colors.ts'
 import { document, horizontal, MARK, mark, stacked, VARIANTS, wordmarkOnly } from '../logo.ts'
 import { FONTS } from '../scene.ts'
 import { escape } from '../svg.ts'
@@ -86,8 +86,8 @@ h1, h2, h3 { margin: 0; font-variation-settings: 'opsz' 32; text-wrap: balance; 
 h1 { font-size: 96px; font-weight: 650; letter-spacing: -0.045em; line-height: 1; }
 h2 { font-size: 46px; font-weight: 650; letter-spacing: -0.035em; line-height: 1.06; margin-top: 14px; }
 h3 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
-.quiet { color: ${gray[400]}; }
-.dark .quiet { color: ${gray[600]}; }
+.quiet { color: ${gray[600]}; }
+.dark .quiet { color: ${gray[500]}; }
 p { margin: 0; }
 .lead { font-size: 21px; line-height: 1.5; color: ${gray[700]}; max-width: 34em; margin-top: 18px; text-wrap: pretty; }
 .dark .lead { color: ${gray[400]}; }
@@ -132,8 +132,8 @@ b, strong { font-weight: 600; color: ${INK}; }
 .note .n { flex: none; width: 24px; height: 24px; border-radius: 12px; background: ${INK}; color: ${PAPER}; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
 .verdict { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
 .verdict svg { flex: none; }
-.ok { color: ${status.good}; }
-.no { color: ${status.critical}; }
+.ok { color: ${themes.light['good-text']}; }
+.no { color: ${themes.light['critical-text']}; }
 .rule { height: 1px; background: ${gray[200]}; }
 .dark .rule { background: ${gray[800]}; }
 table.data { border-collapse: collapse; width: 100%; font-size: 14px; }
@@ -192,8 +192,8 @@ export function notes(items: string[]): string {
     .join('')}</div>`
 }
 
-const check = `<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="${status.good}"/><path d="M5.2 9.3l2.4 2.4 5-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-const cross = `<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="${status.critical}"/><path d="M6 6l6 6m0-6l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>`
+const check = `<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="${status.light.good}"/><path d="M5.2 9.3l2.4 2.4 5-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+const cross = `<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="${status.light.critical}"/><path d="M6 6l6 6m0-6l-6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>`
 
 /** A small "Do" or "Don't" label. */
 export function verdict(ok: boolean, text: string): string {

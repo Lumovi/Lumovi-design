@@ -119,7 +119,7 @@ export function iconSection(a: Assets): Section {
               )
               .join('')}
             <div class="col" style="flex:1.3;justify-content:center;padding-left:16px">
-              ${list(['Up to 96 px the mark is larger than on the big icon, and the glow is left out.', 'At 16 and 20 px the gap narrows to one pixel.', 'The Windows .ico holds ten sizes, 16 to 256; Linux gets a PNG for each.'])}
+              ${list(['Up to 96 px the mark is larger than on the big icon, and the glow is left out.', 'At 16 and 20 px the gap narrows to one pixel.', 'The Windows .ico holds ten sizes, 16 to 256; Linux gets a PNG for each.', 'The Microsoft Store package gets every size Windows asks for, and its tiles have the icon in the middle, on transparency.'])}
             </div>
           </div>`,
       },
@@ -139,7 +139,7 @@ export function iconSection(a: Assets): Section {
             <div class="figure mist" style="flex:1;flex-direction:column;gap:14px">
               <div style="position:relative;width:200px;height:200px">
                 <img src="${a.file('icons/web/icon-maskable-512.png')}" width="200" height="200">
-                <div style="position:absolute;inset:20px;border-radius:50%;outline:2px dashed ${status.warn}"></div>
+                <div style="position:absolute;inset:20px;border-radius:50%;outline:2px dashed ${status.light.warn}"></div>
               </div>
               <span class="caption">Maskable: the mark inside the safe circle</span>
             </div>
@@ -175,7 +175,7 @@ export function iconSection(a: Assets): Section {
               [
                 false,
                 'Don’t add badges or words',
-                `<div style="position:relative"><img src="${a.file('icons/app/macos/icon.png')}" width="200" height="200"><div style="position:absolute;right:24px;top:22px;padding:4px 10px;border-radius:12px;background:${status.critical};color:#fff;font-weight:700;font-size:16px">NEW</div></div>`,
+                `<div style="position:relative"><img src="${a.file('icons/app/macos/icon.png')}" width="200" height="200"><div style="position:absolute;right:24px;top:22px;padding:4px 10px;border-radius:12px;background:${status.light.critical};color:#fff;font-weight:700;font-size:16px">NEW</div></div>`,
               ],
               [
                 false,

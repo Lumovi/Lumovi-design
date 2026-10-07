@@ -166,7 +166,7 @@ export function logoSection(a: Assets): Section {
     <div style="position:relative;border-radius:14px;overflow:hidden;background:${bg};box-shadow:inset 0 0 0 1px ${gray[200]};display:flex;align-items:center;justify-content:center;height:100%">
       ${content}
       <div style="position:absolute;left:16px;bottom:13px;font-size:12.5px;color:${dark ? 'rgb(255 255 255 / 0.85)' : gray[700]};display:flex;align-items:center;gap:7px">
-        <svg width="14" height="14" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="${status.critical}"/><path d="M6 6l6 6m0-6l-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>${label}
+        <svg width="14" height="14" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="${status.light.critical}"/><path d="M6 6l6 6m0-6l-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>${label}
       </div>
     </div>`
   const small = lh(32)

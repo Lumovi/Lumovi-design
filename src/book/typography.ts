@@ -1,6 +1,6 @@
 // 05 Typography: Inter and JetBrains Mono, the type scale, headlines, and numbers and code.
 import { tagline } from '../brand.ts'
-import { gray, INK, status } from '../colors.ts'
+import { gray, INK, status, themes } from '../colors.ts'
 import { head, list, specs, type Section } from './kit.ts'
 
 /** The type scale for the website, the docs and anything printed. The app's interface is denser. */
@@ -65,8 +65,8 @@ export function typographySection(): Section {
               <div class="mono" style="font-size:150px;line-height:0.9;font-weight:500">{ }</div>
               <div class="mono" style="font-size:20px;line-height:1.7;color:${gray[400]}">
                 <span style="color:${gray[600]}">$</span> kubectl get pods -n checkout<br>
-                api-7f9c4d &nbsp;1/1 &nbsp;<span style="color:${status.good}">Running</span> &nbsp;&nbsp;0 &nbsp;12d<br>
-                worker-2x8p 0/1 &nbsp;<span style="color:${status.warn}">Pending</span> &nbsp;&nbsp;0 &nbsp;&nbsp;4m
+                api-7f9c4d &nbsp;1/1 &nbsp;<span style="color:${themes.dark['good-text']}">Running</span> &nbsp;&nbsp;0 &nbsp;12d<br>
+                worker-2x8p 0/1 &nbsp;<span style="color:${themes.dark['warn-text']}">Pending</span> &nbsp;&nbsp;0 &nbsp;&nbsp;4m
               </div>
             </div>
             <div class="col text" style="gap:20px">
@@ -105,12 +105,12 @@ export function typographySection(): Section {
           ${head('05 — Typography', 'Headlines')}
           <div class="content" style="align-items:stretch">
             <div class="figure mist" style="flex:1;flex-direction:column;align-items:flex-start;justify-content:center;padding:64px">
-              <div style="font-size:84px;font-weight:650;letter-spacing:-0.045em;line-height:1.02;font-variation-settings:'opsz' 32">${tagline[0]}<br><span style="color:${gray[400]}">${tagline[1]}</span></div>
+              <div style="font-size:84px;font-weight:650;letter-spacing:-0.045em;line-height:1.02;font-variation-settings:'opsz' 32">${tagline[0]}<br><span class="quiet">${tagline[1]}</span></div>
               <p style="font-size:22px;line-height:1.5;color:${gray[700]};margin-top:28px;max-width:30em">A beautiful, fast Kubernetes dashboard. On your desktop, or in your cluster.</p>
             </div>
             <div class="col text" style="gap:14px">
               ${list([
-                '<b>Two tones.</b> The first line in Ink, what follows in Silver: one statement, read in two beats.',
+                '<b>Two tones.</b> The first line in Ink, what follows quieter: gray 600 on light, gray 500 on dark. One statement, read in two beats.',
                 '<b>Short.</b> Two lines at most, in sentence case, ending with a period when it’s a sentence.',
                 '<b>Tight.</b> Display size, semibold, tracked −0.045em, with the line height almost solid.',
                 '<b>Balanced.</b> Break lines by meaning, not by the edge of the box.',
@@ -129,10 +129,10 @@ export function typographySection(): Section {
                 <thead><tr><th>Pod</th><th>Status</th><th style="text-align:right">CPU</th><th style="text-align:right">Memory</th><th style="text-align:right">Age</th></tr></thead>
                 <tbody style="font-variant-numeric:tabular-nums">
                   ${[
-                    ['api-7f9c4d', 'Running', status.good, '120m', '256Mi', '12d'],
-                    ['worker-2x8p', 'Pending', status.warn, '—', '—', '4m'],
-                    ['cache-0', 'Running', status.good, '1,240m', '1.8Gi', '31d'],
-                    ['ingest-5b6c', 'CrashLoopBackOff', status.critical, '15m', '64Mi', '2h'],
+                    ['api-7f9c4d', 'Running', status.light.good, '120m', '256Mi', '12d'],
+                    ['worker-2x8p', 'Pending', status.light.warn, '—', '—', '4m'],
+                    ['cache-0', 'Running', status.light.good, '1,240m', '1.8Gi', '31d'],
+                    ['ingest-5b6c', 'CrashLoopBackOff', status.light.critical, '15m', '64Mi', '2h'],
                   ]
                     .map(
                       ([pod, s, c, cpu, mem, age]) =>

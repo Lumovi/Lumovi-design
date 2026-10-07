@@ -1,7 +1,8 @@
 // guidelines/images/: the pictures in the brand guidelines, drawn from the same sources as the
 // assets, so they can't disagree with them.
 import sharp from 'sharp'
-import { blue, brand, gray, INK, PAPER, status } from '../../src/colors.ts'
+import { blue, brand, gray, INK, PAPER, status, themes } from '../../src/colors.ts'
+import { dot, levels, pill } from '../../src/health.ts'
 import { macos, plated } from '../../src/icon.ts'
 import {
   document,
@@ -239,7 +240,7 @@ function altered(
 }
 
 function misuse(): string {
-  const no = `<svg width="22" height="22" viewBox="0 0 22 22" style="position:absolute;top:14px;right:14px"><circle cx="11" cy="11" r="11" fill="${status.critical}"/><path d="M7.5 7.5l7 7m0-7l-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`
+  const no = `<svg width="22" height="22" viewBox="0 0 22 22" style="position:absolute;top:14px;right:14px"><circle cx="11" cy="11" r="11" fill="${status.light.critical}"/><path d="M7.5 7.5l7 7m0-7l-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`
   const t = (content: string, label: string, bg: string = PAPER) =>
     `<div class="tile" style="height:170px;background:${bg}">${content}${no}<span class="label"${bg === PAPER ? '' : ' style="color:rgb(255 255 255 / 0.8)"'}>${label}</span></div>`
   const lockup = (style = '', name = 'on-light') => logo('logo', name, logoHeight(34), style)
@@ -297,16 +298,39 @@ function palette(): string {
     <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px">
       ${row('Gray', gray)}
       ${row('Blue', blue)}
-      ${row('Status', status)}
+      ${row('Status', { ...status.light, 'warn, dark': status.dark.warn })}
     </div>
   </div>`)
+}
+
+/** The five levels as a list shows them, most urgent first, in light and dark. */
+function health(): string {
+  const names = ['ingest-5b6c', 'checkout', 'worker-2x8p', 'api-7f9c4d', 'migrate-28']
+  const panel = (scheme: 'light' | 'dark') => {
+    const t = themes[scheme]
+    const rows = levels
+      .map(
+        (
+          h,
+          i,
+        ) => `<div style="display:flex;align-items:center;gap:12px;height:46px;border-top:1px solid ${t.line}">
+          ${dot(h, scheme)}<span style="font-family:'JetBrains Mono';font-size:13.5px;color:${t['text-1']}">${names[i]}</span>
+          <span style="margin-left:auto">${pill(h, scheme)}</span></div>`,
+      )
+      .join('')
+    return `<div style="flex:1;background:${t.surface};padding:22px 26px 12px">
+      <div style="font-size:13px;color:${t['text-3']};margin-bottom:12px">${scheme === 'light' ? 'Light' : 'Dark'}</div>${rows}</div>`
+  }
+  return page(
+    `<div class="sheet" style="display:flex;box-shadow:inset 0 0 0 1px ${gray[200]}">${panel('light')}${panel('dark')}</div>`,
+  )
 }
 
 function typography(): string {
   return page(`<div class="sheet light" style="box-shadow:inset 0 0 0 1px ${gray[200]};display:grid;grid-template-columns:1.35fr 1fr">
     <div style="padding:36px 40px;border-right:1px solid ${gray[200]}">
       <div style="font-size:13px;color:${gray[600]};margin-bottom:18px">Inter — the logo, the app, the website, the docs</div>
-      <div style="font-size:60px;font-weight:650;letter-spacing:-0.045em;line-height:1.02;font-variation-settings:'opsz' 32">Your clusters,<br><span style="color:${gray[500]}">at a glance.</span></div>
+      <div style="font-size:60px;font-weight:650;letter-spacing:-0.045em;line-height:1.02;font-variation-settings:'opsz' 32">Your clusters,<br><span style="color:${gray[600]}">at a glance.</span></div>
       <div style="font-size:16px;line-height:1.6;color:${gray[700]};margin-top:22px;max-width:440px">See what's healthy, what's struggling and where your capacity goes, and fix things safely when they need it.</div>
       <div style="display:flex;gap:26px;margin-top:26px;font-size:15px;color:${gray[700]}">
         <span style="font-weight:400">Regular</span><span style="font-weight:500">Medium</span><span style="font-weight:600">Semibold</span><span style="font-weight:700">Bold</span>
@@ -317,8 +341,8 @@ function typography(): string {
         <div style="font-size:13px;color:${gray[600]};margin-bottom:18px">JetBrains Mono — code, names and numbers</div>
         <div style="font-family:'JetBrains Mono';font-size:15px;line-height:1.75;color:${INK}">
           <span style="color:${gray[500]}">$</span> kubectl get pods -A<br>
-          api-7f9c <span style="color:${status.good}">●</span> Running&nbsp;&nbsp;12d<br>
-          worker-2 <span style="color:${status.warn}">●</span> Pending&nbsp;&nbsp;&nbsp;4m
+          api-7f9c <span style="color:${status.light.good}">●</span> Running&nbsp;&nbsp;12d<br>
+          worker-2 <span style="color:${status.light.warn}">●</span> Pending&nbsp;&nbsp;&nbsp;4m
         </div>
       </div>
       <div style="padding:28px 40px 32px;background:${gray[50]}">
@@ -377,6 +401,7 @@ export default {
       backgrounds: backgrounds(),
       misuse: misuse(),
       palette: palette(),
+      status: health(),
       typography: typography(),
       'app-icons': appIcons(),
     }

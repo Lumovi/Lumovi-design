@@ -53,3 +53,15 @@ export function cmyk(hex: string): string {
   const part = (c: number) => Math.round(((1 - c - k) / (1 - k)) * 100)
   return `${part(r)} ${part(g)} ${part(b)} ${Math.round(k * 100)}`
 }
+
+/** A color at an opacity over another, as the result shows: for a pill's fill on a surface. */
+export function over(fg: string, bg: string, alpha: number): string {
+  const [f, b] = [rgb(fg), rgb(bg)]
+  return `#${f
+    .map((c, i) =>
+      Math.round(c * alpha + b[i]! * (1 - alpha))
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('')}`
+}

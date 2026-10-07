@@ -18,6 +18,7 @@ Columns: 11
 163 163 163	Gray 400
 143 143 143	Gray 500
 115 115 115	Gray 600
+107 107 107	Gray 650
  82  82  82	Gray 700
  64  64  64	Gray 750
  38  38  38	Gray 800
@@ -38,8 +39,8 @@ Columns: 11
  21  51 101	Blue 900
  17  34  66	Blue 950
 # Status
- 12 163  12	Good
-250 178  25	Warn
-236 131  90	Serious
+  0 158   0	Good
+189 120   0	Warn
 208  59  59	Critical
-137 135 129	Neutral
+115 115 115	Neutral
+250 178  25	Warn on dark

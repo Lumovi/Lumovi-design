@@ -20,7 +20,7 @@ function hex(color: string): string {
 function themeTokens(scheme: Scheme): [string, string][] {
   return [
     ...Object.entries(themes[scheme]),
-    ...Object.entries(status),
+    ...Object.entries(status[scheme]),
     ...series[scheme].map((color, i): [string, string] => [`series-${i + 1}`, color]),
     ['series-other', series.other[scheme]],
   ]
@@ -102,7 +102,7 @@ function tokens(): string {
         ),
         gray: scale(gray),
         blue: scale(blue),
-        status: scale(status),
+        status: { light: scale(status.light), dark: scale(status.dark) },
       },
       theme: {
         $type: 'color',
@@ -129,7 +129,10 @@ function swatchGroups() {
     })),
     {
       name: 'Status',
-      colors: Object.entries(status).map(([k, v]) => ({ name: title(k), hex: v })),
+      colors: [
+        ...Object.entries(status.light).map(([k, v]) => ({ name: title(k), hex: v })),
+        { name: 'Warn on dark', hex: status.dark.warn },
+      ],
     },
   ]
 }

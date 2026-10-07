@@ -251,7 +251,10 @@ export function voiceSection(): Section {
 export function legalSection(): Section {
   const tree: [string, string][] = [
     ['logo/', 'The logo, stacked logo, mark and wordmark, as SVG and PNG; animated marks'],
-    ['icons/app/', 'macOS (PNG, ICNS, Liquid Glass), Windows (ICO) and Linux (PNG)'],
+    [
+      'icons/app/',
+      'macOS (PNG, ICNS, Liquid Glass), Windows (ICO, Microsoft Store) and Linux (PNG)',
+    ],
     ['icons/web/', 'Favicons, touch and web app icons, and the web manifest'],
     ['colors/', 'CSS custom properties, Tailwind, design tokens, Adobe and GIMP swatches'],
     ['social/', 'Link previews, GitHub previews and banners, the avatar, the X header'],

@@ -1,8 +1,9 @@
 // 04 Color: the named colors in every notation, the gray and blue scales and their roles,
 // proportion, contrast, status and data colors, and the app's themes.
-import { blue, brand, gray, INK, PAPER, series, status, themes } from '../colors.ts'
+import { blue, brand, gray, INK, PAPER, PILL_FILL, series, status, themes } from '../colors.ts'
+import { dot, icon, levels, motion, pill, type Health } from '../health.ts'
 import { head, list, verdict, type Section } from './kit.ts'
-import { cmyk, contrast, level, oklch, rgb, textOn } from './math.ts'
+import { cmyk, contrast, level, oklch, over, rgb, textOn } from './math.ts'
 
 type Theme = (typeof themes)['light'] | (typeof themes)['dark']
 
@@ -31,7 +32,7 @@ function actions(t: Theme, name: string): string {
     <div style="background:${t.surface};border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 0 0 1px ${gray[200]}">
       <div style="display:flex;align-items:center;gap:14px">
         <span style="padding:7px 14px;border-radius:8px;background:${t.accent};color:#fff;font-size:13px;font-weight:550">Scale</span>
-        <span style="font-size:13px;color:${t.accent};font-weight:500">View in the docs</span>
+        <span style="font-size:13px;color:${t['accent-strong']};font-weight:500">View in the docs</span>
         <span style="margin-left:auto;padding:6px 12px;border-radius:8px;box-shadow:0 0 0 1.5px ${t.accent}, 0 0 0 5px ${t['accent-soft']};font-size:13px;color:${t['text-1']};width:150px">replicas: 3</span>
       </div>
       <div style="display:flex;flex-direction:column;font-size:13px">
@@ -41,6 +42,59 @@ function actions(t: Theme, name: string): string {
     </div>
     <span class="small">${name}: a button, a link, a focused field, a selected row</span>
   </div>`
+}
+
+/** Each theme's surfaces, from lightest to darkest: what text and marks have to read on. */
+const SURFACES = {
+  light: [
+    themes.light.surface,
+    themes.light['surface-2'],
+    themes.light['app-bg'],
+    themes.light['surface-3'],
+  ],
+  dark: [
+    themes.dark['app-bg'],
+    themes.dark.surface,
+    themes.dark['surface-2'],
+    themes.dark['surface-3'],
+  ],
+}
+
+/** The lowest contrast a color has on any of these backgrounds. */
+const lowest = (fg: string, backgrounds: string[]) =>
+  Math.min(...backgrounds.map((bg) => contrast(fg, bg))).toFixed(2)
+
+function statusRow(h: Health): string {
+  const sample = (scheme: 'light' | 'dark') =>
+    `<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:${themes[scheme].surface};box-shadow:inset 0 0 0 1px ${scheme === 'light' ? gray[200] : gray[800]}">${dot(h, scheme)}${pill(h, scheme)}</div>`
+  const values = (
+    light: string,
+    dark: string,
+    ratio: (scheme: 'light' | 'dark', hex: string) => string,
+  ) =>
+    `<div class="mono" style="font-size:12px;line-height:1.9;white-space:nowrap">${(
+      [
+        ['light', light],
+        ['dark', dark],
+      ] as const
+    )
+      .map(
+        ([scheme, hex]) =>
+          `<span class="chip" style="background:${hex};width:10px;height:10px;border-radius:5px;vertical-align:-1px"></span>${hex} <span style="color:${gray[600]}">${ratio(scheme, hex)}</span>`,
+      )
+      .join('<br>')}</div>`
+  const word = `${h.color}-text` as const
+  return `<tr>
+    <td><div style="display:flex;align-items:center;gap:8px;color:${INK};font-weight:600;font-size:15px">${icon(h.icon, 16, 2)}${h.name}</div><div class="small" style="margin-top:3px">Filter: ${h.filter}</div></td>
+    <td><div class="col" style="gap:6px">${sample('light')}${sample('dark')}</div></td>
+    <td style="color:${gray[700]};line-height:1.45">${h.means}${h.level === 'progressing' ? ` <b style="color:${INK}">Neutral, moving:</b> the dot pulses and the dashed circle turns.` : ''}</td>
+    <td>${values(status.light[h.color], status.dark[h.color], (scheme, hex) => lowest(hex, SURFACES[scheme]))}</td>
+    <td>${values(themes.light[word], themes.dark[word], (scheme, hex) =>
+      lowest(hex, [
+        ...SURFACES[scheme],
+        ...SURFACES[scheme].map((bg) => over(status[scheme][h.color], bg, PILL_FILL)),
+      ]),
+    )}</td></tr>`
 }
 
 export function colorSection(): Section {
@@ -60,20 +114,24 @@ export function colorSection(): Section {
   const sample = (fg: string, bg: string, text: string, size = 16) =>
     `<span style="display:inline-block;padding:6px 12px;border-radius:8px;background:${bg};color:${fg};font-size:${size}px;font-weight:${size > 18 ? 600 : 500};box-shadow:inset 0 0 0 1px rgb(127 127 127 / 0.18)">${text}</span>`
   const pairs: [string, string, string, string][] = [
-    ['Ink on Paper', INK, PAPER, 'Body text, headlines'],
-    ['Gray 700 on Paper', gray[700], PAPER, 'Secondary text (text-2)'],
-    ['Gray 600 on Paper', gray[600], PAPER, 'Quiet text, captions (text-3)'],
-    ['Gray 500 on Paper', gray[500], PAPER, 'Large text only'],
-    ['Blue 600 on Paper', blue[600], PAPER, 'Links'],
+    ['Ink on Gray 150', INK, gray[150], 'Body text, headlines (text-1)'],
+    ['Gray 700 on Gray 150', gray[700], gray[150], 'Secondary text (text-2)'],
+    ['Gray 650 on Gray 150', gray[650], gray[150], 'Quiet text, captions (text-3)'],
+    ['Gray 600 on Gray 150', gray[600], gray[150], 'A headline’s second line: large text'],
+    ['Blue 700 on Gray 150', blue[700], gray[150], 'Blue words: links (accent-strong)'],
     ['Paper on Blue 600', PAPER, blue[600], 'Primary buttons'],
-    ['#ededed on Gray 950', '#ededed', gray[950], 'Body text, dark (text-1)'],
-    ['Gray 400 on Gray 950', gray[400], gray[950], 'Secondary text, dark (text-2)'],
-    ['Gray 500 on Gray 950', gray[500], gray[950], 'Quiet text, dark (text-3)'],
-    ['Blue 500 on Gray 950', blue[500], gray[950], 'Links, dark'],
+    ['#ededed on Gray 850', '#ededed', gray[850], 'Body text, dark (text-1)'],
+    ['Gray 400 on Gray 850', gray[400], gray[850], 'Secondary text, dark (text-2)'],
+    ['Gray 500 on Gray 850', gray[500], gray[850], 'Quiet text and second lines, dark (text-3)'],
+    ['Blue 400 on Gray 850', blue[400], gray[850], 'Blue words, dark (accent-strong)'],
   ]
-  const tokenRows = (Object.keys(themes.light) as (keyof typeof themes.light)[]).map((key) => {
-    const l = themes.light[key]
-    const d = themes.dark[key]
+  const tokens = {
+    light: { ...themes.light, ...status.light },
+    dark: { ...themes.dark, ...status.dark },
+  }
+  const tokenRows = (Object.keys(tokens.light) as (keyof typeof tokens.light)[]).map((key) => {
+    const l = tokens.light[key]
+    const d = tokens.dark[key]
     const chip = (v: string) =>
       `<span class="chip" style="background:${v}"></span><span class="mono" style="font-size:12px">${v}</span>`
     return `<tr><td class="mono" style="font-size:12.5px;color:${INK}">--${key}</td><td>${chip(l)}</td><td>${chip(d)}</td></tr>`
@@ -124,7 +182,7 @@ export function colorSection(): Section {
               ['Backgrounds', '50, 100, 150 on light; 900, 925, 950 on dark.'],
               ['Lines', 'Black or white at 7–14% opacity, so they work on any surface.'],
               ['The mark’s shade', '300 (Mist) on light; 750 on dark.'],
-              ['Text', '950 (Ink), 700 and 600 on light; #ededed, 400 and 500 on dark.'],
+              ['Text', '950 (Ink), 700 and 650 on light; #ededed, 400 and 500 on dark.'],
             ]
               .map(
                 ([k, v]) =>
@@ -142,15 +200,15 @@ export function colorSection(): Section {
           <div class="row" style="margin-top:36px;gap:48px">
             <div class="col fill">
               ${verdict(true, 'Use it for')}
-              ${list(['Links, in running text and lists.', 'Primary buttons, one to a view.', 'Focus rings, and the selected row or tab.', 'Progress, and the one chart series that matters most.'])}
+              ${list(['Links, in running text and lists.', 'Primary buttons, one to a view.', 'Focus rings, and the selected row or tab.', 'Progress bars for something you started, and the one chart series that matters most.'])}
             </div>
             <div class="col fill">
               ${verdict(false, 'Don’t use it for')}
-              ${list(['The logo, in any of its versions.', 'Headlines, icons and decoration.', 'Backgrounds of whole sections or pages.', 'Status: that’s what the status colors are for.'])}
+              ${list(['The logo, in any of its versions.', 'Headlines, icons and decoration.', 'Backgrounds of whole sections or pages.', 'Status, even in progress: that’s what the status colors are for.'])}
             </div>
             <div class="col fill">
               <h3>Steps</h3>
-              <p class="body"><b>600</b> on light and <b>500</b> on dark, with <b>700</b> and <b>400</b> to press or hover. Text in 600, and white text on it, reach 4.5:1 on white.</p>
+              <p class="body"><b>600</b> on light and <b>500</b> on dark for fills, rings and icons, with <b>700</b> and <b>400</b> to press or hover. Blue words use 700 on light and 400 on dark (accent-strong): 4.5:1 on every surface.</p>
             </div>
           </div>
           <div class="row" style="margin-top:28px;gap:16px">${actions(themes.light, 'Light')}${actions(themes.dark, 'Dark')}</div>`,
@@ -165,7 +223,7 @@ export function colorSection(): Section {
               ['Ink', 18, INK],
               ['Mist and Silver', 14, gray[300]],
               ['Blue', 4, blue[600]],
-              ['Status', 2, status.good],
+              ['Status', 2, status.light.good],
             ]
               .map(
                 ([name, share, hex]) =>
@@ -182,7 +240,7 @@ export function colorSection(): Section {
       {
         title: 'Contrast',
         html: `
-          ${head('04 — Color', 'Contrast', 'Text meets WCAG 2 AA: 4.5:1 for body text, 3:1 for large text (24 px, or 19 px bold).')}
+          ${head('04 — Color', 'Contrast', 'Text meets WCAG 2 AA on every surface, shown here on the hardest: 4.5:1, or 3:1 for large text (24 px, or 19 px bold).')}
           <table class="data" style="margin-top:28px">
             <thead><tr><th>Pair</th><th>Sample</th><th>Ratio</th><th>Passes</th><th>For</th></tr></thead>
             <tbody>
@@ -200,59 +258,31 @@ export function colorSection(): Section {
           </table>`,
       },
       {
-        title: 'Status and data',
+        title: 'Status',
         html: `
-          ${head('04 — Color', 'Status and data', 'Health and charts keep their own colors: they say how things are, and never decorate.')}
+          ${head('04 — Color', 'Status', 'Five levels of health, the same in the app, the docs and the website. Each has a color, an icon and a word, and never shows as color alone.')}
+          <table class="data" style="margin-top:22px;font-size:14px">
+            <thead><tr><th style="width:190px">Level</th><th style="width:270px">In the app, light and dark</th><th>Means</th><th style="width:170px">Mark</th><th style="width:170px">Words</th></tr></thead>
+            <tbody>${levels.map(statusRow).join('')}</tbody>
+          </table>
+          <p class="small" style="margin-top:12px">Light, then dark. Each ratio is the lowest on any surface of its theme, and for words on the pill’s fill too: marks need 3:1 (WCAG 1.4.11), words 4.5:1.</p>`,
+      },
+      {
+        title: 'Status in use, and data',
+        html: `
+          ${head('04 — Color', 'Status in use, and data', 'Health and charts keep their own colors: they say how things are, and never decorate.')}
           <div class="content">
             <div class="col fill">
               <h3>Status</h3>
-              <p class="body">Marks (dots, bars) are the same in both themes; text in a status color uses a readable step for its theme. A status color always comes with a word.</p>
-              <table class="data" style="margin-top:8px">
-                <thead><tr><th>Status</th><th>Mark</th><th>Text, light</th><th>Text, dark</th></tr></thead>
-                <tbody>
-                  ${(
-                    [
-                      [
-                        'Good',
-                        status.good,
-                        themes.light['good-text'],
-                        themes.dark['good-text'],
-                        'Running',
-                      ],
-                      [
-                        'Warning',
-                        status.warn,
-                        themes.light['warn-text'],
-                        themes.dark['warn-text'],
-                        'Pending',
-                      ],
-                      [
-                        'Serious',
-                        status.serious,
-                        themes.light['serious-text'],
-                        themes.dark['serious-text'],
-                        'Degraded',
-                      ],
-                      [
-                        'Critical',
-                        status.critical,
-                        themes.light['critical-text'],
-                        themes.dark['critical-text'],
-                        'CrashLoopBackOff',
-                      ],
-                      ['Neutral', status.neutral, gray[600], gray[500], 'Completed'],
-                    ] as const
-                  )
-                    .map(
-                      ([name, mark, lt, dt, word]) => `<tr>
-                        <td style="color:${INK};font-weight:500">${name}</td>
-                        <td><span class="chip" style="background:${mark};border-radius:7px"></span><span class="mono" style="font-size:12px">${mark}</span></td>
-                        <td><span style="color:${lt};font-weight:550">${word}</span></td>
-                        <td><span style="display:inline-block;padding:3px 9px;border-radius:6px;background:${gray[950]};color:${dt};font-weight:550">${word}</span></td></tr>`,
-                    )
-                    .join('')}
-                </tbody>
-              </table>
+              ${list([
+                '<b>Never color alone.</b> A dot sits beside a name, and a pill has its icon and its word.',
+                '<b>Marks and words.</b> Dots, bars and fills take the status color; words take its <span class="mono">*-text</span> token, which reads on every surface.',
+                `<b>A pill</b> is its words on its mark at ${PILL_FILL * 100}%, over whatever it’s on.`,
+                `<b>Progressing is neutral, moving.</b> Its dot pulses, to ${motion.pulse.opacity * 100}% and back every ${motion.pulse.duration.replace('s', ' s')}; the dashed circle on its pill turns once every ${motion.turn.duration.replace('s', ' s')}. Both hold still for reduced motion.`,
+                '<b>Blue is never a status,</b> not even for something in progress: it’s for what you can act on.',
+                '<b>Four colors, five levels.</b> There’s no orange between warning and critical: it’s hard to tell from either, more so for color-blind readers.',
+                '<b>Lists sort by level,</b> critical first, so what needs you is at the top.',
+              ])}
             </div>
             <div class="col fill">
               <h3>Data</h3>

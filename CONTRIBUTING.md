@@ -29,6 +29,7 @@ folder. Nothing outside `src/` and `scripts/` is edited by hand: change the sour
 commit both.
 
 - `src/colors.ts`: every color, and the app's theme tokens.
+- `src/health.ts`: the five status levels, with their colors, icons, names and motion.
 - `src/mark.ts`: the mark's geometry (a 48-unit square, drawn from circles) and how it's painted.
 - `src/wordmark.ts`: the wordmark, outlined from Inter Display Semibold, with its spacing.
 - `src/logo.ts`: the lockups and their versions.

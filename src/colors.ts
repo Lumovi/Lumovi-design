@@ -16,6 +16,8 @@ export const gray = {
   400: '#a3a3a3',
   500: '#8f8f8f',
   600: '#737373',
+  // Quiet text on light: 4.5:1 on every light surface, gray 150 included.
+  650: '#6b6b6b',
   700: '#525252',
   750: '#404040',
   800: '#262626',
@@ -55,7 +57,7 @@ export const brand = {
   silver: {
     name: 'Silver',
     hex: gray[400],
-    use: 'Quieter text, and the second line of headlines.',
+    use: 'Quieter text on dark backgrounds.',
   },
   mist: { name: 'Mist', hex: gray[300], use: 'Lines, and the mark’s shade on light.' },
   paper: { name: 'Paper', hex: PAPER, use: 'Light surfaces, and the logo on dark.' },
@@ -67,17 +69,20 @@ export const brand = {
 } as const
 
 /**
- * Health, as the app shows it. The marks (dots, bars) are the same in both themes; text in a
- * status color uses the readable step for its theme. A status color always comes with a
- * label, never on its own.
+ * The status colors, for marks: dots, bars, and a pill's fill. Each reaches 3:1 on every
+ * surface of its theme, as WCAG asks of marks; only warn differs, deeper on light. Words in a
+ * status color use the theme's *-text tokens. src/health.ts says which level uses which, and
+ * a status color always comes with an icon and a word, never on its own.
  */
 export const status = {
-  good: '#0ca30c',
-  warn: '#fab219',
-  serious: '#ec835a',
-  critical: '#d03b3b',
-  neutral: '#898781',
+  light: { good: '#009e00', warn: '#bd7800', critical: '#d03b3b', neutral: gray[600] },
+  dark: { good: '#009e00', warn: '#fab219', critical: '#d03b3b', neutral: gray[600] },
 } as const
+
+export type StatusColor = keyof (typeof status)['light']
+
+/** A status pill's fill: its mark, at this opacity, over whatever the pill is on. */
+export const PILL_FILL = 0.12
 
 /** Categorical colors for charts, in order: neighbors stay apart for color-blind readers. */
 export const series = {
@@ -97,15 +102,17 @@ export const themes = {
     'line-strong': 'rgb(0 0 0 / 0.14)',
     'text-1': INK,
     'text-2': gray[700],
-    'text-3': gray[600],
+    'text-3': gray[650],
+    // Blue for fills, rings and icons; blue words use accent-strong, 4.5:1 on every surface.
     accent: blue[600],
     'accent-strong': blue[700],
     'accent-soft': 'rgb(38 117 211 / 0.1)',
     'accent-track': blue[100],
-    'good-text': '#1a7f37',
+    // Words in a status color: 4.5:1 on every surface, and on the status's pill over each.
+    'good-text': '#00732b',
     'warn-text': '#8a5a00',
-    'serious-text': '#b4501f',
     'critical-text': '#b42318',
+    'neutral-text': gray[700],
   },
   dark: {
     'app-bg': gray[950],
@@ -123,8 +130,8 @@ export const themes = {
     'accent-track': 'rgb(57 135 229 / 0.2)',
     'good-text': '#3fb950',
     'warn-text': '#e3a008',
-    'serious-text': '#f0883e',
-    'critical-text': '#f85149',
+    'critical-text': '#fc554c',
+    'neutral-text': gray[400],
   },
 } as const
 

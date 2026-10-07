@@ -42,7 +42,7 @@ drawn only from circles, in black, white and gray. Read more in the
 | [`social/`](social)         | Link previews, GitHub's social previews and profile banner, an avatar and a header               |
 | [`media/`](media)           | Wallpapers, and the installers' artwork (macOS disk image, Windows installer)                    |
 | [`snippets/`](snippets)     | The mark as a React and an Astro component, and the HTML `<head>` tags for the icons             |
-| [`guidelines/`](guidelines) | How to use all of it, online and as a 64-page brand book (PDF)                                   |
+| [`guidelines/`](guidelines) | How to use all of it, online and as a 65-page brand book (PDF)                                   |
 
 ## Logo
 
@@ -201,16 +201,17 @@ npm run check                  # whether those are up to date with src/, as CI c
 Images are rendered with Chrome, through Playwright: your Google Chrome if you have it, or
 Playwright's Chromium (`npx playwright install chromium`). Node.js 24 or later.
 
-| Source                               | What it defines                                             |
-| ------------------------------------ | ----------------------------------------------------------- |
-| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                     |
-| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                    |
-| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Inter Display Semibold, with its spacing |
-| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                              |
-| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                   |
-| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers      |
-| [`src/book/`](src/book)              | The brand book, page by page                                |
-| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                               |
+| Source                               | What it defines                                               |
+| ------------------------------------ | ------------------------------------------------------------- |
+| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                       |
+| [`src/health.ts`](src/health.ts)     | The five status levels: their colors, icons, names and motion |
+| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                      |
+| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Inter Display Semibold, with its spacing   |
+| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                                |
+| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                     |
+| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers        |
+| [`src/book/`](src/book)              | The brand book, page by page                                  |
+| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                                 |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to propose a change.
 
