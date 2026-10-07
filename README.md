@@ -33,16 +33,16 @@ drawn only from circles, in black, white and gray. Read more in the
 
 ## What's here
 
-| Folder                      | What                                                                                        |
-| --------------------------- | ------------------------------------------------------------------------------------------- |
-| [`logo/`](logo)             | The logo, stacked logo, mark and wordmark, as SVG and PNG, in every version; animated marks |
-| [`icons/app/`](icons/app)   | The app's icons: macOS (PNG, ICNS, Liquid Glass), Windows (ICO) and Linux (PNG)             |
-| [`icons/web/`](icons/web)   | Favicons, touch icons, web app icons and a web manifest                                     |
-| [`colors/`](colors)         | The palette and the app's theme tokens: CSS, Tailwind, design tokens, Adobe and GIMP        |
-| [`social/`](social)         | Link previews, GitHub's social previews and profile banner, an avatar and a header          |
-| [`media/`](media)           | Wallpapers, and the installers' artwork (macOS disk image, Windows installer)               |
-| [`snippets/`](snippets)     | The mark as a React and an Astro component, and the HTML `<head>` tags for the icons        |
-| [`guidelines/`](guidelines) | How to use all of it, online and as a 64-page brand book (PDF)                              |
+| Folder                      | What                                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| [`logo/`](logo)             | The logo, stacked logo, mark and wordmark, as SVG and PNG, in every version; animated marks      |
+| [`icons/app/`](icons/app)   | The app's icons: macOS (PNG, ICNS, Liquid Glass), Windows (ICO, Microsoft Store) and Linux (PNG) |
+| [`icons/web/`](icons/web)   | Favicons, touch icons, web app icons and a web manifest                                          |
+| [`colors/`](colors)         | The palette and the app's theme tokens: CSS, Tailwind, design tokens, Adobe and GIMP             |
+| [`social/`](social)         | Link previews, GitHub's social previews and profile banner, an avatar and a header               |
+| [`media/`](media)           | Wallpapers, and the installers' artwork (macOS disk image, Windows installer)                    |
+| [`snippets/`](snippets)     | The mark as a React and an Astro component, and the HTML `<head>` tags for the icons             |
+| [`guidelines/`](guidelines) | How to use all of it, online and as a 64-page brand book (PDF)                                   |
 
 ## Logo
 
@@ -83,6 +83,7 @@ ask for reduced motion.
 | `icons/app/macos/icon.png`                         | `build/icon.png`                       |
 | `icons/app/macos/Lumovi.icon/`                     | `build/Lumovi.icon/`                   |
 | `icons/app/windows/icon.png`                       | `build/icon-win.png`                   |
+| `icons/app/windows/store/`                         | `build/appx/`                          |
 | `icons/app/linux/`                                 | `build/icons/`                         |
 | `media/installer/dmg-background.png` and its `@2x` | `build/background.png` and its `@2x`   |
 | `media/installer/nsis-sidebar.bmp`                 | `build/installerSidebar.bmp`           |
@@ -91,8 +92,8 @@ ask for reduced motion.
 | `snippets/react/Logo.tsx`                          | `src/renderer/src/components/Logo.tsx` |
 | `colors/tokens.css` (the semantic tokens)          | `src/renderer/src/styles/index.css`    |
 
-electron-builder finds the installer artwork in `build/` by those names. The rest goes in
-`electron-builder.yml`:
+electron-builder finds the installer artwork in `build/`, and the Microsoft Store package's
+images in `build/appx/`, by those names. The rest goes in `electron-builder.yml`:
 
 ```yaml
 mac:
@@ -106,6 +107,9 @@ linux:
   icon: build/icons
 nsis:
   installerHeader: build/installerHeader.bmp
+appx:
+  # The tiles are transparent, so Start shows them on the tile color Windows picks.
+  backgroundColor: transparent
 ```
 
 `icons/app/macos/icon.icns` is there too, for anything that wants one. The app's window and

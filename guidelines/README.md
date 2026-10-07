@@ -115,6 +115,8 @@ brightest along the curve.
 - **Windows and Linux** use the plate edge to edge, as icons there do, and every size is drawn
   for itself: up to 96 pixels the mark is larger, and at 16 and 20 pixels the gap narrows to a
   single pixel.
+- **The Microsoft Store** package has the same icon at every size Windows asks for, and its
+  tiles have it in the middle, on transparency, so Start's tile color shows around it.
 - **Favicons** are the mark alone, which reads best at tab size, in the colors for the
   browser's theme. `favicon.ico` can't follow the theme, so it's the app icon.
 

@@ -225,11 +225,20 @@ export function fittedMark(size: number): { size: number; geometry: Geometry } {
     16: [12, tiny],
     20: [12, tiny],
     24: [16, standard],
+    30: [24, standard],
     32: [24, standard],
+    36: [24, standard],
     40: [24, standard],
+    44: [32, standard],
     48: [32, standard],
+    50: [32, standard],
+    60: [40, standard],
     64: [40, standard],
+    72: [48, standard],
+    80: [48, standard],
+    88: [56, standard],
     96: [64, standard],
+    100: [64, standard],
   }
   const [markSize, geometry] = table[size] ?? [Math.round((size * 0.5625) / 8) * 8, standard]
   return { size: markSize, geometry }
