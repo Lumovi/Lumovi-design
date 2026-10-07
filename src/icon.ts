@@ -217,7 +217,8 @@ export function macos(size: number, id = 'lumovi-icon'): string {
 
 /**
  * How big the mark is on a full-size plate, per pixel size: larger at small sizes (with the
- * narrow gap at 16 and 20), and 56.25% of the plate from 128 up.
+ * narrow gap at 16 and 20), and about 56.25% of the plate from 128 up. From 24 pixels on, a
+ * multiple of 8, so the gap and the corners fall on whole pixels.
  */
 export function fittedMark(size: number): { size: number; geometry: Geometry } {
   const table: Record<number, [number, Geometry]> = {
@@ -230,7 +231,7 @@ export function fittedMark(size: number): { size: number; geometry: Geometry } {
     64: [40, standard],
     96: [64, standard],
   }
-  const [markSize, geometry] = table[size] ?? [size * 0.5625, standard]
+  const [markSize, geometry] = table[size] ?? [Math.round((size * 0.5625) / 8) * 8, standard]
   return { size: markSize, geometry }
 }
 
