@@ -1,6 +1,7 @@
 // guidelines/images/: the pictures in the brand guidelines, drawn from the same sources as the
 // assets, so they can't disagree with them.
 import sharp from 'sharp'
+import * as appMenu from '../../src/appmenu.ts'
 import * as clusters from '../../src/clusters.ts'
 import * as fleet from '../../src/fleet.ts'
 import { blue, brand, gray, INK, PAPER, status, themes } from '../../src/colors.ts'
@@ -674,6 +675,16 @@ export default {
         ['add-done', 'dark', '.dialog'],
       ],
     }
+    // Where Windows and Linux reach the app's menu.
+    const menu = (html: string, height: number) =>
+      renderHtml(html, { width: 760, height, scale: 2, transparent: false })
+    const menus = await Promise.all([
+      menu(appMenu.sidebarMenu('light', false), 460),
+      menu(appMenu.sidebarMenu('dark', true), 460),
+      menu(appMenu.startMenu('dark', false), 500),
+      menu(appMenu.startMenu('light', true), 500),
+    ])
+    await ctx.png('guidelines/images/app-menu.png', await shoot(await clustersSheet(menus)))
     for (const [name, list] of Object.entries(fleetSheets)) {
       await ctx.png(
         `guidelines/images/${name}.png`,

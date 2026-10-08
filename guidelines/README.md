@@ -19,6 +19,7 @@ values and contrast, the type scale, the app icon's anatomy, imagery, motion and
 - [The sponsor card](#the-sponsor-card)
 - [The clusters page](#the-clusters-page)
 - [The Fleet page](#the-fleet-page)
+- [The menu on Windows and Linux](#the-menu-on-windows-and-linux)
 - [Typography](#typography)
 - [Imagery](#imagery)
 - [Writing about Lumovi](#writing-about-lumovi)
@@ -545,6 +546,37 @@ boxes are the clusters page's (see its build table). What's new:
 
 The command's values (`agent.joinToken`, the release's name) stand for what the agent's chart
 defines. The mockups are drawn from [`src/fleet.ts`](../src/fleet.ts).
+
+## The menu on Windows and Linux
+
+<img src="images/app-menu.png" alt="Lumovi on Windows, four views: in light, a cluster's sidebar with the menu button in its own top band, above the cluster, hovered, its tooltip Menu, Alt; in dark, the same with the app's menu open on Help; in dark, the start screen with the button at the top left, hovered; in light, the start screen with the menu open on View." />
+
+The desktop app's window hides its title bar, and with it Windows' and Linux's menu bar. So
+the menu has a button where macOS keeps its traffic lights: the window's top left corner.
+
+- **The button:** an `IconButton` with Lucide's `Menu`, named "Menu", its tooltip "Menu" with
+  `Alt`. It's in the same place in every view: 12 px from the left, centered in the 52 px band
+  Windows draws its window controls in (`TITLE_BAR_HEIGHT`), so it lines up with them. In a
+  cluster, the sidebar's top band, which macOS keeps 40 px for its traffic lights
+  (`traffic-lights h-10`), is 52 px on Windows and Linux (`h-[52px]`), with the button at its
+  left (`flex items-center px-3`); the cluster sits 12 px lower than on a Mac. On the start
+  screen it's at the left of the 52 px title bar (`titlebar-leading`, the button `ml-3`,
+  centered). Its tooltip shows to its right, centered on it (`side="right"`), clear of the
+  cluster. Open, it's `bg-surface-3 text-ink-1`, as any `IconButton` is.
+- **The corner still drags the window.** Only the button is `no-drag`; the rest of the band
+  around it stays a drag region, and double-clicking it maximizes the window, as before.
+- **The menu is the app's own,** opened under the button with Electron's `Menu.popup()`. So its
+  items, groups, labels, check marks, shortcuts and what an organization's policy locks are the
+  macOS menu's, and can't drift: File, Edit, View, Go, Window and Help. The system draws it, in
+  the app's theme (`nativeTheme.themeSource`), and its edit, zoom and full-screen commands work
+  as they would from a menu bar.
+- **Keys:** `Alt` pressed and released on its own, or `F10`, opens it, as a menu bar would.
+- **Help → Documentation,** on every platform, comes first among Help's links, before Lumovi on
+  GitHub.
+- **macOS has no button:** its menu bar has all of it, and the corner is the traffic lights'.
+
+The picture is drawn from [`src/appmenu.ts`](../src/appmenu.ts), the menu as Windows 11 draws
+it.
 
 ## Typography
 

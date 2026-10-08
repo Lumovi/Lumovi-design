@@ -227,6 +227,7 @@ Playwright's Chromium (`npx playwright install chromium`). Node.js 24 or later.
 | [`src/sponsor.ts`](src/sponsor.ts)   | The sidebar's sponsor card: its measurements and motion, and the spec sponsors get                            |
 | [`src/clusters.ts`](src/clusters.ts) | The desktop app's clusters page, drawn as the app draws it: the mockups of every state                        |
 | [`src/fleet.ts`](src/fleet.ts)       | The server's Fleet page, with an admin's ways to connect, set up and add clusters: the mockups of every state |
+| [`src/appmenu.ts`](src/appmenu.ts)   | Where Windows and Linux reach the app's menu: its button, and the menu as Windows draws it                    |
 | [`src/lucide.ts`](src/lucide.ts)     | The app's Lucide icons, for its mockups                                                                       |
 | [`src/book/`](src/book)              | The brand book, page by page                                                                                  |
 | [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                                                                                 |
