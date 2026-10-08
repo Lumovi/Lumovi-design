@@ -222,7 +222,7 @@ const CSS = `
 .problem { display: flex; gap: 10px; padding: 10px 12px; border-radius: 8px; background: var(--surface-3); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-2); }
 .problem svg.i { color: var(--critical-text); }
 .card.pending { border: 1.5px dashed var(--line-strong); background: transparent; box-shadow: none; }
-.card.pending .st { color: var(--accent-strong); }
+.card.pending .st { color: var(--neutral-text); }
 .card.pending p { margin: 0; font-size: 12px; line-height: 18px; color: var(--text-3); }
 .card.pending .buttons { display: flex; gap: 8px; margin-top: auto; }
 .audit { display: flex; align-items: center; gap: 6px; margin-right: auto; font-size: 12px; color: var(--text-3); }
@@ -241,7 +241,7 @@ const CSS = `
 .menu .foot svg.i { margin-top: 1px; color: var(--text-3); }
 .menu .foot code { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-1); }
 .waiting { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; color: var(--text-1); }
-.waiting .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.waiting .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--neutral); box-shadow: 0 0 0 4px color-mix(in srgb, var(--neutral) 12%, transparent); }
 .waiting .t { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-3); }
 .trust { padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
 .trust .top { display: flex; gap: 10px; }
@@ -314,7 +314,7 @@ export function card(c: FleetCluster, o: CardOptions = {}): string {
 
 function pendingCard(): string {
   return `<div class="card pending">
-    <div class="top"><span class="sdot pulse" style="--d:var(--accent)"></span><div class="who"><div class="nm">edge-ap-south</div><div class="st">Waiting for its agent</div></div></div>
+    <div class="top"><span class="sdot pulse" style="--d:var(--neutral)"></span><div class="who"><div class="nm">edge-ap-south</div><div class="st">Waiting for its agent</div></div></div>
     <div class="chips"><span>env=production</span><span>region=ap-south</span></div>
     <p>The command to connect it works until 15:42. Run it in the cluster, and its card fills in.</p>
     <div class="buttons"><span class="btn secondary sm">${icon('terminal', 14)}Show the command</span><span class="btn ghost sm">Cancel it</span></div>

@@ -435,7 +435,7 @@ function logo(scheme: Scheme): string {
 }
 
 const health = (c: Cluster) =>
-  c.problem === 'checking' ? 'var(--accent)' : c.problem ? 'var(--critical)' : 'var(--good)'
+  c.problem === 'checking' ? 'var(--neutral)' : c.problem ? 'var(--critical)' : 'var(--good)'
 
 /** A cluster's tile: its color and letters, with its status in the corner. */
 export function tile(c: Cluster, big = false): string {
