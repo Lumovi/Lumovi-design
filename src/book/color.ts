@@ -119,7 +119,12 @@ export function colorSection(): Section {
     ['Gray 650 on Gray 150', gray[650], gray[150], 'Quiet text, captions (text-3)'],
     ['Gray 600 on Gray 150', gray[600], gray[150], 'A headline’s second line: large text'],
     ['Blue 700 on Gray 150', blue[700], gray[150], 'Blue words: links (accent-strong)'],
-    ['Paper on Blue 600', PAPER, blue[600], 'Primary buttons'],
+    [
+      'Paper on Blue 600',
+      PAPER,
+      blue[600],
+      `Primary buttons, in both themes; ${contrast(PAPER, blue[700]).toFixed(2)}:1 on hover (Blue 700)`,
+    ],
     ['#ededed on Gray 850', '#ededed', gray[850], 'Body text, dark (text-1)'],
     ['Gray 400 on Gray 850', gray[400], gray[850], 'Secondary text, dark (text-2)'],
     ['Gray 500 on Gray 850', gray[500], gray[850], 'Quiet text and second lines, dark (text-3)'],
@@ -208,7 +213,7 @@ export function colorSection(): Section {
             </div>
             <div class="col fill">
               <h3>Steps</h3>
-              <p class="body"><b>600</b> on light and <b>500</b> on dark for fills, rings and icons, with <b>700</b> and <b>400</b> to press or hover. Blue words use 700 on light and 400 on dark (accent-strong): 4.5:1 on every surface.</p>
+              <p class="body"><b>600</b> for fills, rings and icons in both themes, deepening to <b>700</b> on hover, so white labels reach ${contrast(PAPER, blue[600]).toFixed(2)}:1 and ${contrast(PAPER, blue[700]).toFixed(2)}:1. Blue words use 700 on light and 400 on dark (accent-strong): 4.5:1 on every surface.</p>
             </div>
           </div>
           <div class="row" style="margin-top:28px;gap:16px">${actions(themes.light, 'Light')}${actions(themes.dark, 'Dark')}</div>`,

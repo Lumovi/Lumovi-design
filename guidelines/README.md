@@ -142,9 +142,8 @@ Apple present themselves. Color is kept for meaning.
 
 - **Blue** is for what you can act on (links, buttons, focus and selection), as in Apple's
   interfaces. It isn't the brand: never color the logo with it. Blue 600 (`--accent`) is for
-  fills, rings and icons, and white text on it reaches 4.60:1. Blue words use `--accent-strong`
-  (Blue 700 on light, 400 on dark), which reaches 4.5:1 on every surface; Blue 600 is only
-  4.00:1 on gray 150.
+  fills, rings and icons, in both themes. Blue words use `--accent-strong` (Blue 700 on light,
+  400 on dark), which reaches 4.5:1 on every surface; Blue 600 is only 4.00:1 on gray 150.
 - **Text** reaches 4.5:1 on every surface of its theme (WCAG AA). Quiet text (`--text-3`) is
   gray 650 on light (4.63:1 on gray 150, the darkest light surface) and gray 500 on dark.
 - **Status colors** say how things are, and nothing else. See [Status](#status).
@@ -153,6 +152,27 @@ Apple present themselves. Color is kept for meaning.
 
 The palette, and the app's semantic tokens for light and dark, are in [`colors/`](../colors) as
 CSS custom properties, a Tailwind theme, design tokens (JSON), and Adobe and GIMP swatches.
+
+### Buttons
+
+A filled button's label is white, and reaches 4.5:1 at rest and on hover, in both themes alike:
+hover deepens the fill, never lightens it.
+
+| Button            | Fill                                  | White label |
+| ----------------- | ------------------------------------- | ----------- |
+| Primary           | Blue 600 `#2675d3` (`--accent`)       | 4.60:1      |
+| Primary, on hover | Blue 700 `#1c5cab` (`--accent-hover`) | 6.63:1      |
+| Danger            | `#d03b3b` (`--critical`)              | 4.80:1      |
+| Danger, on hover  | `#bb3535` (`--critical-hover`)        | 5.72:1      |
+
+- **Focus** is a 2-pixel ring in Blue 600, set off from the button by a pixel or two, so it
+  stands out from the button's own fill. It reaches 4.00:1 on any light surface and 3.50:1 on
+  any dark one, over the 3:1 a focus ring needs.
+- **Pressed** buttons move down a pixel; the color doesn't change again.
+- **Disabled** buttons are at half opacity. They don't need to reach 4.5:1, but they still need
+  their label.
+- Dark mode used Blue 500 for buttons, and white on it is only 3.64:1. Lightening on hover
+  made it worse (2.66:1 on Blue 400).
 
 ## Status
 

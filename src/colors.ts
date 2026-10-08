@@ -104,8 +104,10 @@ export const themes = {
     'text-2': gray[700],
     'text-3': gray[650],
     // Blue for fills, rings and icons; blue words use accent-strong, 4.5:1 on every surface.
+    // White labels on a fill reach 4.5:1 at rest and on hover, which deepens it.
     accent: blue[600],
     'accent-strong': blue[700],
+    'accent-hover': blue[700],
     'accent-soft': 'rgb(38 117 211 / 0.1)',
     'accent-track': blue[100],
     // Words in a status color: 4.5:1 on every surface, and on the status's pill over each.
@@ -113,6 +115,8 @@ export const themes = {
     'warn-text': '#8a5a00',
     'critical-text': '#b42318',
     'neutral-text': gray[700],
+    // A danger button: white on critical, deepening on hover.
+    'critical-hover': '#bb3535',
   },
   dark: {
     'app-bg': gray[950],
@@ -124,14 +128,16 @@ export const themes = {
     'text-1': '#ededed',
     'text-2': gray[400],
     'text-3': gray[500],
-    accent: blue[500],
+    accent: blue[600],
     'accent-strong': blue[400],
+    'accent-hover': blue[700],
     'accent-soft': 'rgb(57 135 229 / 0.16)',
     'accent-track': 'rgb(57 135 229 / 0.2)',
     'good-text': '#3fb950',
     'warn-text': '#e3a008',
     'critical-text': '#fc554c',
     'neutral-text': gray[400],
+    'critical-hover': '#bb3535',
   },
 } as const
 

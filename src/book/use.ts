@@ -17,10 +17,10 @@ export function useSection(a: Assets): Section {
         ${logo('logo', theme === 'light' ? 'on-light' : 'on-dark', logoHeight(24))}
         ${['The app', 'Features', 'In your cluster', 'Install'].map((l) => `<span style="font-size:14px;color:${muted}">${l}</span>`).join('')}
         <span style="margin-left:auto;font-size:14px;color:${muted}">Docs</span>
-        <span style="padding:8px 14px;border-radius:9px;background:${theme === 'light' ? blue[600] : blue[500]};color:#fff;font-size:14px;font-weight:550">Download</span>
+        <span style="padding:8px 14px;border-radius:9px;background:${blue[600]};color:#fff;font-size:14px;font-weight:550">Download</span>
       </div>
       <div style="padding:20px 24px 22px">
-        <div style="font-size:30px;font-weight:650;letter-spacing:-0.045em;line-height:1.02;color:${fg};font-variation-settings:'opsz' 32">Your clusters,<br><span style="color:${theme === 'light' ? gray[400] : gray[600]}">at a glance.</span></div>
+        <div style="font-size:30px;font-weight:650;letter-spacing:-0.045em;line-height:1.02;color:${fg};font-variation-settings:'opsz' 32">Your clusters,<br><span style="color:${theme === 'light' ? gray[600] : gray[500]}">at a glance.</span></div>
       </div>
     </div>`
   }
@@ -85,7 +85,7 @@ export function useSection(a: Assets): Section {
               ['Links', 'Body text in Gray 600 (400 on dark)'],
             ])}
             ${specs([
-              ['Primary button', 'Blue 600 (500 on dark), white text, 9 px corners'],
+              ['Primary button', 'Blue 600 (700 on hover), white text, 9 px corners'],
               [
                 'Docs (Mintlify)',
                 'logo/light.svg and logo/dark.svg: the logo, on-light and on-dark',
