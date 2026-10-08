@@ -1,6 +1,7 @@
 // guidelines/images/: the pictures in the brand guidelines, drawn from the same sources as the
 // assets, so they can't disagree with them.
 import sharp from 'sharp'
+import * as clusters from '../../src/clusters.ts'
 import { blue, brand, gray, INK, PAPER, status, themes } from '../../src/colors.ts'
 import { dot, levels, pill } from '../../src/health.ts'
 import { macos, plated } from '../../src/icon.ts'
@@ -504,6 +505,33 @@ function sponsorAnatomy(cards: Cards): string {
   )
 }
 
+// ─── The clusters page ─────────────────────────────────────────────────────────────────────
+
+/** The desktop app's default window, which the clusters page's mockups are drawn in. */
+const CLUSTERS_WINDOW = { width: 1440, height: 920 }
+
+/** Part of the clusters page in one state: what `selector` covers, with `pad` around it. */
+function clustersView(state: clusters.State, scheme: 'light' | 'dark', selector: string, pad = 0) {
+  return renderHtml(clusters.clustersPage(state, scheme, CLUSTERS_WINDOW), {
+    ...CLUSTERS_WINDOW,
+    scale: 2,
+    transparent: false,
+    clip: { selector, pad },
+  })
+}
+
+/** Pictures in two columns, each with the app's rounded corners and hairline. */
+function clustersSheet(pictures: Buffer[]): string {
+  const cells = pictures
+    .map((png) => `<img src="data:image/png;base64,${png.toString('base64')}" alt="">`)
+    .join('')
+  return page(
+    `<div class="pair">${cells}</div>`,
+    `.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+    .pair img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 0 0 1px rgb(128 128 128 / 0.25); }`,
+  )
+}
+
 export default {
   name: 'guidelines',
   outputs: ['guidelines/images'],
@@ -544,5 +572,54 @@ export default {
       'guidelines/images/sponsor-anatomy.png',
       await shoot(sponsorAnatomy(themed.light)),
     )
+
+    // The clusters page, from its mockups.
+    const views = (list: [clusters.State, 'light' | 'dark', string, number?][]) =>
+      Promise.all(
+        list.map(([state, scheme, selector, pad]) => clustersView(state, scheme, selector, pad)),
+      )
+    const sheets: Record<string, [clusters.State, 'light' | 'dark', string, number?][]> = {
+      clusters: [
+        ['list', 'dark', '.column', 24],
+        ['list', 'light', '.column', 24],
+      ],
+      'clusters-list': [
+        ['search', 'dark', '.picker', 16],
+        ['actions', 'dark', '.picker, .menu', 16],
+        ['group-by', 'dark', '.picker, .menu', 16],
+        ['hidden', 'dark', '.picker', 16],
+      ],
+      'clusters-files': [
+        ['files', 'dark', '.menu.pop, footer.page', 16],
+        ['files', 'light', '.menu.pop, footer.page', 16],
+      ],
+      'clusters-empty': [
+        ['empty', 'light', '.empty-panel, footer.page', 16],
+        ['unreadable', 'light', '.empty-panel, footer.page', 16],
+        ['missing', 'light', '.empty-panel, footer.page', 16],
+        ['partial', 'light', '.picker, footer.page', 16],
+      ],
+      'clusters-add': [
+        ['add-paste', 'dark', '.dialog'],
+        ['add-import', 'dark', '.dialog'],
+        ['add-checking', 'dark', '.dialog'],
+        ['add-exec', 'dark', '.dialog'],
+        ['add-failed', 'dark', '.dialog'],
+        ['add-done', 'dark', '.dialog'],
+      ],
+      'clusters-settings': [
+        ['settings', 'light', '.dialog'],
+        ['settings-added', 'light', '.dialog'],
+      ],
+      'clusters-policy': [
+        ['locked', 'dark', '.bar, .menu', 16],
+        ['locked-files', 'dark', '.menu.pop, footer.page', 16],
+        ['locked-settings', 'dark', '.dialog'],
+        ['locked-empty', 'dark', '.empty-panel, footer.page', 16],
+      ],
+    }
+    for (const [name, list] of Object.entries(sheets)) {
+      await ctx.png(`guidelines/images/${name}.png`, await shoot(clustersSheet(await views(list))))
+    }
   },
 } satisfies Task

@@ -214,19 +214,21 @@ npm run sources                # take the pictures in sources/ again (see its RE
 Images are rendered with Chrome, through Playwright: your Google Chrome if you have it, or
 Playwright's Chromium (`npx playwright install chromium`). Node.js 24 or later.
 
-| Source                               | What it defines                                                                    |
-| ------------------------------------ | ---------------------------------------------------------------------------------- |
-| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                                            |
-| [`src/health.ts`](src/health.ts)     | The five status levels: their colors, icons, names and motion                      |
-| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                                           |
-| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Inter Display Semibold, with its spacing                        |
-| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                                                     |
-| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                                          |
-| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers                             |
-| [`src/launch.ts`](src/launch.ts)     | The launch art: YouTube thumbnails and channel art, Product Hunt's gallery         |
-| [`src/sponsor.ts`](src/sponsor.ts)   | The sidebar's sponsor card: its measurements and motion, and the spec sponsors get |
-| [`src/book/`](src/book)              | The brand book, page by page                                                       |
-| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                                                      |
+| Source                               | What it defines                                                                        |
+| ------------------------------------ | -------------------------------------------------------------------------------------- |
+| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                                                |
+| [`src/health.ts`](src/health.ts)     | The five status levels: their colors, icons, names and motion                          |
+| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                                               |
+| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Inter Display Semibold, with its spacing                            |
+| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                                                         |
+| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                                              |
+| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers                                 |
+| [`src/launch.ts`](src/launch.ts)     | The launch art: YouTube thumbnails and channel art, Product Hunt's gallery             |
+| [`src/sponsor.ts`](src/sponsor.ts)   | The sidebar's sponsor card: its measurements and motion, and the spec sponsors get     |
+| [`src/clusters.ts`](src/clusters.ts) | The desktop app's clusters page, drawn as the app draws it: the mockups of every state |
+| [`src/lucide.ts`](src/lucide.ts)     | The app's Lucide icons, for its mockups                                                |
+| [`src/book/`](src/book)              | The brand book, page by page                                                           |
+| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                                                          |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to propose a change.
 

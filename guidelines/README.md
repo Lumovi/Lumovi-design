@@ -17,6 +17,7 @@ values and contrast, the type scale, the app icon's anatomy, imagery, motion and
 - [Color](#color)
 - [Status](#status)
 - [The sponsor card](#the-sponsor-card)
+- [The clusters page](#the-clusters-page)
 - [Typography](#typography)
 - [Imagery](#imagery)
 - [Writing about Lumovi](#writing-about-lumovi)
@@ -304,6 +305,164 @@ shown at half that), with a placeholder sponsor's (`example-*.png`) for tests.
 README, with a template: a picture for light mode and one for dark, 408 × 136 (3:1) exactly,
 with logos and words inside the middle 360 × 88; PNG, WebP, GIF or animated WebP, up to 150 KB
 still or 500 KB animated; a line of up to 32 characters; and an `https` link.
+
+## The clusters page
+
+<img src="images/clusters.png" alt="The desktop app's clusters page in dark and light: the Lumovi logo and “Choose a cluster to explore.”, then the list, with Recent first as one-line shortcuts, then the Payments, Platform and Other clusters groups. Each row has a colored tile with the cluster's letters and a status dot on its corner, its name, a Production badge where it applies, and its version and latency." />
+
+The desktop app's start screen is where people choose a cluster, choose the kubeconfig Lumovi
+reads, add clusters and keep each one's settings. It stays the calm, keyboard-first list it was:
+the search field has the focus, the list does the rest, and everything else is one step away, in
+the list's bar, the page's footer, or a dialog.
+
+Lumovi never writes a kubeconfig. Clusters added in Lumovi are kept in its own folder, and a
+cluster's settings in its own settings, never in the file.
+
+### The list
+
+- **Rows** show what tells clusters apart. A tile in the cluster's color, with its letters, and
+  its status dot on the tile's corner. Then its name, with a Production badge, a lock if it's
+  read-only, and "current" for the kubeconfig's current context. Under the name, in mono, the
+  context's name if the cluster has its own name, cut in the middle so its start and end show;
+  otherwise its server and user. On the right, its version and latency, or what went wrong.
+- **The selected row** steps up to `--surface-3`, and only it shows ⋯ and ↵ (`--text-3`, 4.6:1
+  on it in light and 5.0:1 in dark). There's no colored bar: the step, and the row's own
+  controls, are enough.
+- **Recent** comes first: up to three clusters, one line each, as shortcuts. They stay in their
+  groups too, so no group looks incomplete. Searching hides Recent.
+- **Groups** are Lumovi's own (a cluster has one), in name order, then "Other clusters". **Group
+  by** can also group by a label's values, in mono headings like `env=production`, or not group.
+- **Labels** aren't on the rows, which keeps the list calm. Search finds them (`env=production`
+  is a search), and a row shows the label a search matched, in blue.
+- **Colors** are the eight data colors (`--series-1` to `--series-8`), in their order, or none: a
+  gray tile. The tile is the color at 16% (22% in dark), and its letters the color mixed toward
+  the text.
+- **Hidden clusters** are left out, and the list's footer counts them. Shown, they're dimmed,
+  with an eye.
+
+<img src="images/clusters-list.png" alt="Four views of the list in dark: a search for env=production with two matches, each showing the label in blue; a cluster's actions menu; the Group by menu; and hidden clusters shown, dimmed." />
+
+From the left: a search for a label, a cluster's actions, Group by, and hidden clusters shown.
+
+### Kubeconfig files
+
+<img src="images/clusters-files.png" alt="The Kubeconfig files popover over the page's footer, in dark and light: four files, each with where it comes from and how many clusters; a missing one in red; then Choose a kubeconfig…, Add another file…, and Back to KUBECONFIG and ~/.kube/config." />
+
+The footer's "Loaded from" becomes a button: the first file, a count of the others, and a
+chevron. It opens the files Lumovi reads, merged as kubectl merges them:
+
+- Each file says **where it comes from**: "The default" (`~/.kube/config`), "From KUBECONFIG",
+  "Added in Lumovi", or "Clusters added in Lumovi" for Lumovi's own folder. On hover or focus, a
+  file shows **Show in Finder**, and **Remove** if it was added in Lumovi; KUBECONFIG's own files
+  can't be removed from here.
+- **A file that's gone** is in red, with **Choose it again…** and Remove.
+- **Choose a kubeconfig…** reads only the file chosen; **Add another file…** adds one to those
+  read; **Back to KUBECONFIG and ~/.kube/config** undoes both.
+
+<img src="images/clusters-empty.png" alt="In light: No clusters yet, with Choose a kubeconfig… and Add a cluster; Your kubeconfig couldn't be read, with the parser's error, Choose a kubeconfig… and Show in Finder; The kubeconfig you chose is gone, with Choose a kubeconfig… and Back to KUBECONFIG and ~/.kube/config; and the list with a notice that one file is gone." />
+
+When nothing can be read, the list's panel says why, and every case offers **Choose a
+kubeconfig…**, with the focus on it: no clusters, an unreadable file (with the parser's own
+words), and a chosen file that's gone. When one file of several is gone or unreadable, the others
+still load, under a notice in the list.
+
+### Adding a cluster
+
+<img src="images/clusters-add.png" alt="The Add a cluster dialog, in dark, in six steps: a pasted kubeconfig; a file dropped on it; the check under way; a credential plugin, with the command it would run and Allow and continue; a server that didn't answer, with Try again and Add it anyway; and done, with a name, color and group, and the line to use it with kubectl." />
+
+**Add cluster** (in the list's bar, or ⌘N) opens a dialog. Paste a kubeconfig, or one context
+from one, or drop a file. **Check it** then checks three things, one after another, and says what
+it found: it reads as a kubeconfig, the server answers (its version and latency), and the
+credentials work (who Lumovi signed in as).
+
+- **A credential plugin** (an `exec` user) runs a program on this computer, so the check stops
+  before it and shows the exact command, with its environment, in a warning. Nothing runs until
+  **Allow and continue**.
+- **A check that fails** says why, in the error's own words, and what to try. **Add it anyway**
+  keeps a cluster whose server didn't answer, as one behind a VPN that's off.
+- **Done**, the cluster is in Lumovi's own folder. The dialog offers its name, color and group,
+  and the line that uses it with kubectl:
+  `export KUBECONFIG="$HOME/Library/Application Support/Lumovi/clusters/<name>.yaml"`. The new
+  row lands selected in its group, tinted blue for a moment.
+
+### A cluster's settings
+
+<img src="images/clusters-settings.png" alt="Cluster settings, in light: for a cluster from a kubeconfig, its name, color, group, labels and namespace, Production, Read-only and Hidden, and its connection, from ~/.kube/config, with Show in Finder; for a cluster added in Lumovi, the same, with its server, how it signs in, Edit connection… and Copy for kubectl, and Remove from Lumovi." />
+
+⌘I, or Settings… in a cluster's actions: name, color, group, labels, the namespace it opens in,
+and three switches. **Production** makes deleting and draining ask for its name, and shows its
+badge; it's set by hand, and starts as Lumovi's guess from the name. **Read-only** and **Hidden**
+are as they say. **Connection** shows where the cluster comes from: a kubeconfig's can't be edited
+here (Show in Finder); one added in Lumovi has **Edit connection…** (the add dialog again, with
+its kubeconfig), **Copy for kubectl**, and **Remove from Lumovi**. Changes apply on **Save**.
+
+### When an organization manages it
+
+<img src="images/clusters-policy.png" alt="In dark: the Managed badge in place of Add cluster, with its popover, Managed by your organization; the files popover, set by your organization; a cluster's Read-only switch, locked, Set by your organization; and No clusters yet on a managed computer, with Reload." />
+
+When an organization's policy sets the kubeconfig, **Add cluster** gives way to a **Managed**
+badge, like the app's Read-only badge, whose popover says why and names the policy's file. The
+files popover lists the managed file without changes. A setting the policy fixes, such as
+Read-only, is locked and says "Set by your organization." A managed computer with no clusters
+says who to ask.
+
+### Motion, keys and words
+
+- **Motion:** the header and the list rise in (320 ms, 60 ms apart), as today. Menus and popovers
+  pop in from their button (160 ms); dialogs pop in over a dimmed, blurred page (160 ms). In the
+  check, each step starts 80 ms after the last, and its spinner becomes a check with the toasts'
+  quarter turn (500 ms). A new row's blue fades over 1.2 s. With reduced motion, all of it is
+  instant.
+- **Keys:** ↑ ↓ move, ↵ opens, `.` opens the selected cluster's actions, ⌘I its settings, ⌘N adds
+  a cluster, ⌘⌫ removes one Lumovi added. The list's footer shows the first four.
+- **Focus:** buttons and swatches get the app's 2 px Blue 600 ring; fields a blue border and a
+  soft ring. On a page with nothing found, "Choose a kubeconfig…" has the focus.
+- **Words:** "Choose a cluster to explore." "Search clusters and labels…" "Add cluster".
+  "Kubeconfig files" "Merged as kubectl does". "Lumovi reads these files and never writes to
+  them. Removing one only stops Lumovi reading it." "No clusters yet". "Signing in runs a program
+  on this computer". The rest are in the mockups' source.
+
+### Building it
+
+In the app's Tailwind and tokens. The list keeps the start screen's cmdk picker and its classes,
+except where this says otherwise; the column is `max-w-[720px]`.
+
+| Part                     | Size       | Classes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The list's bar           | 48 tall    | `flex h-12 items-center gap-2.5 border-b border-line pr-2.5 pl-4`; count `text-xs text-ink-3 tabular-nums`; then `h-5 w-px bg-line`                                                                                                                                                                                                                                                                                                                                                              |
+| Group by, Add cluster    | 28 tall    | ghost and secondary buttons with `h-7 px-2.5 text-xs`, icons `size-3.5` (`Layers`, `Plus`); Group by is `bg-surface-3 text-ink-1` while it groups by a label                                                                                                                                                                                                                                                                                                                                     |
+| Group heading            | 16 tall    | the picker's heading classes, then the count: `ml-1.5 font-normal tracking-normal tabular-nums opacity-75`; a label's value adds `font-mono normal-case tracking-normal`                                                                                                                                                                                                                                                                                                                         |
+| Row                      | 56 tall    | `flex items-center gap-3.5 rounded-xl px-3 py-2.5`; selected `data-[selected=true]:bg-surface-3`, with no inset bar                                                                                                                                                                                                                                                                                                                                                                              |
+| Recent row               | 40 tall    | `gap-3 py-2`, a 24 px tile (`size-6 rounded-[7px] text-[10px]`, its dot `size-2.5`), and no second line                                                                                                                                                                                                                                                                                                                                                                                          |
+| Tile                     | 32 × 32    | `relative grid size-8 shrink-0 place-items-center rounded-[9px] text-xs font-semibold`; background `color-mix(in srgb, var(--series-N) 16%, transparent)` (22% in dark), letters `color-mix(in srgb, var(--series-N), black 28%)` (`white 30%` in dark)                                                                                                                                                                                                                                          |
+| No color                 | 32 × 32    | `bg-surface-3 text-ink-2 ring-1 ring-inset ring-line`; on the selected row, `bg-surface-2`                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Status dot               | 12 × 12    | `absolute -right-[3px] -bottom-[3px] size-3 rounded-full border-2` in the row's background (`border-surface-2`, selected `border-surface-3`), with the health's `bg-*`                                                                                                                                                                                                                                                                                                                           |
+| Name, badges             | 13.5 / 20  | name as today; Production `rounded bg-critical/10 px-1.5 py-px text-2xs font-semibold tracking-wide text-critical-text uppercase`; read-only `Lock` `size-3 text-ink-3`; hidden `EyeOff` `size-3.5`, row `opacity-55`                                                                                                                                                                                                                                                                            |
+| Second line              | 12 / 16    | `mt-0.5 block truncate font-mono text-xs text-ink-3`; a context over 46 characters is cut in the middle                                                                                                                                                                                                                                                                                                                                                                                          |
+| A matched label          | 20 tall    | `h-5 rounded-md bg-accent-soft px-1.5 font-mono text-2xs text-accent-strong`                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Version and latency      | 116 wide   | `w-[116px] shrink-0 text-right text-xs text-ink-3`, the version `font-mono text-ink-2`                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ⋯ and ↵                  | 28, 20     | an `IconButton` at `size-7` with `Ellipsis`, then the ↵; both `opacity-0 group-data-[selected=true]:opacity-100`                                                                                                                                                                                                                                                                                                                                                                                 |
+| The list's footer        | 36 tall    | as today, adding `.` for actions and ⌘N to add; on the right `ml-auto flex items-center gap-1.5 text-xs font-medium text-ink-2`, `EyeOff` or `Eye` `size-3.5`: "2 hidden", "Showing 2 hidden"                                                                                                                                                                                                                                                                                                    |
+| Files button             | 28 tall    | `-ml-2 flex h-7 min-w-0 items-center gap-1.5 rounded-lg px-2 text-ink-3 hover:bg-surface-3 data-[state=open]:bg-surface-3`; path `truncate font-mono text-xs text-ink-2 [direction:rtl]`, count `rounded-full bg-surface-3 px-1.5 text-2xs font-medium text-ink-2`, `ChevronUp` `size-3.5`                                                                                                                                                                                                       |
+| Files popover            | 440 wide   | `menuContent w-[440px] p-0`, `side="top" align="start"`; heading `flex items-baseline justify-between px-3.5 pt-3 pb-1.5`; a file `mx-1 flex items-center gap-2.5 rounded-lg px-2.5 py-2 hover:bg-surface-3`, path `truncate font-mono text-xs text-ink-1`, note `text-xs text-ink-3` (gone: `text-critical-text`), its buttons `size-[26px] rounded-md`; the items `border-t border-line p-1` with `menuItem`; the note `flex gap-2 border-t border-line px-3.5 pt-2.5 pb-3 text-xs text-ink-3` |
+| A file gone, in the list | 32 tall    | `StaleNotice`'s classes, with `TriangleAlert` `size-3.5` and its two actions `ml-auto flex gap-3 font-medium`                                                                                                                                                                                                                                                                                                                                                                                    |
+| Nothing to show          | 380 tall   | `flex min-h-[380px] flex-col justify-center rounded-2xl border border-line bg-surface-2 shadow-panel` (`min-h-[320px]` under 800 tall), holding `EmptyState` at `max-w-[460px]`, buttons `mt-5 flex gap-2`; unreadable uses `ErrorState`'s tile                                                                                                                                                                                                                                                  |
+| Add, settings dialogs    | 600 wide   | `ActionDialog`, `w-[600px]`; settings at `top-[7vh]`                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Paste or a file          |            | `Segmented`; the editor is `CodeEditor` in `rounded-lg border border-line-strong bg-surface`, with the field focus ring; the drop zone `flex flex-col items-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-line-strong px-5 py-10`, over it `border-accent bg-accent-soft`                                                                                                                                                                                                        |
+| What was pasted          | 36 tall    | `flex items-center gap-2.5 rounded-lg bg-surface-3 px-3 py-2 text-xs text-ink-2`, and Edit `ml-auto font-medium text-accent-strong`                                                                                                                                                                                                                                                                                                                                                              |
+| A check                  |            | `flex gap-2.5`; icons `size-4`: `CircleCheck` `text-good-text`, `CircleX` `text-critical-text`, `CircleAlert` `text-warn-text`, `LoaderCircle` `animate-spin text-ink-3`, `CircleDashed` `text-ink-3`; title `text-[13px] font-medium`, detail `truncate font-mono text-xs text-ink-3`, hint `mt-0.5 text-xs text-ink-2`                                                                                                                                                                         |
+| The plugin warning       |            | `rounded-xl border border-warn/30 bg-warn/9 px-3.5 py-3`, `TriangleAlert` `size-4 text-warn-text`; the command `mt-2.5 ml-[26px] rounded-lg bg-surface px-3 py-2.5 shadow-[inset_0_0_0_1px_var(--line)]`, labelled as the Equivalent command box is, its environment `text-ink-3`, each argument kept whole                                                                                                                                                                                      |
+| Use it with kubectl      |            | the Equivalent command box                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Settings form            | 128 + rest | `grid grid-cols-[128px_1fr] items-center gap-x-4 gap-y-3`; labels `text-xs font-medium text-ink-2`; fields the standard `field` (`h-8`), Group and Namespace with `ChevronsUpDown`                                                                                                                                                                                                                                                                                                               |
+| Labels field             | 32 tall    | `flex min-h-8 flex-wrap items-center gap-1 px-1.5 py-1`, a label `h-5 rounded-md bg-surface-3 pr-1 pl-1.5 font-mono text-2xs text-ink-1` with `X` `size-3`                                                                                                                                                                                                                                                                                                                                       |
+| Swatches                 | 22 × 22    | `size-[22px] rounded-full`, chosen `ring-2 ring-offset-2 ring-offset-surface-2` in its color, with `Check` `size-3` in white; none `bg-surface ring-1 ring-inset ring-line-strong` with `Minus`                                                                                                                                                                                                                                                                                                  |
+| Switches                 |            | `flex items-start gap-3`, `Switch`, title `text-[13px] font-medium`, line `text-xs text-ink-3`; locked: `Switch` disabled and `inline-flex items-center gap-1 text-ink-2`, `Lock` `size-3`, "Set by your organization."                                                                                                                                                                                                                                                                          |
+| Connection               |            | `rounded-xl bg-surface-3/70 px-3.5 py-3`; its label row as the Equivalent command box's, the source `ml-auto font-mono text-xs text-ink-2`; details `grid grid-cols-[96px_1fr] gap-x-3 gap-y-1 text-xs`                                                                                                                                                                                                                                                                                          |
+| Managed                  | 28 tall    | the Read-only badge's classes, reading "Managed"; its popover `menuContent w-[340px] p-3`                                                                                                                                                                                                                                                                                                                                                                                                        |
+
+The tile's colors need `--series-3` to `--series-8` in the app's `@theme`, beside the two it has.
+The mockups are drawn from [`src/clusters.ts`](../src/clusters.ts), with the app's own icons
+([`src/lucide.ts`](../src/lucide.ts)).
 
 ## Typography
 

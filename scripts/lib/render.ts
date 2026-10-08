@@ -38,6 +38,8 @@ export interface RenderOptions {
   transparent?: boolean
   /** JavaScript to run in the page before it's captured, such as pausing its animations. */
   prepare?: string
+  /** Capture only what these elements cover (a CSS selector), with `pad` pixels around it. */
+  clip?: { selector: string; pad?: number }
 }
 
 /** Renders an HTML page to PNG bytes. */
@@ -55,6 +57,26 @@ export async function renderHtml(html: string, options: RenderOptions): Promise<
     await page.goto(`file://${file}`)
     await page.evaluate(() => document.fonts.ready)
     if (options.prepare) await page.evaluate(options.prepare)
+    if (options.clip) {
+      const { selector, pad = 0 } = options.clip
+      const box = await page.$$eval(selector, (elements) => {
+        const rects = elements.map((e) => e.getBoundingClientRect())
+        const left = Math.min(...rects.map((r) => r.left))
+        const top = Math.min(...rects.map((r) => r.top))
+        return {
+          x: left,
+          y: top,
+          width: Math.max(...rects.map((r) => r.right)) - left,
+          height: Math.max(...rects.map((r) => r.bottom)) - top,
+        }
+      })
+      const x = Math.max(0, box.x - pad)
+      const y = Math.max(0, box.y - pad)
+      return await page.screenshot({
+        omitBackground: transparent,
+        clip: { x, y, width: box.width + 2 * pad, height: box.height + 2 * pad },
+      })
+    }
     if (options.height === 'fit') {
       return await page.screenshot({ omitBackground: transparent, fullPage: true })
     }
