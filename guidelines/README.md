@@ -150,6 +150,11 @@ Apple present themselves. Color is kept for meaning.
 - **Status colors** say how things are, and nothing else. See [Status](#status).
 - The **data colors** for charts (`--series-1` to `--series-8`) are ordered so that neighbors
   stay apart for color-blind readers. Use them in that order.
+- A chart's **reference lines** (a request, a limit, a recommendation) are dashed, and each
+  label gives the line's name and its value, "Request 500m", in every chart and wherever the
+  label sits: the axis can't say exactly where 500m is, and a pod's chart has nothing else that
+  does. A label keeps off the data and the other lines; where nothing is clear, it sits on the
+  card's surface, with a hairline.
 
 The palette, and the app's semantic tokens for light and dark, are in [`colors/`](../colors) as
 CSS custom properties, a Tailwind theme, design tokens (JSON), and Adobe and GIMP swatches.
