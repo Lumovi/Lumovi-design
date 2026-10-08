@@ -88,10 +88,16 @@ export function imagerySection(a: Assets): Section {
             <div style="position:relative;width:660px;height:220px;margin-bottom:${660 * 0.11}px">
               <img src="${a.file('social/header.png')}" width="660" height="220" style="border-radius:12px">
               <div style="position:absolute;left:${660 * 0.025}px;top:${220 - 660 * 0.11}px;width:${660 * 0.22}px;height:${660 * 0.22}px;border-radius:50%;border:2px dashed #f5a524;background:rgb(245 165 36 / 0.12)"></div>
+              ${[111, 1243, 1392]
+                .map(
+                  (x) =>
+                    `<div style="position:absolute;left:${(x - 65) * 0.44}px;top:${(102 - 65) * 0.44}px;width:${130 * 0.44}px;height:${130 * 0.44}px;box-sizing:border-box;border-radius:50%;border:2px dashed #f5a524;background:rgb(245 165 36 / 0.12)"></div>`,
+                )
+                .join('')}
             </div>
             <div class="col fill" style="gap:12px">
               <h3>X, Bluesky and Mastodon</h3>
-              <p class="body">The header leaves the bottom left to the avatar (dashed), and keeps the address out of the top corners, where phones put their buttons.</p>
+              <p class="body">The header leaves the bottom left to the avatar, and the top corners to the buttons phones put there (dashed): the mark sits beside the words, the two centered as one group.</p>
               ${specs([
                 ['Header', '1500 × 500, at twice the size'],
                 ['Avatar', 'social/avatar.png, 1024 × 1024'],

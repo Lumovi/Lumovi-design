@@ -21,10 +21,15 @@ interface Card {
   lead?: string
   /** The type size of the title, in pixels at this card's size. */
   titleSize: number
-  /** The address the card is for, as people read it. */
-  url: string
+  /** The address the card is for, as people read it, or none. */
+  url?: string
   /** Leave out the logo, and center the copy higher: for headers an avatar overlaps. */
   header?: boolean
+  /**
+   * Set the mark beside the copy, the two centered as one group, instead of at the right edge:
+   * for headers that apps put their buttons over, in the top corners.
+   */
+  beside?: boolean
 }
 
 /**
@@ -40,10 +45,13 @@ function card({
   titleSize,
   url,
   header,
+  beside,
 }: Card): string {
   const u = H / 630
   const pad = 64 * u
-  const markSize = Math.min(290 * u, W * 0.26)
+  const markSize = beside ? H * 0.4 : Math.min(290 * u, W * 0.26)
+  // The copy's left edge; beside it, the mark's right edge is as far from the right.
+  const left = header ? W * 0.27 : pad
   const variant = VARIANTS.find((v) => v.name === (theme === 'dark' ? 'on-dark' : 'on-light'))!
   const logo = document(horizontal(variant), 34 * u)
   const c = palette[theme]
@@ -51,7 +59,11 @@ function card({
     width: W,
     height: H,
     theme,
-    mark: { x: W - pad - markSize - 28 * u, y: (H - markSize) / 2 - 18 * u, size: markSize },
+    mark: {
+      x: beside ? W - left - markSize : W - pad - markSize - 28 * u,
+      y: (H - markSize) / 2 - 18 * u,
+      size: markSize,
+    },
     floor: { fadeLeft: true },
     css: `
       .logo { position: absolute; left: ${pad}px; top: ${60 * u}px; }
@@ -75,7 +87,7 @@ function card({
       }
       .copy {
         position: absolute;
-        left: ${header ? W * 0.27 : pad}px;
+        left: ${left}px;
         top: ${header ? H * 0.42 : H / 2 + 60 * u}px;
         transform: translateY(-50%);
         max-width: ${W * 0.56}px;
@@ -98,11 +110,11 @@ function card({
         text-wrap: balance;
       }`,
     content: `
-      ${header ? '' : `<div class="logo">${logo}</div><div class="url">${escape(url)}</div>`}
+      ${header ? '' : `<div class="logo">${logo}</div>${url ? `<div class="url">${escape(url)}</div>` : ''}`}
       <div class="copy">
         <h1>${headline(title, theme)}</h1>
         ${lead ? `<p>${escape(lead)}</p>` : ''}
-        ${header ? `<div class="url">${escape(url)}</div>` : ''}
+        ${header && url ? `<div class="url">${escape(url)}</div>` : ''}
       </div>`,
   })
 }
@@ -191,6 +203,8 @@ export default {
     }
 
     // A header for X, Bluesky and Mastodon (1500 × 500), and the avatar for all of them and GitHub.
+    // Their apps put buttons in its top corners, so the mark comes in beside the words. The
+    // address is left out: each profile shows its link just below.
     await ctx.png(
       'social/header.png',
       await render(
@@ -198,9 +212,9 @@ export default {
           width: 1500,
           height: 500,
           title: tagline,
-          url: WEBSITE,
           titleSize: 66,
           header: true,
+          beside: true,
         }),
         1500,
         500,
