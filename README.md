@@ -21,8 +21,8 @@ docs.**
 
 <img src="guidelines/images/cover.png" alt="The Lumovi logo, its light glowing over a floor of dots." />
 
-[Lumovi](https://lumovi.dev) is a beautiful, fast Kubernetes dashboard, on your desktop or in
-your cluster. It was called KubeStacks. This repository is the source of everything it looks like: every asset is
+[Lumovi](https://lumovi.dev) is a calm, fast Kubernetes dashboard, on your desktop or in your
+cluster. It was called KubeStacks. This repository is the source of everything it looks like: every asset is
 built from a few files in [`src/`](src), so they all agree, and you can grab whatever you need
 from the folders below.
 

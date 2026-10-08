@@ -331,6 +331,10 @@ For the product itself, show the product: real screenshots of the app, in light 
 - It's **Lumovi**: one word, capital L. Not LUMOVI, LumoVi or Lumovi App.
 - Lumovi is **a Kubernetes dashboard** you run **on your desktop** (macOS, Windows and Linux),
   or **in your cluster** for your whole team.
+- **The one line,** the same everywhere: "Lumovi is a calm, fast Kubernetes dashboard, on your
+  desktop or in your cluster." In a description or another short field: "A calm, fast
+  Kubernetes dashboard, on your desktop or in your cluster." It says what Lumovi is, not how
+  good it is: no "beautiful", "powerful" or "modern".
 - Link to **[lumovi.dev](https://lumovi.dev)**, and to
   **[docs.lumovi.dev](https://docs.lumovi.dev)** for how to use it. Write the addresses in
   lowercase, without `https://` or `www.`

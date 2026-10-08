@@ -1,6 +1,6 @@
 // 09 In use, 10 Voice and 11 Legal and resources: the brand in the places Lumovi lives, how it
 // talks, the rules for the name and logo, and where the files are.
-import { address, site } from '../brand.ts'
+import { address, description, site } from '../brand.ts'
 import { blue, gray, INK, PAPER } from '../colors.ts'
 import { head, list, logo, logoHeight, specs, verdict, type Assets, type Section } from './kit.ts'
 
@@ -129,7 +129,7 @@ export function useSection(a: Assets): Section {
             <div class="col" style="flex:1.6;gap:14px">
               <div class="figure paper" style="flex:1;flex-direction:column;gap:20px;padding:32px">
                 ${logo('logo', 'on-light', logoHeight(40))}
-                <div class="small" style="color:${gray[700]};font-size:15px">A beautiful, fast Kubernetes dashboard.</div>
+                <div class="small" style="color:${gray[700]};font-size:15px">${description}</div>
               </div>
               <div class="mono" style="padding:18px 20px;border-radius:12px;background:${gray[950]};color:${gray[300]};font-size:12.5px;line-height:1.7;white-space:pre">&lt;picture&gt;
   &lt;source media="(prefers-color-scheme: dark)" srcset="lumovi-logo-on-dark.svg" /&gt;

@@ -1,5 +1,5 @@
 // 05 Typography: Inter and JetBrains Mono, the type scale, headlines, and numbers and code.
-import { tagline } from '../brand.ts'
+import { description, tagline } from '../brand.ts'
 import { gray, INK, status, themes } from '../colors.ts'
 import { head, list, specs, type Section } from './kit.ts'
 
@@ -106,7 +106,7 @@ export function typographySection(): Section {
           <div class="content" style="align-items:stretch">
             <div class="figure mist" style="flex:1;flex-direction:column;align-items:flex-start;justify-content:center;padding:64px">
               <div style="font-size:84px;font-weight:650;letter-spacing:-0.045em;line-height:1.02;font-variation-settings:'opsz' 32">${tagline[0]}<br><span class="quiet">${tagline[1]}</span></div>
-              <p style="font-size:22px;line-height:1.5;color:${gray[700]};margin-top:28px;max-width:30em">A beautiful, fast Kubernetes dashboard. On your desktop, or in your cluster.</p>
+              <p style="font-size:22px;line-height:1.5;color:${gray[700]};margin-top:28px;max-width:30em">${description}</p>
             </div>
             <div class="col text" style="gap:14px">
               ${list([
