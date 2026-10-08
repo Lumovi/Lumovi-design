@@ -198,7 +198,9 @@ shows has one, and lists sort by it, in this order, so what needs you is at the 
 | **Neutral**     | Inactive    | `circle-minus`                      | `neutral`         | Nothing to worry about: completed, suspended, scaled to zero.                      |
 
 A list can name a level in its own words, like Running, Starting or Completed for pods. The
-level, and so its color and icon, stays the same.
+level, and so its color and icon, stays the same. One word has one look: where a word could mean
+two levels in the same list, the one that isn't its usual meaning takes another word. A pod's
+Running is healthy, so a job that's still running says In progress.
 
 | Color      | Mark, light      | Mark, dark       | Words, light     | Words, dark      |
 | ---------- | ---------------- | ---------------- | ---------------- | ---------------- |
