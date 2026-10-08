@@ -567,13 +567,17 @@ the menu has a button where macOS keeps its traffic lights: the window's top lef
   around it stays a drag region, and double-clicking it maximizes the window, as before.
 - **The menu is the app's own,** opened under the button with Electron's `Menu.popup()`. So its
   items, groups, labels, check marks, shortcuts and what an organization's policy locks are the
-  macOS menu's, and can't drift: File, Edit, View, Go, Window and Help. The system draws it, in
-  the app's theme (`nativeTheme.themeSource`), and its edit, zoom and full-screen commands work
-  as they would from a menu bar.
+  macOS menu's, and can't drift: File, Edit, View, Go, Window and Help. The system draws it, and
+  its edit, zoom and full-screen commands work as they would from a menu bar. On Windows it's in
+  the app's theme (`nativeTheme.themeSource`); on Linux, in the desktop's own (GTK) theme, as
+  every menu there is, so it can be light in a dark Lumovi.
 - **Keys:** `Alt` pressed and released on its own, or `F10`, opens it, as a menu bar would.
 - **Help → Documentation,** on every platform, comes first among Help's links, before Lumovi on
   GitHub.
 - **macOS has no button:** its menu bar has all of it, and the corner is the traffic lights'.
+- **Pages of their own** (AI assistants, the audit log) have it too, first in their header, at the
+  same place; their header is 52 px above its border, on every system, so its row is on the
+  window controls' line.
 
 The picture is drawn from [`src/appmenu.ts`](../src/appmenu.ts), the menu as Windows 11 draws
 it.
