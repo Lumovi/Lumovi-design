@@ -329,6 +329,41 @@ things.
 - **Lumovi counts nothing**: no views, no clicks. The app only reads this repository, as it reads
   GitHub for its updates.
 
+## sponsor.json
+
+What the card shows. Every Lumovi reads it from this repository's main branch: the desktop app
+a few seconds after it starts, and a Lumovi server for the pages it serves; then every hour. So a
+change here shows everywhere within the hour (GitHub's caching can add a few minutes), with no
+release.
+
+\`\`\`json
+{
+  "version": 1,
+  "mode": "sponsor",
+  "lumovi": { "link": "${lumovi.link}" },
+  "sponsor": {
+    "name": "${example.name}",
+    "description": "${example.line}",
+    "link": "${example.link}",
+    "alt": "${example.alt}",
+    "image": { "light": "acme-light.png", "dark": "acme-dark.png" },
+    "until": "2026-12-31"
+  }
+}
+\`\`\`
+
+| Field | |
+| --- | --- |
+| \`version\` | \`1\`. |
+| \`mode\` | \`"none"\`: no card, and the sidebar is as it's always been. \`"lumovi"\`: Lumovi's own card, "${lumovi.line}". \`"sponsor"\`: the sponsor's card. |
+| \`lumovi.link\` | Where Lumovi's own card leads, as an \`https\` address. Optional: without it, [Lumovi's GitHub Sponsors page](${lumovi.link}). |
+| \`sponsor\` | The sponsor's card, with the words above. It must be there when \`mode\` is \`"sponsor"\`, and it's checked whenever it's there. |
+| \`sponsor.image\` | The pictures' file names, next to \`sponsor.json\`, one for \`light\` mode and one for \`dark\`: letters, digits, \`.\`, \`_\` and \`-\`. |
+| \`sponsor.until\` | The card's last day, as \`YYYY-MM-DD\`: it shows until the end of that day, UTC. Optional. After it, Lumovi shows its own card. |
+
+Nothing else goes in it: a misspelt field fails the check, rather than being quietly ignored.
+Every change comes as a pull request, and merges once the check passes.
+
 ## What's checked
 
 Every change to this repository is checked: the pictures' real type, their size in pixels and in
