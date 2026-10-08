@@ -6,7 +6,7 @@ How Lumovi looks, and how to use its logo, colors and type, whether you're worki
 the website or the docs, or writing about Lumovi elsewhere. Every file mentioned here is in this
 repository; the [README](../README.md#whats-here) says where each one goes.
 
-**[The brand book (PDF, 65 pages)](lumovi-brand-guidelines.pdf)** has all of this in more detail,
+**[The brand book (PDF, 66 pages)](lumovi-brand-guidelines.pdf)** has all of this in more detail,
 laid out to read on screen or to print: construction, proportions, every version, color
 values and contrast, the type scale, the app icon's anatomy, imagery, motion and voice.
 
@@ -16,6 +16,7 @@ values and contrast, the type scale, the app icon's anatomy, imagery, motion and
 - [The app icon](#the-app-icon)
 - [Color](#color)
 - [Status](#status)
+- [The sponsor card](#the-sponsor-card)
 - [Typography](#typography)
 - [Imagery](#imagery)
 - [Writing about Lumovi](#writing-about-lumovi)
@@ -217,6 +218,87 @@ and `--surface-3`), and for words on the pill's fill over each of them too.
 
 The levels, their icons and their motion are defined in [`src/health.ts`](../src/health.ts),
 and the colors in [`src/colors.ts`](../src/colors.ts).
+
+## The sponsor card
+
+<img src="images/sponsor.png" alt="Four of Lumovi's sidebars, whole, at their real size: Lumovi's own Sponsor card in light and dark, then a sponsor's card, for a placeholder called Acme, in light and dark." />
+
+The app has one sponsor slot: a card at the bottom of the sidebar, above the footer, in the
+desktop app, the server's web UI and the fleet hub. `sponsor.json` in
+[Lumovi/main-sponsor](https://github.com/Lumovi/main-sponsor) says what it shows, so it changes
+without a release:
+
+- **None:** nothing. The sidebar is as it's always been.
+- **Lumovi's own card**, built into the app, with no remote picture: the brand's scene, and
+  "Help keep Lumovi free.", leading to Lumovi's GitHub Sponsors page. It's the one at
+  launch, and whenever a sponsor's can't be shown: no network, no file, anything in it invalid,
+  or past its `until`. The slot is never empty or broken.
+- **A sponsor's card:** their picture, in its version for the mode, one line, and their link.
+
+It's made of the sidebar's own parts, so it reads as part of Lumovi, not as an ad: a label like
+the nav's section labels, over a card like the cluster switcher. Lumovi's card and a sponsor's
+are the same size, so one replaces the other without moving anything.
+
+<img src="images/sponsor-states.png" alt="The bottom of the sidebar in five states, in light and dark: no card; Lumovi's own; Acme's; Acme's on hover, its domain shown beside the label; and Acme's with keyboard focus, in a blue ring." />
+
+From the left: none, Lumovi's own, a sponsor's, on hover, and with keyboard focus.
+
+- **Hover and focus.** The card's surface steps up, and the link's domain fades in beside the
+  label, so people see where it leads before they click. It's the link's host, without `www.`;
+  if it's too long, it's cut at the start, so the end, the part that says whose it is, always
+  shows. Focus is the app's own ring, 2 px of Blue 600, and shows the domain too.
+- **The link** is the whole card. The desktop app opens it in the browser, and the web UI in a
+  new tab with `rel="noopener noreferrer"`, so the sponsor doesn't learn the server's address.
+- **Screen readers** hear the section's name, the picture's `alt` and the line: "Sponsor, link,
+  Acme, Rockets, anvils and other gear." The label row is hidden from them, since the section's
+  name says it, and the domain is the link's description.
+- **One card replaces another in place,** with the app's 160 ms fade, and only once the new
+  picture has loaded and passed its checks. Nothing slides in.
+- **Animated pictures** play once when the card appears, for 5 seconds at most, then rest on
+  their last frame. For people who ask for reduced motion, the card shows the first frame, still,
+  and doesn't fade.
+
+### A long nav, and short windows
+
+<img src="images/sponsor-scroll.png" alt="The whole sidebar with Lumovi's card, on a 900-pixel window: at rest, the list fades out at the bottom, above a hairline over the card; scrolled, it fades at the top too. In light, then dark." />
+
+- **The card is pinned above the footer,** with a 1 px `--line` along its top as the footer has,
+  so its label never reads as one more section of the nav.
+- **When the nav is longer than its room,** it fades out over 24 px at each edge where it goes
+  on: at the bottom until it's scrolled to the end, and at the top once it's scrolled. Above, from
+  the left: light at rest and scrolled, then dark.
+- **On short windows the card steps aside.** Under 720 px tall there's no card, and the nav
+  keeps the room. At 720 px the nav still has about 405 px (with macOS's title bar); the desktop
+  app is never under 640 px tall.
+
+### Building it
+
+<img src="images/sponsor-anatomy.png" alt="The card at two and a half times its size, with its measurements: 12 px gutters and 220 px wide; under the divider 8 px, the 16 px label and 4 px; then the card's 8 px padding, the 68 px picture, 8 px, the 16 px line and 8 px; and 12 px above the footer." />
+
+The card takes 149 px between the nav and the footer, outside the nav's scrolling. In the app's
+Tailwind and tokens:
+
+| Part           | Size      | Classes                                                                                                                                                                                                                              |
+| -------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The section    | 244 × 149 | `group shrink-0 border-t border-line px-3 pt-2 pb-3`, named "Sponsor" (`aria-label`); under 720 px tall, `[@media(max-height:719px)]:hidden`                                                                                         |
+| Label          | 16 tall   | `mb-1 flex h-4 items-center px-2.5 text-2xs font-medium tracking-wider text-ink-3 uppercase`                                                                                                                                         |
+| Domain         | 11/16     | `ml-auto flex min-w-0 items-center gap-[3px] font-mono font-normal tracking-normal normal-case opacity-0 transition-opacity group-hover:opacity-100 group-has-[:focus-visible]:opacity-100`, and Lucide's `ArrowUpRight` at `size-3` |
+| Card, the link | 220 × 108 | `block rounded-xl bg-surface-2 p-2 shadow-[inset_0_0_0_1px_var(--line)] transition-colors hover:bg-surface-3`                                                                                                                        |
+| Picture        | 204 × 68  | `relative block overflow-hidden rounded bg-surface`, with a 1 px `--line` inside it (`after:absolute after:inset-0 after:rounded after:shadow-[inset_0_0_0_1px_var(--line)]`), and `<img width="204" height="68">`                   |
+| Line           | 200 wide  | `block truncate px-0.5 pt-2 text-xs text-ink-2`                                                                                                                                                                                      |
+| The nav's fade | 24 px     | `mask-image: linear-gradient(to bottom, transparent, #000 24px, #000 calc(100% - 24px), transparent)`, each end only while the list goes on past it                                                                                  |
+
+Hover and focus change over 150 ms (`duration-150`). The numbers are in
+[`src/sponsor.ts`](../src/sponsor.ts). Lumovi's own pictures are in
+[`media/sponsor/`](../media/sponsor) (`lumovi-light.png` and `lumovi-dark.png`, 408 × 136,
+shown at half that), with a placeholder sponsor's (`example-*.png`) for tests.
+
+### What sponsors send
+
+[`media/sponsor/README.md`](../media/sponsor/README.md) is the spec, ready to be Lumovi/main-sponsor's
+README, with a template: a picture for light mode and one for dark, 408 × 136 (3:1) exactly,
+with logos and words inside the middle 360 × 88; PNG, WebP, GIF or animated WebP, up to 150 KB
+still or 500 KB animated; a line of up to 32 characters; and an `https` link.
 
 ## Typography
 

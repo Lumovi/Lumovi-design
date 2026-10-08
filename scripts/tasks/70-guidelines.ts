@@ -17,6 +17,7 @@ import {
 } from '../../src/logo.ts'
 import { GRID, geometry, shapes } from '../../src/mark.ts'
 import { FONTS, scene } from '../../src/scene.ts'
+import * as sponsor from '../../src/sponsor.ts'
 import { n } from '../../src/svg.ts'
 import { wordmark } from '../../src/wordmark.ts'
 import { renderHtml } from '../lib/render.ts'
@@ -386,6 +387,123 @@ function appIcons(): string {
   </div>`)
 }
 
+type Cards = ReturnType<typeof sponsor.contents>
+type Themed = Record<'light' | 'dark', Cards>
+
+/** The sidebar, whole, at its real size: Lumovi's own card, and a sponsor's, in light and dark. */
+function sponsorSidebars(cards: Themed): string {
+  const gap = (WIDTH - 4 * sponsor.card.sidebar) / 3
+  const cell = (scheme: 'light' | 'dark', mode: 'lumovi' | 'sponsor') =>
+    `<div style="border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1px ${gray[200]}">${sponsor.sidebar(scheme, mode, cards[scheme])}</div>`
+  return sponsor.page(
+    `<div style="display:flex;gap:${gap}px">${cell('light', 'lumovi')}${cell('dark', 'lumovi')}${cell('light', 'sponsor')}${cell('dark', 'sponsor')}</div>`,
+    WIDTH,
+  )
+}
+
+/**
+ * The nav, when it's longer than the window, as on a 900-pixel one: at rest, it fades out over
+ * the card; scrolled, it fades at the top too. In light and dark, with Lumovi's own card.
+ */
+function sponsorScroll(cards: Themed): string {
+  const gap = (WIDTH - 4 * sponsor.card.sidebar) / 3
+  const cell = (scheme: 'light' | 'dark', scroll: number) =>
+    `<div style="border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1px ${gray[200]}">${sponsor.sidebar(scheme, 'lumovi', cards[scheme], { scroll })}</div>`
+  return sponsor.page(
+    `<div style="display:flex;gap:${gap}px">${cell('light', 0)}${cell('light', 100)}${cell('dark', 0)}${cell('dark', 100)}</div>`,
+    WIDTH,
+  )
+}
+
+/** Every state, at the bottom of the real sidebar, in light and dark: none, Lumovi's own card, a
+ * sponsor's, and a sponsor's on hover and with focus. */
+const SPONSOR_STATES: [sponsor.Mode, sponsor.State][] = [
+  ['none', 'rest'],
+  ['lumovi', 'rest'],
+  ['sponsor', 'rest'],
+  ['sponsor', 'hover'],
+  ['sponsor', 'focus'],
+]
+const STATES_WIDTH = SPONSOR_STATES.length * sponsor.card.sidebar + (SPONSOR_STATES.length - 1) * 12
+
+function sponsorStates(cards: Themed): string {
+  const row = (scheme: 'light' | 'dark') =>
+    `<div style="display:flex;gap:12px">${SPONSOR_STATES.map(
+      ([mode, state]) =>
+        `<div style="border-radius:14px;overflow:hidden;box-shadow:inset 0 0 0 1px ${gray[200]}">${sponsor.sidebar(scheme, mode, cards[scheme], { state, view: sponsor.BOTTOM })}</div>`,
+    ).join('')}</div>`
+  return sponsor.page(
+    `<div style="display:flex;flex-direction:column;gap:12px">${row('light')}${row('dark')}</div>`,
+    STATES_WIDTH,
+  )
+}
+
+/** The card's measurements, three times its size, as the app builds it. */
+function sponsorAnatomy(cards: Cards): string {
+  const Z = 2.5
+  const c = sponsor.card
+  const ox = 76
+  const oy = 64
+  const t = themes.light
+  const red = blue[600]
+  const ink = blue[700]
+  // Its parts, in CSS pixels from the top left of the space it takes.
+  const label = c.rule + c.above
+  const top = label + c.label.lineHeight + c.label.gap
+  const image = top + c.padding
+  const line = image + c.image.height + c.line.gap
+  const bottom = top + c.height
+  const footer = bottom + c.below
+  const X = (x: number) => ox + x * Z
+  const Y = (y: number) => oy + y * Z
+  const text = (x: number, y: number, s: string, anchor = 'middle') =>
+    `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="12" font-weight="550" fill="${ink}" font-family="Inter">${s}</text>`
+  const vertical = (x: number, y1: number, y2: number, label: string) =>
+    `<path d="M${x - 4} ${Y(y1) + 0.5}h8M${x - 4} ${Y(y2) - 0.5}h8M${x} ${Y(y1) + 0.5}V${Y(y2) - 0.5}" stroke="${red}" fill="none"/>${text(x - 10, (Y(y1) + Y(y2)) / 2 + 4, label, 'end')}`
+  const horizontal = (y: number, x1: number, x2: number, label: string) =>
+    `<path d="M${X(x1) + 0.5} ${y - 4}v8M${X(x2) - 0.5} ${y - 4}v8M${X(x1) + 0.5} ${y}H${X(x2) - 0.5}" stroke="${red}" fill="none"/>${text((X(x1) + X(x2)) / 2, y - 8, label)}`
+  // A note at the right, its leader from a point on the card, along the line `via` if it's given.
+  const note = (y: number, at: [number, number], lines: string[], via = at[1]) =>
+    `<path d="M${X(at[0])} ${Y(at[1])}V${Y(via)}H${X(c.sidebar) + 18}L${X(c.sidebar) + 30} ${y - 4}H${X(c.sidebar) + 36}" stroke="${red}" stroke-opacity="0.5" fill="none"/><circle cx="${X(at[0])}" cy="${Y(at[1])}" r="3" fill="${red}"/>
+    ${lines.map((l, i) => `<text x="${X(c.sidebar) + 42}" y="${y + i * 16}" font-size="${i ? 11.5 : 12.5}" font-weight="${i ? 400 : 600}" fill="${i ? gray[700] : INK}" font-family="Inter">${l}</text>`).join('')}`
+  const height = Y(footer) + 64
+  const right = c.gutter + c.width
+  return sponsor.page(
+    `<div style="position:relative;height:${height}px;border-radius:20px;overflow:hidden;background:${PAPER};box-shadow:inset 0 0 0 1px ${gray[200]}">
+      <div style="position:absolute;left:${ox}px;top:${oy}px"><div style="${Object.entries(t)
+        .map(([k, v]) => `--${k}:${v}`)
+        .join(';')};width:${c.sidebar}px;zoom:${Z};background:${t['app-bg']}">
+        <style>.sponsor .domain { opacity: 1 }</style>
+        ${sponsor.sponsorCard(cards.sponsor)}
+        <div style="height:12px;border-top:1px solid ${t.line}"></div>
+      </div></div>
+      <svg width="${WIDTH}" height="${height}" style="position:absolute;inset:0">
+        ${horizontal(oy - 22, 0, c.gutter, `${c.gutter}`)}
+        ${horizontal(oy - 22, c.gutter, right, `${c.width}`)}
+        ${horizontal(Y(footer) + 30, c.gutter, c.gutter + c.padding, `${c.padding}`)}
+        ${horizontal(Y(footer) + 30, c.gutter + c.padding, right - c.padding, `${c.image.width}`)}
+        ${vertical(ox - 18, c.rule, label, `${c.above}`)}
+        ${vertical(ox - 18, label, label + c.label.lineHeight, `${c.label.lineHeight}`)}
+        ${vertical(ox - 18, label + c.label.lineHeight, top, `${c.label.gap}`)}
+        ${vertical(ox - 18, top, image, `${c.padding}`)}
+        ${vertical(ox - 18, image, image + c.image.height, `${c.image.height}`)}
+        ${vertical(ox - 18, image + c.image.height, line, `${c.line.gap}`)}
+        ${vertical(ox - 18, line, line + c.line.lineHeight, `${c.line.lineHeight}`)}
+        ${vertical(ox - 18, line + c.line.lineHeight, bottom, `${c.padding}`)}
+        ${vertical(ox - 18, bottom, footer, `${c.below}`)}
+        ${note(oy + 4, [c.gutter + 150, 0.2], ['Divider', '1px --line along the top, as the footer’s'])}
+        ${note(oy + 58, [c.gutter + c.label.inset + 56, label + 8], ['Label', '11/16 Medium, caps, +0.05em', '--text-3, inset 10, as the nav’s are'], c.rule + c.above / 2)}
+        ${note(oy + 124, [right - 10, label + 8], ['Domain, on hover and focus', 'JetBrains Mono 11/16, --text-3', 'arrow-up-right 12, fades in over 150 ms'])}
+        ${note(oy + 190, [right - 1, top + 30], ['Card', 'Radius 12, padding 8', '--surface-2, 1px --line inside it', 'Hover: --surface-3, over 150 ms'])}
+        ${note(oy + 266, [right - 16, image + 52], ['Picture', '204 × 68 (3:1), radius 4', '1px --line inside it, on --surface'])}
+        ${note(oy + 330, [c.gutter + c.padding + c.line.inset + 180, line + 8], ['Line', '12/16, --text-2, inset 10', 'One line, cut with an ellipsis'])}
+        ${text(X(c.sidebar) - 12, Y(footer) + 22, 'Footer', 'end')}
+      </svg>
+    </div>`,
+    WIDTH,
+  )
+}
+
 export default {
   name: 'guidelines',
   outputs: ['guidelines/images'],
@@ -408,5 +526,23 @@ export default {
     for (const [name, html] of Object.entries(pictures)) {
       await ctx.png(`guidelines/images/${name}.png`, await shoot(html))
     }
+
+    // The sponsor card, with Lumovi's picture and the placeholder sponsor's.
+    const { width: w, height: h } = sponsor.asset
+    const art = (html: string) => renderHtml(html, { width: w, height: h, transparent: false })
+    const cards = (theme: 'light' | 'dark') =>
+      Promise.all([art(sponsor.lumoviArt(theme)), art(sponsor.exampleArt(theme))])
+    const [light, dark] = await Promise.all([cards('light'), cards('dark')])
+    const themed: Themed = { light: sponsor.contents(...light), dark: sponsor.contents(...dark) }
+    await ctx.png('guidelines/images/sponsor.png', await shoot(sponsorSidebars(themed)))
+    await ctx.png('guidelines/images/sponsor-scroll.png', await shoot(sponsorScroll(themed)))
+    await ctx.png(
+      'guidelines/images/sponsor-states.png',
+      await renderHtml(sponsorStates(themed), { width: STATES_WIDTH, height: 'fit', scale: 2 }),
+    )
+    await ctx.png(
+      'guidelines/images/sponsor-anatomy.png',
+      await shoot(sponsorAnatomy(themed.light)),
+    )
   },
 } satisfies Task

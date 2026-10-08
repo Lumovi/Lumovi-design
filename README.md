@@ -33,17 +33,17 @@ drawn only from circles, in black, white and gray. Read more in the
 
 ## What's here
 
-| Folder                      | What                                                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| [`logo/`](logo)             | The logo, stacked logo, mark and wordmark, as SVG and PNG, in every version; animated marks                 |
-| [`icons/app/`](icons/app)   | The app's icons: macOS (PNG, ICNS, Liquid Glass), Windows (ICO, Microsoft Store) and Linux (PNG)            |
-| [`icons/web/`](icons/web)   | Favicons, touch icons, web app icons and a web manifest                                                     |
-| [`colors/`](colors)         | The palette and the app's theme tokens: CSS, Tailwind, design tokens, Adobe and GIMP                        |
-| [`social/`](social)         | Link previews, GitHub's previews and banner, an avatar, headers, and LinkedIn, YouTube and Product Hunt art |
-| [`media/`](media)           | Wallpapers, and the installers' artwork (macOS disk image, Windows installer)                               |
-| [`snippets/`](snippets)     | The mark as a React and an Astro component, and the HTML `<head>` tags for the icons                        |
-| [`sources/`](sources)       | Video frames and the app's screenshots, from other repositories, that the launch art is made from           |
-| [`guidelines/`](guidelines) | How to use all of it, online and as a 65-page brand book (PDF)                                              |
+| Folder                      | What                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [`logo/`](logo)             | The logo, stacked logo, mark and wordmark, as SVG and PNG, in every version; animated marks                         |
+| [`icons/app/`](icons/app)   | The app's icons: macOS (PNG, ICNS, Liquid Glass), Windows (ICO, Microsoft Store) and Linux (PNG)                    |
+| [`icons/web/`](icons/web)   | Favicons, touch icons, web app icons and a web manifest                                                             |
+| [`colors/`](colors)         | The palette and the app's theme tokens: CSS, Tailwind, design tokens, Adobe and GIMP                                |
+| [`social/`](social)         | Link previews, GitHub's previews and banner, an avatar, headers, and LinkedIn, YouTube and Product Hunt art         |
+| [`media/`](media)           | Wallpapers, the installers' artwork (macOS disk image, Windows installer), and the sponsor card's pictures and spec |
+| [`snippets/`](snippets)     | The mark as a React and an Astro component, and the HTML `<head>` tags for the icons                                |
+| [`sources/`](sources)       | Video frames and the app's screenshots, from other repositories, that the launch art is made from                   |
+| [`guidelines/`](guidelines) | How to use all of it, online and as a 66-page brand book (PDF)                                                      |
 
 ## Logo
 
@@ -89,6 +89,7 @@ ask for reduced motion.
 | `media/installer/dmg-background.png` and its `@2x` | `build/background.png` and its `@2x`   |
 | `media/installer/nsis-sidebar.bmp`                 | `build/installerSidebar.bmp`           |
 | `media/installer/nsis-header.bmp`                  | `build/installerHeader.bmp`            |
+| `media/sponsor/lumovi-light.png` and `-dark.png`   | `src/renderer/public/sponsor/`         |
 | `icons/web/favicon.svg`                            | `src/renderer/public/favicon.svg`      |
 | `snippets/react/Logo.tsx`                          | `src/renderer/src/components/Logo.tsx` |
 | `colors/tokens.css` (the semantic tokens)          | `src/renderer/src/styles/index.css`    |
@@ -188,12 +189,13 @@ titles, frames and the gallery are set in [`src/launch.ts`](src/launch.ts).
 
 ## Media
 
-| File                                          | What                                                               |
-| --------------------------------------------- | ------------------------------------------------------------------ |
-| `media/wallpapers/lumovi-desktop-16x9-*.jpg`  | 5120 × 2880, for 16:9 displays, in dark and light                  |
-| `media/wallpapers/lumovi-desktop-16x10-*.jpg` | 3456 × 2160, for MacBooks and other 16:10 displays                 |
-| `media/wallpapers/lumovi-phone-*.jpg`         | 1290 × 2796, for phones                                            |
-| `media/installer/`                            | The macOS disk image's window and the Windows installer's pictures |
+| File                                          | What                                                                                                                                                                  |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `media/wallpapers/lumovi-desktop-16x9-*.jpg`  | 5120 × 2880, for 16:9 displays, in dark and light                                                                                                                     |
+| `media/wallpapers/lumovi-desktop-16x10-*.jpg` | 3456 × 2160, for MacBooks and other 16:10 displays                                                                                                                    |
+| `media/wallpapers/lumovi-phone-*.jpg`         | 1290 × 2796, for phones                                                                                                                                               |
+| `media/installer/`                            | The macOS disk image's window and the Windows installer's pictures                                                                                                    |
+| `media/sponsor/`                              | The sidebar's sponsor card: Lumovi's own pictures, and the spec sponsors get ([README](media/sponsor/README.md)), with a template, a placeholder sponsor and previews |
 
 ## Building the assets
 
@@ -212,18 +214,19 @@ npm run sources                # take the pictures in sources/ again (see its RE
 Images are rendered with Chrome, through Playwright: your Google Chrome if you have it, or
 Playwright's Chromium (`npx playwright install chromium`). Node.js 24 or later.
 
-| Source                               | What it defines                                                            |
-| ------------------------------------ | -------------------------------------------------------------------------- |
-| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                                    |
-| [`src/health.ts`](src/health.ts)     | The five status levels: their colors, icons, names and motion              |
-| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                                   |
-| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Inter Display Semibold, with its spacing                |
-| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                                             |
-| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                                  |
-| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers                     |
-| [`src/launch.ts`](src/launch.ts)     | The launch art: YouTube thumbnails and channel art, Product Hunt's gallery |
-| [`src/book/`](src/book)              | The brand book, page by page                                               |
-| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                                              |
+| Source                               | What it defines                                                                    |
+| ------------------------------------ | ---------------------------------------------------------------------------------- |
+| [`src/colors.ts`](src/colors.ts)     | Every color, and the app's theme tokens                                            |
+| [`src/health.ts`](src/health.ts)     | The five status levels: their colors, icons, names and motion                      |
+| [`src/mark.ts`](src/mark.ts)         | The mark's geometry and how it's painted                                           |
+| [`src/wordmark.ts`](src/wordmark.ts) | The wordmark, from Inter Display Semibold, with its spacing                        |
+| [`src/logo.ts`](src/logo.ts)         | The lockups and their versions                                                     |
+| [`src/icon.ts`](src/icon.ts)         | The app icons, for each platform and size                                          |
+| [`src/scene.ts`](src/scene.ts)       | The brand's imagery: social cards, banners, wallpapers                             |
+| [`src/launch.ts`](src/launch.ts)     | The launch art: YouTube thumbnails and channel art, Product Hunt's gallery         |
+| [`src/sponsor.ts`](src/sponsor.ts)   | The sidebar's sponsor card: its measurements and motion, and the spec sponsors get |
+| [`src/book/`](src/book)              | The brand book, page by page                                                       |
+| [`scripts/tasks/`](scripts/tasks)    | One task per folder of assets                                                      |
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to propose a change.
 

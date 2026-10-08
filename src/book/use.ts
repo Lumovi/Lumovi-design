@@ -28,7 +28,7 @@ export function useSection(a: Assets): Section {
     number: '09',
     name: 'In use',
     summary:
-      'The brand in the places Lumovi lives: the installers, the website, the docs and GitHub.',
+      'The brand in the places Lumovi lives: the installers, the app’s sponsor card, the website, the docs and GitHub.',
     pages: [
       {
         title: 'Installers',
@@ -67,6 +67,29 @@ export function useSection(a: Assets): Section {
                 <div style="padding:22px;display:flex;flex-direction:column;gap:12px"><div style="font-size:17px;font-weight:600;color:${INK}">Welcome to Lumovi Setup</div><div style="font-size:12px;line-height:1.5;color:${gray[700]}">Setup will guide you through the installation of Lumovi.</div></div>
               </div>
               <span class="caption">The Windows installer’s welcome page</span>
+            </div>
+          </div>`,
+      },
+      {
+        title: 'The sponsor card',
+        html: `
+          ${head('09 — In use', 'The sponsor card', 'One card at the bottom of the app’s sidebar: Lumovi’s own, a sponsor’s, or none.')}
+          <div class="content">
+            <div class="text col" style="gap:24px">
+              <p class="body">It’s made of the sidebar’s own parts, so it reads as part of Lumovi, not as an ad: a label like the nav’s, over a card like the cluster’s. Lumovi’s card and a sponsor’s are the same size, so one replaces the other without moving anything.</p>
+              ${specs([
+                ['Label', '“Sponsor”, as the nav’s section labels'],
+                ['Card', '220 × 108, 12 px corners, Surface 2'],
+                ['Picture', '204 × 68 (3:1), sent at 408 × 136'],
+                ['Hover, focus', 'Surface 3, and the link’s domain fades in'],
+                ['A long nav', 'Fades where it goes on, under a hairline'],
+                ['Short windows', 'Under 720 px tall, no card'],
+                ['Motion', 'Plays once, 5 s at most; the first frame for reduced motion'],
+              ])}
+            </div>
+            <div class="figure mist" style="flex:1;padding:24px 24px 48px">
+              <img src="${a.file('guidelines/images/sponsor-states.png')}" style="display:block;width:100%">
+              <span class="caption">None, Lumovi’s own, a sponsor’s, on hover and with focus. Acme is a placeholder.</span>
             </div>
           </div>`,
       },

@@ -1,9 +1,11 @@
-// media/: wallpapers, and the artwork the installers show (the macOS disk image's window, and
-// the Windows installer's sidebar and header).
+// media/: wallpapers, the artwork the installers show (the macOS disk image's window, and the
+// Windows installer's sidebar and header), and the sidebar's sponsor card: Lumovi's own picture
+// for it, and what sponsors get (the spec, a template, a placeholder and previews).
 import { gray, PAPER } from '../../src/colors.ts'
 import { icon } from '../../src/icon.ts'
 import { document, VARIANTS, wordmarkOnly } from '../../src/logo.ts'
 import { FONTS, scene, type Theme } from '../../src/scene.ts'
+import * as sponsor from '../../src/sponsor.ts'
 import { bmp } from '../lib/formats.ts'
 import { renderHtml, rgba } from '../lib/render.ts'
 import type { Task } from '../lib/task.ts'
@@ -99,9 +101,30 @@ export default {
   name: 'media',
   outputs: ['media'],
   async build(ctx) {
+    ctx.text('media/sponsor/README.md', sponsor.spec())
     if (!ctx.raster) return
     const page = (html: string, width: number, height: number, scale = 1) =>
       renderHtml(html, { width, height, scale, transparent: false })
+
+    // The sponsor card's pictures, at the size sponsors send theirs, and the card in the sidebar.
+    const { width: w, height: h } = sponsor.asset
+    await ctx.png('media/sponsor/template.png', await page(sponsor.template(), w, h))
+    for (const theme of ['dark', 'light'] as const) {
+      const lumovi = await page(sponsor.lumoviArt(theme), w, h)
+      const example = await page(sponsor.exampleArt(theme), w, h)
+      await ctx.png(`media/sponsor/lumovi-${theme}.png`, lumovi)
+      await ctx.png(`media/sponsor/example-${theme}.png`, example)
+      const preview = sponsor.page(
+        sponsor.sidebar(theme, 'sponsor', sponsor.contents(lumovi, example), {
+          view: sponsor.BOTTOM,
+        }),
+        sponsor.card.sidebar,
+      )
+      await ctx.png(
+        `media/sponsor/preview-${theme}.png`,
+        await page(preview, sponsor.card.sidebar, sponsor.BOTTOM.height, 2),
+      )
+    }
 
     for (const [name, width, height] of WALLPAPERS) {
       for (const theme of ['dark', 'light'] as const) {

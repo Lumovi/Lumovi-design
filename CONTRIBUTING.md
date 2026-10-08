@@ -38,6 +38,7 @@ build, and commit both.
 - `src/launch.ts`: the launch art: YouTube's thumbnails and channel art, and Product Hunt's
   gallery, from the pictures in `sources/`, which come from other repositories (`npm run
 sources` takes them again).
+- `src/sponsor.ts`: the sidebar's sponsor card, as the app draws it, and the spec sponsors get.
 - `src/animation.ts`: the animated marks.
 - `src/book/`: the brand book (the PDF in `guidelines/`), a module per section. Its pages are
   HTML, printed with Chrome; render them to look at while you work on them.
