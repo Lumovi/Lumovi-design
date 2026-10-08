@@ -25,8 +25,8 @@ otherwise Playwright's Chromium (`npx playwright install chromium`).
 ## How it fits together
 
 Every asset is built from the source in `src/`, by the tasks in `scripts/tasks/`, one per
-folder. Nothing outside `src/` and `scripts/` is edited by hand: change the source, build, and
-commit both.
+folder. Nothing outside `src/`, `scripts/` and `sources/` is edited by hand: change the source,
+build, and commit both.
 
 - `src/colors.ts`: every color, and the app's theme tokens.
 - `src/health.ts`: the five status levels, with their colors, icons, names and motion.
@@ -35,6 +35,9 @@ commit both.
 - `src/logo.ts`: the lockups and their versions.
 - `src/icon.ts`: the app icons for each platform and size, and the Liquid Glass icon.
 - `src/scene.ts`: the brand's imagery: social cards, banners, wallpapers.
+- `src/launch.ts`: the launch art: YouTube's thumbnails and channel art, and Product Hunt's
+  gallery, from the pictures in `sources/`, which come from other repositories (`npm run
+sources` takes them again).
 - `src/animation.ts`: the animated marks.
 - `src/book/`: the brand book (the PDF in `guidelines/`), a module per section. Its pages are
   HTML, printed with Chrome; render them to look at while you work on them.

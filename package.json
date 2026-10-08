@@ -13,6 +13,7 @@
     "build": "node scripts/build.ts",
     "build:vector": "node scripts/build.ts --vector",
     "check": "node scripts/build.ts --check",
+    "sources": "node scripts/sources.ts",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

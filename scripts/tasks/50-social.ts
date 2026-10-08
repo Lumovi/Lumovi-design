@@ -1,7 +1,9 @@
 // social/: link previews (Open Graph), GitHub's social previews and profile banner, the
-// avatar, and a header for X, Bluesky and Mastodon.
+// avatar, a header for X, Bluesky and Mastodon, and the launch's art: a LinkedIn banner,
+// YouTube's channel art and video thumbnails, and Product Hunt's thumbnail and gallery.
 import { address, description, site, tagline } from '../../src/brand.ts'
 import { filled } from '../../src/icon.ts'
+import { channelArt, gallery, galleryImage, thumbnail, videos } from '../../src/launch.ts'
 import { document, horizontal, VARIANTS } from '../../src/logo.ts'
 import { headline, palette, scene, type Theme } from '../../src/scene.ts'
 import { escape } from '../../src/svg.ts'
@@ -206,5 +208,45 @@ export default {
       ),
     )
     await ctx.png('social/avatar.png', await renderSvg(filled(1024, 0.5625), 1024))
+
+    // The launch: in light and dark, so either can be picked for each account.
+    for (const theme of ['dark', 'light'] as const) {
+      // LinkedIn's company banner. The page's logo sits over its bottom left, so the copy is
+      // set in from the left, as on the header for X.
+      await ctx.png(
+        `social/linkedin/banner-${theme}.png`,
+        await render(
+          card({
+            width: 1128,
+            height: 191,
+            theme,
+            title: tagline,
+            url: WEBSITE,
+            titleSize: 34,
+            header: true,
+          }),
+          1128,
+          191,
+        ),
+      )
+      await ctx.png(
+        `social/youtube/channel-art-${theme}.png`,
+        await render(channelArt(theme), 2560, 1440),
+      )
+      for (const video of videos) {
+        await ctx.png(
+          `social/youtube/thumbnails/${video.id}-${theme}.png`,
+          await render(thumbnail(video, theme), 1280, 720),
+        )
+      }
+      for (const [i, shot] of gallery.entries()) {
+        await ctx.png(
+          `social/product-hunt/gallery-${i + 1}-${shot.screen}-${theme}.png`,
+          await render(galleryImage(shot, theme), 1270, 760),
+        )
+      }
+    }
+    // Product Hunt's thumbnail: the app icon, as small as it gets shown.
+    await ctx.png('social/product-hunt/thumbnail.png', await renderSvg(filled(240, 0.6), 240))
   },
 } satisfies Task
