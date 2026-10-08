@@ -150,6 +150,8 @@ export const FLEET: FleetCluster[] = [
 const find = (name: string) => FLEET.find((c) => c.name === name)!
 const HUB = 'https://lumovi.example.com'
 const NAMESPACE = 'lumovi'
+/** Where clusters added from the page are kept: a namespace of their own (`fleet.addNamespace`). */
+const CLUSTERS_NAMESPACE = `${NAMESPACE}-clusters`
 
 /** Where a cluster comes from, in words. */
 export function sourceText(s: Source): string {
@@ -488,7 +490,7 @@ function addMenu(off: boolean, right: number): string {
   return `<div class="menu" style="right:${right}px;top:${56 + 32 + 74}px;width:320px">
     ${item('cable', 'Connect with an agent…', 'For a cluster this server can’t reach. Its agent dials out.', ' hl')}
     <div class="sep"></div>
-    ${item('clipboard-paste', 'Paste a kubeconfig…', `Kept as a Secret in ${NAMESPACE}.`, off ? ' off' : '')}
+    ${item('clipboard-paste', 'Paste a kubeconfig…', `Kept as a Secret in ${CLUSTERS_NAMESPACE}.`, off ? ' off' : '')}
     ${item('key-round', 'Use a token…', 'A server’s address, a token and its CA.', off ? ' off' : '')}
     ${off ? `<div class="foot">${icon('lock', 14)}<span>Adding by kubeconfig or token is off on this server. It’s turned on with the Helm value <code>fleet.addFromPage</code>.</span></div>` : ''}
   </div>`
@@ -630,7 +632,7 @@ function editor(): string {
 
 function addDialog(state: FleetState, size: Size): string {
   const top = Math.round(size.height * 0.08)
-  const head = `<div class="glyph">${icon('plus', 18)}</div><div style="min-width:0"><h3>Add a cluster</h3><div class="sub">Lumovi keeps it as a Secret in ${NAMESPACE}, labelled lumovi.dev/cluster.</div></div>`
+  const head = `<div class="glyph">${icon('plus', 18)}</div><div style="min-width:0"><h3>Add a cluster</h3><div class="sub">Lumovi keeps it as a Secret in ${CLUSTERS_NAMESPACE}, labelled lumovi.dev/cluster.</div></div>`
   const tabs = (on: 'kubeconfig' | 'token') =>
     `<div class="seg"><span${on === 'kubeconfig' ? ' class="on"' : ''}>${icon('clipboard-paste', 14)}A kubeconfig</span><span${on === 'token' ? ' class="on"' : ''}>${icon('key-round', 14)}A token</span></div>`
   let body = ''

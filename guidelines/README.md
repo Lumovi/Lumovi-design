@@ -519,8 +519,9 @@ cluster's name, says what stops, and gives the command that uninstalls its agent
 
 <img src="images/fleet-add.png" alt="Add a cluster, in dark: a pasted kubeconfig; a server, a token and its CA; a kubeconfig whose user runs a program, refused, with Use a token and Connect with an agent; and checked, with its name, labels and groups, and Add to the fleet." />
 
-Only where the server allows it. Lumovi keeps the cluster as a Secret in its own namespace,
-labelled `lumovi.dev/cluster`. The checks are the clusters page's. **A credential plugin is
+Only where the server allows it. Lumovi keeps the cluster as a Secret, labelled
+`lumovi.dev/cluster`, in a namespace of its own (`<release namespace>-clusters`, the Helm value
+`fleet.addNamespace`), so the hub's write access reaches nothing else. The checks are the clusters page's. **A credential plugin is
 refused,** not asked about, since the hub can't run programs: the dialog shows the command,
 says why, and offers what works instead, a token or an agent.
 
