@@ -530,7 +530,7 @@ function connectDialog(state: FleetState, size: Size): string {
       body = `<div class="form">
           <span class="lbl mid">Name</span><span class="field focus typed" style="gap:0">edge-ap-south<span class="caret" style="height:16px;margin:0 0 0 1px"></span></span>
           <span class="lbl">Labels</span><span class="control">${chips(['env=production', 'region=ap-south'], false, 'Add a label…')}</span>
-          <span class="lbl">Groups</span><span class="control">${chips(['platform'], false, 'Add a group…')}<div class="field-help">Who sees it, besides admins. With none, only admins do.</div></span>
+          <span class="lbl">Groups</span><span class="control">${chips(['platform'], false, 'Add a group…')}<div class="field-help">Who sees it, besides admins: with none, everyone signed in.</div></span>
         </div>
         <p class="help">Nobody pastes the cluster’s credentials here: the agent uses its own service account, inside the cluster.</p>`
       actions = `${AUDIT}<span class="btn ghost">Cancel</span><span class="btn primary">Create the command</span>`

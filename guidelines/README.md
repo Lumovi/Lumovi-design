@@ -507,7 +507,8 @@ credentials into the hub.
 Name, labels and groups, from a card's ⋯. **Each field says where its value comes from.** One
 the cluster's source sets (a Secret's `lumovi.dev/*` annotation, or the kubeconfig's
 `lumovi.dev` extension) is locked, and says which and where to change it; the page never
-overrides it. One the source leaves unset is set here, and says so. **Groups** decide who sees
+overrides it. One the source leaves unset can be set here, and once it is, says so; an empty one
+shows no source line. **Groups** decide who sees
 the cluster, and a change applies at once. **Comes from** names the source; for a cluster
 connected from the page, when, and its checked certificate authority. **Removing** asks for the
 cluster's name, says what stops, and gives the command that uninstalls its agent.
