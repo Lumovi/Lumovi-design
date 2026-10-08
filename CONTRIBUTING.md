@@ -40,6 +40,7 @@ build, and commit both.
 sources` takes them again).
 - `src/sponsor.ts`: the sidebar's sponsor card, as the app draws it, and the spec sponsors get.
 - `src/clusters.ts`: the desktop app's clusters page, every state of it, as the app draws it.
+- `src/fleet.ts`: the server's Fleet page, with what admins get to manage clusters, every state.
 - `src/lucide.ts`: the Lucide icons the app uses, for the mockups.
 - `src/animation.ts`: the animated marks.
 - `src/book/`: the brand book (the PDF in `guidelines/`), a module per section. Its pages are

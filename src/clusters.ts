@@ -161,7 +161,7 @@ export function middle(text: string, max = 46): string {
 // ─── Tokens ────────────────────────────────────────────────────────────────────────────────
 
 /** The app's tokens for one theme, as custom properties: semantic, status and data colors. */
-function tokens(scheme: Scheme): string {
+export function tokens(scheme: Scheme): string {
   const t: Record<string, string> = { ...themes[scheme] }
   const s = status[scheme]
   Object.assign(t, { good: s.good, warn: s.warn, critical: s.critical, neutral: s.neutral })

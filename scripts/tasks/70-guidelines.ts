@@ -2,6 +2,7 @@
 // assets, so they can't disagree with them.
 import sharp from 'sharp'
 import * as clusters from '../../src/clusters.ts'
+import * as fleet from '../../src/fleet.ts'
 import { blue, brand, gray, INK, PAPER, status, themes } from '../../src/colors.ts'
 import { dot, levels, pill } from '../../src/health.ts'
 import { macos, plated } from '../../src/icon.ts'
@@ -520,15 +521,28 @@ function clustersView(state: clusters.State, scheme: 'light' | 'dark', selector:
   })
 }
 
-/** Pictures in two columns, each with the app's rounded corners and hairline. */
-function clustersSheet(pictures: Buffer[]): string {
-  const cells = pictures
-    .map((png) => `<img src="data:image/png;base64,${png.toString('base64')}" alt="">`)
-    .join('')
+/** Part of the Fleet page in one state, as `clustersView` draws the clusters page. */
+function fleetView(state: fleet.FleetState, scheme: 'light' | 'dark', selector: string, pad = 0) {
+  return renderHtml(fleet.fleetPage(state, scheme, CLUSTERS_WINDOW), {
+    ...CLUSTERS_WINDOW,
+    scale: 2,
+    transparent: false,
+    clip: { selector, pad },
+  })
+}
+
+/** Pictures in two columns, each with the app's rounded corners and hairline, at most at their size. */
+async function clustersSheet(pictures: Buffer[]): Promise<string> {
+  const cells = await Promise.all(
+    pictures.map(async (png) => {
+      const { width = 0 } = await sharp(png).metadata()
+      return `<img src="data:image/png;base64,${png.toString('base64')}" style="width:min(100%, ${width / 2}px)" alt="">`
+    }),
+  )
   return page(
-    `<div class="pair">${cells}</div>`,
-    `.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-    .pair img { display: block; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 0 0 1px rgb(128 128 128 / 0.25); }`,
+    `<div class="pair">${cells.join('')}</div>`,
+    `.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; justify-items: center; }
+    .pair img { display: block; height: auto; border-radius: 12px; box-shadow: 0 0 0 1px rgb(128 128 128 / 0.25); }`,
   )
 }
 
@@ -619,7 +633,52 @@ export default {
       ],
     }
     for (const [name, list] of Object.entries(sheets)) {
-      await ctx.png(`guidelines/images/${name}.png`, await shoot(clustersSheet(await views(list))))
+      await ctx.png(
+        `guidelines/images/${name}.png`,
+        await shoot(await clustersSheet(await views(list))),
+      )
+    }
+
+    // The Fleet page's admin flows, from their mockups.
+    const fleetViews = (list: [fleet.FleetState, 'light' | 'dark', string, number?][]) =>
+      Promise.all(
+        list.map(([state, scheme, selector, pad]) => fleetView(state, scheme, selector, pad)),
+      )
+    const fleetSheets: Record<string, [fleet.FleetState, 'light' | 'dark', string, number?][]> = {
+      fleet: [
+        ['fleet', 'dark', '.fcontent', 0],
+        ['viewer', 'light', '.fcontent', 0],
+      ],
+      'fleet-menus': [
+        ['add-menu', 'dark', '.titlerow .btn, .menu', 16],
+        ['add-menu-off', 'light', '.titlerow .btn, .menu', 16],
+        ['card-menu', 'dark', '.card.hover, .menu', 16],
+        ['pending', 'light', '.card.pending', 16],
+      ],
+      'fleet-connect': [
+        ['connect-form', 'dark', '.dialog'],
+        ['connect-command', 'dark', '.dialog'],
+        ['connect-connected', 'dark', '.dialog'],
+        ['connect-expired', 'dark', '.dialog'],
+      ],
+      'fleet-settings': [
+        ['settings-managed', 'light', '.dialog'],
+        ['settings-page', 'light', '.dialog'],
+        ['remove', 'light', '.dialog'],
+        ['connect-used', 'light', '.dialog'],
+      ],
+      'fleet-add': [
+        ['add-kubeconfig', 'dark', '.dialog'],
+        ['add-token', 'dark', '.dialog'],
+        ['add-refused', 'dark', '.dialog'],
+        ['add-done', 'dark', '.dialog'],
+      ],
+    }
+    for (const [name, list] of Object.entries(fleetSheets)) {
+      await ctx.png(
+        `guidelines/images/${name}.png`,
+        await shoot(await clustersSheet(await fleetViews(list))),
+      )
     }
   },
 } satisfies Task

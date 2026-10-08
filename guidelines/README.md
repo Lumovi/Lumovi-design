@@ -18,6 +18,7 @@ values and contrast, the type scale, the app icon's anatomy, imagery, motion and
 - [Status](#status)
 - [The sponsor card](#the-sponsor-card)
 - [The clusters page](#the-clusters-page)
+- [The Fleet page](#the-fleet-page)
 - [Typography](#typography)
 - [Imagery](#imagery)
 - [Writing about Lumovi](#writing-about-lumovi)
@@ -463,6 +464,83 @@ except where this says otherwise; the column is `max-w-[720px]`.
 The tile's colors need `--series-3` to `--series-8` in the app's `@theme`, beside the two it has.
 The mockups are drawn from [`src/clusters.ts`](../src/clusters.ts), with the app's own icons
 ([`src/lucide.ts`](../src/lucide.ts)).
+
+## The Fleet page
+
+<img src="images/fleet.png" alt="The server's Fleet page: in dark, as an admin sees it, with Add cluster beside the title and a ⋯ on a card; in light, as someone else sees it, the clusters shared with their groups and nothing new to click." />
+
+The server's Fleet page gains what an admin needs to manage the fleet from it: connecting a
+private cluster, a cluster's settings, and, where the server allows it, adding one by kubeconfig
+or token. Everyone else sees the page as it was, with nothing new to click. Every change is an
+admin's, and goes in the audit log; each dialog says so in its footer.
+
+<img src="images/fleet-menus.png" alt="Add cluster's menu: Connect with an agent… first, then Paste a kubeconfig… and Use a token…; the same menu where adding is off, those two disabled, with the Helm value that turns them on; a card's ⋯ menu, with Open, Settings…, Copy its name and Remove from the fleet…; and a dashed card waiting for its agent." />
+
+- **Add cluster** sits beside the title, and opens a menu. **Connect with an agent…** comes
+  first: it's the way that puts no credentials in the hub. **Paste a kubeconfig…** and **Use a
+  token…** follow; where the server doesn't allow them (`fleet.addFromPage`), they're shown
+  disabled, with the Helm value that turns them on.
+- **A card's ⋯** shows on hover or focus, beside the version, so the cards stay as they are:
+  Open, Settings…, Copy its name, and **Remove from the fleet…** for clusters added from the page.
+
+### Connecting a private cluster
+
+<img src="images/fleet-connect.png" alt="Connect a cluster, in dark: its name, labels and groups; the helm install command with its one-time token, and Waiting for edge-ap-south to connect…; connected, with the check of its certificate authority; and an expired command, with Create a new command." />
+
+The cluster's agent dials out to the hub, so the cluster opens no port, and nobody pastes its
+credentials into the hub.
+
+- **First, what the fleet calls it,** its labels, and its groups: who sees it, besides admins.
+- **Then one command,** `helm install … mode=agent`, with copy. Its token works once, for an
+  hour, and isn't shown again. The dialog waits, with a timer. Closed, it leaves a dashed card on
+  the page, which waits too, with **Show the command** and **Cancel it**.
+- **Connected,** its card lands in place, tinted blue for a moment, and the dialog asks for the
+  last step: checking the cluster's certificate authority, with the command that prints its
+  fingerprint. **Later** leaves it to the page's "Agents to check" notice.
+- **An expired command, or a used one,** says what happened, and offers a new one. A second
+  agent with a used token is refused, and the dialog says when.
+
+### A cluster's settings
+
+<img src="images/fleet-settings.png" alt="Cluster settings, in light: an Argo CD cluster, its labels locked, set by its Secret, with where to change them; a cluster connected from the page, everything set here, with Remove from the fleet…; removing it, typed to confirm, with the command to uninstall its agent; and a used token." />
+
+Name, labels and groups, from a card's ⋯. **Each field says where its value comes from.** One
+the cluster's source sets (a Secret's `lumovi.dev/*` annotation, or the kubeconfig's
+`lumovi.dev` extension) is locked, and says which and where to change it; the page never
+overrides it. One the source leaves unset is set here, and says so. **Groups** decide who sees
+the cluster, and a change applies at once. **Comes from** names the source; for a cluster
+connected from the page, when, and its checked certificate authority. **Removing** asks for the
+cluster's name, says what stops, and gives the command that uninstalls its agent.
+
+### Adding by kubeconfig or token
+
+<img src="images/fleet-add.png" alt="Add a cluster, in dark: a pasted kubeconfig; a server, a token and its CA; a kubeconfig whose user runs a program, refused, with Use a token and Connect with an agent; and checked, with its name, labels and groups, and Add to the fleet." />
+
+Only where the server allows it. Lumovi keeps the cluster as a Secret in its own namespace,
+labelled `lumovi.dev/cluster`. The checks are the clusters page's. **A credential plugin is
+refused,** not asked about, since the hub can't run programs: the dialog shows the command,
+says why, and offers what works instead, a token or an agent.
+
+### Building it
+
+The page, its cards and its menus keep their classes; dialogs, menus, fields, checks and command
+boxes are the clusters page's (see its build table). What's new:
+
+| Part                 | Size     | Classes                                                                                                                                                                                                                                                                          |
+| -------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Title row            |          | `flex items-end gap-4`: the `h1`, then Add cluster, a secondary button with `Plus` and `ChevronDown`, for admins only                                                                                                                                                            |
+| Add cluster's menu   | 320 wide | `menuContent w-80`, `align="end"`; items `menuItem h-auto items-start py-2 whitespace-normal`, with a second line `block text-xs text-ink-3`; disabled `data-[disabled]:opacity-45`; the note `m-1 flex gap-2 rounded-lg bg-surface-3 p-2 text-xs text-ink-2`, `Lock` `size-3.5` |
+| A card's ⋯           | 28 × 28  | an `IconButton` at `size-7`, `-mt-1 -mr-1.5`, after the version, `opacity-0 group-hover:opacity-100 group-focus-within:opacity-100`; outside the card's link, so it isn't a link inside a link                                                                                   |
+| A waiting card       |          | `rounded-xl border-[1.5px] border-dashed border-line-strong p-4`, no fill; its dot `bg-accent animate-pulse-dot`, status `text-accent-strong`; buttons `mt-auto` (`h-7 text-xs`)                                                                                                 |
+| A new card           |          | for 1.2 s, `border-accent/45 bg-[color-mix(in_srgb,var(--accent)_6%,var(--surface-2))]`, fading to its own                                                                                                                                                                       |
+| Waiting              | 40 tall  | `flex items-center gap-2.5 rounded-[10px] border border-line px-3 py-2.5 text-[13px]`; the dot `size-2 rounded-full bg-accent ring-4 ring-accent-soft`; the timer `ml-auto font-mono text-xs text-ink-3`                                                                         |
+| Checking its CA      |          | `rounded-xl border border-line bg-surface px-3.5 py-3`, `ShieldCheck` `size-4 text-accent-strong`; the command box and the field `ml-[26px]`                                                                                                                                     |
+| Where a value's from | 17 tall  | `mt-1.5 flex items-start gap-1.5 text-xs text-ink-3`, `Pencil` `size-3` ("Set on this page."); from its source `text-ink-2`, `Lock` `size-3`, its names in `font-mono`                                                                                                           |
+| A locked field       | 32 tall  | the labels field, `bg-surface-2`, its labels `border border-line bg-transparent text-ink-2`, with no `X`                                                                                                                                                                         |
+| Audit note           |          | `mr-auto flex items-center gap-1.5 text-xs text-ink-3`, `ScrollText` `size-3.5`: "Recorded in the audit log"                                                                                                                                                                     |
+
+The command's values (`agent.joinToken`, the release's name) stand for what the agent's chart
+defines. The mockups are drawn from [`src/fleet.ts`](../src/fleet.ts).
 
 ## Typography
 
