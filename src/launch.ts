@@ -101,9 +101,13 @@ export const gallery: Shot[] = [
 
 /** The pictures the art is made from, for npm run sources to fetch. */
 export const sources = {
+  // Each video's frame in both themes: Lumovi-marketing names the light one <id>-light-<second>.
   posters: videos.flatMap((v) =>
     'second' in v.picture
-      ? [{ id: v.id, second: v.picture.second, file: `posters/${v.id}.webp` }]
+      ? (['dark', 'light'] as const).map((theme) => ({
+          still: `${v.id}${theme === 'light' ? '-light' : ''}-${(v.picture as { second: number }).second.toFixed(1)}.png`,
+          file: `posters/${v.id}-${theme}.webp`,
+        }))
       : [],
   ),
   screenshots: [
@@ -196,7 +200,7 @@ export function thumbnail(v: Video, theme: Theme): string {
   const [picture, size] =
     'screen' in v.picture
       ? [source(`screenshots/${v.picture.screen}-${theme}.webp`), SCREENSHOT]
-      : [source(`posters/${v.id}.webp`), FRAME]
+      : [source(`posters/${v.id}-${theme}.webp`), FRAME]
   return page(
     W,
     H,

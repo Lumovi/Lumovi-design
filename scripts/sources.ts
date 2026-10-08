@@ -1,7 +1,8 @@
 // sources/: the pictures the launch art is made from, which come from other repositories.
 // `npm run sources` takes them again: the app's screenshots as published (Lumovi's
 // docs/screenshots, through jsDelivr), and the videos' frames from a Lumovi-marketing checkout
-// beside this one, rendered there first with `npm run stills`.
+// beside this one, rendered there first with `npm run stills`, from both the dark and the light
+// versions of each video.
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import sharp from 'sharp'
@@ -26,10 +27,10 @@ for (const path of sources.screenshots) {
 }
 
 const missing: string[] = []
-for (const { id, second, file } of sources.posters) {
-  const still = join(MARKETING, 'out', 'stills', `${id}-${second.toFixed(1)}.png`)
+for (const { still: name, file } of sources.posters) {
+  const still = join(MARKETING, 'out', 'stills', name)
   if (!existsSync(still)) {
-    missing.push(`npm run stills -- ${id} ${second.toFixed(1)}`)
+    missing.push(name)
     continue
   }
   // Lossless, a third of the PNG's size.
@@ -38,7 +39,7 @@ for (const { id, second, file } of sources.posters) {
 }
 if (missing.length) {
   console.error(
-    `\nSome frames are missing. In ${MARKETING}, run:\n${missing.map((m) => `  ${m}`).join('\n')}\nthen this again.`,
+    `\nThese frames aren't in ${MARKETING}/out/stills: render them there (npm run stills), then run this again.\n${missing.map((m) => `  ${m}`).join('\n')}`,
   )
   process.exitCode = 1
 }
