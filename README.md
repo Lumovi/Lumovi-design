@@ -179,7 +179,7 @@ Black, white and true neutral grays carry the brand. Blue is only for what you c
 | `social/youtube/channel-art-*.png`               | The YouTube channel's banner, 2560 × 1440. TVs show it all, computers the middle band, phones only the middle 1546 × 423, where the title and the mark are  |
 | `social/youtube/thumbnails/<video>-*.png`        | Each video's thumbnail, 1280 × 720: `hero`, `incident` ("It's 2 a.m."), `approval` ("It asked first"), `platform` ("Monday") and `map` ("Where's the 503?") |
 | `social/product-hunt/thumbnail.png`              | The Product Hunt thumbnail, 240 × 240: the app icon                                                                                                         |
-| `social/product-hunt/gallery-<n>-<screen>-*.png` | The Product Hunt gallery, 1270 × 760, in its order, from the app's own screenshots                                                                          |
+| `social/product-hunt/gallery-<n>-<screen>-*.png` | The Product Hunt gallery, 1270 × 760, in its order, from the app's screens as the videos show them                                                          |
 
 The launch art comes in dark and light (`-dark`, `-light`): pick one for each account, or one
 theme for a whole gallery. It's made from the pictures in [`sources/`](sources), and the videos'

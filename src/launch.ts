@@ -1,7 +1,7 @@
 /**
  * The launch's art, for the accounts Lumovi opens: YouTube's channel art and a thumbnail for
  * each video, and Product Hunt's gallery. They show the real app, from pictures in sources/:
- * frames of the videos, and the app's own screenshots.
+ * frames of the videos, the app's own screenshots, and the pictures the videos are made from.
  */
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -38,7 +38,7 @@ export interface Video {
   crop: Crop
 }
 
-/** The pictures' sizes: the videos' frames, and the app's screenshots at twice the size. */
+/** The pictures' sizes: the videos' frames, and the app's window at twice the size. */
 const FRAME = { width: 1920, height: 1080 }
 const SCREENSHOT = { width: 2880, height: 1800 }
 
@@ -92,19 +92,24 @@ export const videos: Video[] = [
 ]
 
 export interface Shot {
-  /** The screenshot's name in the app's docs/screenshots/. */
+  /** The screen's name in sources/captures/, as Lumovi-marketing captures it for the videos. */
   screen: string
   /** The headline over it: the website's, for the same part of the app. */
   title: [string, string]
+  /**
+   * Where the window's top is, when not at 213: the window runs off the bottom of the image,
+   * and this puts that edge between two of the screen's rows, not through one's text.
+   */
+  top?: number
 }
 
-/** Product Hunt's gallery, in order: the app's own screenshots, each with what it shows. */
+/** Product Hunt's gallery, in order: the app's screens, each with what it shows. */
 export const gallery: Shot[] = [
   { screen: 'overview', title: ['Your clusters,', 'at a glance.'] },
   { screen: 'workloads', title: ['Made for the day something breaks.', 'Calm on all the others.'] },
   { screen: 'map', title: ['See what it’s connected to.', 'And what’s missing.'] },
   { screen: 'assistant-approval', title: ['Your assistant,', 'with you in charge.'] },
-  { screen: 'access', title: ['Who may do what,', 'and who did.'] },
+  { screen: 'access', title: ['Who may do what,', 'and who did.'], top: 206 },
 ]
 
 /** The pictures the art is made from, for npm run sources to fetch. */
@@ -118,16 +123,18 @@ export const sources = {
         }))
       : [],
   ),
-  screenshots: [
-    ...new Set(
-      [
-        ...gallery.map((s) => s.screen),
-        ...videos.flatMap((v) => ('screen' in v.picture ? [v.picture.screen] : [])),
-      ].flatMap((screen) =>
-        (['dark', 'light'] as const).map((theme) => `screenshots/${screen}-${theme}.webp`),
-      ),
+  screenshots: videos
+    .flatMap((v) => ('screen' in v.picture ? [v.picture.screen] : []))
+    .flatMap((screen) =>
+      (['dark', 'light'] as const).map((theme) => `screenshots/${screen}-${theme}.webp`),
     ),
-  ],
+  // The gallery's screens in both themes: Lumovi-marketing names them <screen>-<theme>.png.
+  captures: gallery.flatMap((s) =>
+    (['dark', 'light'] as const).map((theme) => ({
+      capture: `${s.screen}-${theme}.png`,
+      file: `captures/${s.screen}-${theme}.webp`,
+    })),
+  ),
 }
 
 const logo = (theme: Theme, height: number) =>
@@ -227,13 +234,14 @@ export function thumbnail(v: Video, theme: Theme): string {
 }
 
 /**
- * A Product Hunt gallery image, 1270 × 760: a headline over the app's screenshot, in the
- * screenshot's theme, the window running off the bottom.
+ * A Product Hunt gallery image, 1270 × 760: a headline over the app's screen, in the
+ * screen's theme, the window running off the bottom.
  */
 export function galleryImage(s: Shot, theme: Theme): string {
   const W = 1270
   const H = 760
-  const box = { x: 70, y: 214, width: W - 140, height: H - 214 }
+  const top = s.top ?? 213
+  const box = { x: 70, y: top, width: W - 140, height: H - top }
   return page(
     W,
     H,
@@ -246,7 +254,7 @@ export function galleryImage(s: Shot, theme: Theme): string {
     .window { left: ${box.x}px; top: ${box.y}px; width: ${box.width}px; height: ${box.height + 40}px; border-radius: 16px; }`,
     `<div class="copy"><h1>${headline(s.title, theme)}</h1></div>
     <div class="logo">${logo(theme, 30)}</div>
-    <div class="window">${cropped(source(`screenshots/${s.screen}-${theme}.webp`), SCREENSHOT, { x: 0, y: 0, ...SCREENSHOT }, box.width, (box.width * SCREENSHOT.height) / SCREENSHOT.width)}</div>`,
+    <div class="window">${cropped(source(`captures/${s.screen}-${theme}.webp`), SCREENSHOT, { x: 0, y: 0, ...SCREENSHOT }, box.width, (box.width * SCREENSHOT.height) / SCREENSHOT.width)}</div>`,
   )
 }
 
