@@ -62,9 +62,9 @@ export const videos: Video[] = [
     id: 'approval',
     title: ['It asked first.'],
     lead: 'An AI assistant’s fix, approved by you.',
-    // The change, red and green, and the Approve button under it.
+    // Why it asks, the change in red and green, and the Approve button under it.
     picture: { second: 16.6 },
-    crop: { x: 568, y: 240, width: 780, height: 706 },
+    crop: { x: 564, y: 146, width: 792, height: 717 },
   },
   {
     id: 'platform',
@@ -80,6 +80,14 @@ export const videos: Video[] = [
     // The route, and the service it leads to with no pods: the line between them is amber.
     picture: { second: 19 },
     crop: { x: 677, y: 186, width: 560, height: 507 },
+  },
+  {
+    id: 'tour',
+    title: ['A tour of', 'the whole app.'],
+    lead: 'Nine minutes, one feature at a time.',
+    // Command K, open over the overview: the list of everywhere it goes.
+    picture: { second: 100 },
+    crop: { x: 668, y: 259, width: 584, height: 529 },
   },
 ]
 
