@@ -720,6 +720,8 @@ dialogs are dialogs, menus are popovers. Three things differ:
 - **A detail is a panel from the right,** 600 px wide, over the list, which is dimmed behind it.
   Under 700 px it fills the screen.
 - **On a touch screen, buttons and menu items are 44 px high.**
+- **Logs wrap under 1024 px, at any pointer.** A log never scrolls sideways there, and the
+  Wrap toggle isn't shown. From 1024 px the toggle is back; on a touch screen it starts on.
 
 ### Building it
 
