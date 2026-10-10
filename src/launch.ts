@@ -97,10 +97,10 @@ export interface Shot {
   /** The headline over it: the website's, for the same part of the app. */
   title: [string, string]
   /**
-   * Where the window's top is, when not at 213: the window runs off the bottom of the image,
-   * and this puts that edge between two of the screen's rows, not through one's text.
+   * Its capture's name, where the gallery has one of its own: the screen in a state whose rows
+   * end clear of the image's bottom edge, which cuts the window 697 px down.
    */
-  top?: number
+  capture?: string
 }
 
 /** Product Hunt's gallery, in order: the app's screens, each with what it shows. */
@@ -109,7 +109,11 @@ export const gallery: Shot[] = [
   { screen: 'workloads', title: ['Made for the day something breaks.', 'Calm on all the others.'] },
   { screen: 'map', title: ['See what it’s connected to.', 'And what’s missing.'] },
   { screen: 'assistant-approval', title: ['Your assistant,', 'with you in charge.'] },
-  { screen: 'access', title: ['Who may do what,', 'and who did.'], top: 206 },
+  {
+    screen: 'access',
+    title: ['Who may do what,', 'and who did.'],
+    capture: 'access-gallery',
+  },
 ]
 
 /** The pictures the art is made from, for npm run sources to fetch. */
@@ -131,8 +135,8 @@ export const sources = {
   // The gallery's screens in both themes: Lumovi-marketing names them <screen>-<theme>.png.
   captures: gallery.flatMap((s) =>
     (['dark', 'light'] as const).map((theme) => ({
-      capture: `${s.screen}-${theme}.png`,
-      file: `captures/${s.screen}-${theme}.webp`,
+      capture: `${s.capture ?? s.screen}-${theme}.png`,
+      file: `captures/${s.capture ?? s.screen}-${theme}.webp`,
     })),
   ),
 }
@@ -240,7 +244,7 @@ export function thumbnail(v: Video, theme: Theme): string {
 export function galleryImage(s: Shot, theme: Theme): string {
   const W = 1270
   const H = 760
-  const top = s.top ?? 213
+  const top = 213
   const box = { x: 70, y: top, width: W - 140, height: H - top }
   return page(
     W,
@@ -254,7 +258,7 @@ export function galleryImage(s: Shot, theme: Theme): string {
     .window { left: ${box.x}px; top: ${box.y}px; width: ${box.width}px; height: ${box.height + 40}px; border-radius: 16px; }`,
     `<div class="copy"><h1>${headline(s.title, theme)}</h1></div>
     <div class="logo">${logo(theme, 30)}</div>
-    <div class="window">${cropped(source(`captures/${s.screen}-${theme}.webp`), SCREENSHOT, { x: 0, y: 0, ...SCREENSHOT }, box.width, (box.width * SCREENSHOT.height) / SCREENSHOT.width)}</div>`,
+    <div class="window">${cropped(source(`captures/${s.capture ?? s.screen}-${theme}.webp`), SCREENSHOT, { x: 0, y: 0, ...SCREENSHOT }, box.width, (box.width * SCREENSHOT.height) / SCREENSHOT.width)}</div>`,
   )
 }
 
