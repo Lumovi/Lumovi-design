@@ -512,6 +512,8 @@ brightest where it meets the floor.
 - **On light, the floor stays gray.** It's lit at a fifth of the sky's strength there: lit
   alike, the horizon would be white on white. The sky ends on the floor, and that edge is the
   picture.
+  For the same reason the floor has no pool of shade under it on light (the other lights'
+  floors have one, at 3.5%): under daylight it shows as a dim patch in the middle.
 - **Its numbers,** in the scene's units (k pixels to a unit): the horizon 0.95 above the floor's
   middle; the sky from nothing at the top to white at 30% at the horizon; a glow along the horizon as wide as the card and 1.1 units tall, at 14%, falling off evenly, so the horizon is brightest at its middle with no spot that reads as a lamp; the floor's white from 18% at the
   horizon to 3% at the foot; the dots reach 80% of the card's width from its middle and stop at
