@@ -3,7 +3,15 @@
 // YouTube's channel art and video thumbnails, and Product Hunt's thumbnail and gallery.
 import { address, description, site, tagline } from '../../src/brand.ts'
 import { filled } from '../../src/icon.ts'
-import { channelArt, gallery, galleryImage, thumbnail, videos } from '../../src/launch.ts'
+import {
+  channelArt,
+  fileName,
+  gallery,
+  galleryImage,
+  square,
+  thumbnail,
+  videos,
+} from '../../src/launch.ts'
 import { document, horizontal, VARIANTS } from '../../src/logo.ts'
 import { headline, palette, scene, type Theme } from '../../src/scene.ts'
 import { escape } from '../../src/svg.ts'
@@ -249,8 +257,12 @@ export default {
       )
       for (const video of videos) {
         await ctx.png(
-          `social/youtube/thumbnails/${video.id}-${theme}.png`,
+          `social/youtube/thumbnails/${fileName(video)}-${theme}.png`,
           await render(thumbnail(video, theme), 1280, 720),
+        )
+        await ctx.png(
+          `social/square/${fileName(video)}-${theme}.png`,
+          await render(square(video, theme), 1080, 1080),
         )
       }
       for (const [i, shot] of gallery.entries()) {

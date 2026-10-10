@@ -24,6 +24,8 @@ export interface Crop {
 export interface Video {
   /** The video's id in Lumovi-marketing, and its file name here. */
   id: string
+  /** Its file name here, where it isn't its id: a later version of its pictures. */
+  name?: string
   /** Its title, as on YouTube: the first line bright, the rest quieter. */
   title: string[]
   /** A line under the title, or none. */
@@ -36,20 +38,30 @@ export interface Video {
     | { /** A screenshot in sources/screenshots/, in the thumbnail's theme. */ screen: string }
   /** The part of the picture the thumbnail shows: the moment, without a caption. */
   crop: Crop
+  /**
+   * The part its square still shows, in the pixels of its frame without a caption
+   * (sources/site/, 3840 wide), or of its screenshot: as tall as the still's window makes it.
+   */
+  square: { x: number; y: number; width: number }
 }
 
 /** The pictures' sizes: the videos' frames, and the app's window at twice the size. */
 const FRAME = { width: 1920, height: 1080 }
 const SCREENSHOT = { width: 2880, height: 1800 }
+/** A frame rendered for a still, at twice the videos' size. */
+const STILL = { width: 3840, height: 2160 }
 
 /** The videos, in the order of the launch plan, each shown at its telling moment. */
 export const videos: Video[] = [
   {
     id: 'hero',
+    // Its second version: the overview as the app has it now.
+    name: 'hero-v2',
     title: [...tagline],
-    // The app itself, as the video's opening shows it: its overview.
+    // The app itself, as the video's opening shows it: its overview, from its tiles down.
     picture: { screen: 'overview' },
-    crop: { x: 500, y: 0, width: 1600, height: 1449 },
+    crop: { x: 500, y: 216, width: 1100, height: 996 },
+    square: { x: 500, y: 216, width: 1300 },
   },
   {
     id: 'incident',
@@ -57,6 +69,7 @@ export const videos: Video[] = [
     lead: 'Checkout is crash-looping.',
     picture: { second: 24 },
     crop: { x: 660, y: 112, width: 800, height: 725 },
+    square: { x: 1290, y: 700, width: 1650 },
   },
   {
     id: 'approval',
@@ -65,6 +78,7 @@ export const videos: Video[] = [
     // Why it asks, the change in red and green, and the Approve button under it.
     picture: { second: 16.6 },
     crop: { x: 564, y: 146, width: 792, height: 717 },
+    square: { x: 1082, y: 78, width: 1500 },
   },
   {
     id: 'platform',
@@ -72,6 +86,7 @@ export const videos: Video[] = [
     lead: 'The same app, for your whole team.',
     picture: { second: 30 },
     crop: { x: 100, y: 50, width: 860, height: 779 },
+    square: { x: 100, y: 80, width: 1500 },
   },
   {
     id: 'map',
@@ -80,6 +95,7 @@ export const videos: Video[] = [
     // The route, and the service it leads to with no pods: the line between them is amber.
     picture: { second: 19 },
     crop: { x: 677, y: 186, width: 560, height: 507 },
+    square: { x: 1470, y: 430, width: 900 },
   },
   {
     id: 'tour',
@@ -88,6 +104,7 @@ export const videos: Video[] = [
     // Command K, open over the overview: the list of everywhere it goes.
     picture: { second: 100 },
     crop: { x: 668, y: 259, width: 584, height: 529 },
+    square: { x: 1056, y: 172, width: 1500 },
   },
 ]
 
@@ -148,9 +165,16 @@ export const posters: Poster[] = [
 
 export const sources = {
   // The website's posters: Lumovi-marketing renders them without captions, as poster-<id>-….
-  site: posters.flatMap((p) =>
+  // The squares' frames are the same ones, and the map's and the tour's with them.
+  site: [
+    ...posters,
+    // The map's at four times the video's size: its square shows a small part of it.
+    { id: 'map', second: 19, scale: '@4x' },
+    // The palette once it has opened, two seconds after the thumbnail's frame.
+    { id: 'tour', second: 102 },
+  ].flatMap((p: { id: string; second: number; scale?: string }) =>
     (['dark', 'light'] as const).map((theme) => ({
-      still: `poster-${p.id}-${theme}-${p.second.toFixed(1)}.png`,
+      still: `poster-${p.id}-${theme}-${p.second.toFixed(1)}${p.scale ?? ''}.png`,
       file: `site/${p.id}-${theme}.webp`,
     })),
   ),
@@ -270,6 +294,41 @@ export function thumbnail(v: Video, theme: Theme): string {
     `<div class="logo">${logo(theme, 38)}</div>
     <div class="copy"><h1>${title}</h1>${v.lead ? `<p>${escape(v.lead)}</p>` : ''}</div>
     <div class="window">${cropped(picture, size, v.crop, box.width, box.height)}</div>`,
+  )
+}
+
+/** A video's pictures' file name: its id, or a later version's name. */
+export const fileName = (v: Video) => v.name ?? v.id
+
+/**
+ * A video's square still, 1080 × 1080, for social posts: the thumbnail, stacked. The logo, the
+ * title and its lead on top, and the video's moment in a window running off the right and the
+ * bottom, from its frame without a caption.
+ */
+export function square(v: Video, theme: Theme): string {
+  const S = 1080
+  const box = { x: 72, y: 448, width: S - 72, height: S - 448 }
+  const c = palette[theme]
+  const title = v.title.length > 1 ? headline(v.title, theme) : escape(v.title[0]!)
+  const [picture, size] =
+    'screen' in v.picture
+      ? [source(`screenshots/${v.picture.screen}-${theme}.webp`), SCREENSHOT]
+      : [source(`site/${v.id}-${theme}.webp`), STILL]
+  const crop = { ...v.square, height: (v.square.width * box.height) / box.width }
+  return page(
+    S,
+    S,
+    theme,
+    [0.6, 0.7],
+    `
+    .logo { position: absolute; left: 72px; top: 64px; }
+    .copy { position: absolute; left: 72px; top: 156px; width: 900px; }
+    h1 { font-size: ${v.title.length > 1 ? 72 : 100}px; }
+    p { margin: 22px 0 0; font-size: 32px; line-height: 1.3; letter-spacing: -0.012em; color: ${c.lead}; }
+    .window { left: ${box.x}px; top: ${box.y}px; width: ${box.width}px; height: ${box.height}px; border-radius: 22px 0 0 0; }`,
+    `<div class="logo">${logo(theme, 38)}</div>
+    <div class="copy"><h1>${title}</h1>${v.lead ? `<p>${escape(v.lead)}</p>` : ''}</div>
+    <div class="window">${cropped(picture, size, crop, box.width, box.height)}</div>`,
   )
 }
 
