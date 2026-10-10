@@ -4,6 +4,7 @@ import sharp from 'sharp'
 import * as appMenu from '../../src/appmenu.ts'
 import * as clusters from '../../src/clusters.ts'
 import * as fleet from '../../src/fleet.ts'
+import * as phone from '../../src/phone.ts'
 import { blue, brand, gray, INK, PAPER, status, themes } from '../../src/colors.ts'
 import { dot, levels, pill } from '../../src/health.ts'
 import { macos, plated } from '../../src/icon.ts'
@@ -532,6 +533,16 @@ function fleetView(state: fleet.FleetState, scheme: 'light' | 'dark', selector: 
   })
 }
 
+/** A phone or tablet screen in one state: all of it, or what `selector` covers. */
+function phoneView(state: phone.State, scheme: 'light' | 'dark', selector?: string, pad = 0) {
+  return renderHtml(phone.phonePage(state, scheme), {
+    ...phone.sizeOf(state),
+    scale: 2,
+    transparent: false,
+    ...(selector ? { clip: { selector, pad } } : {}),
+  })
+}
+
 /** Pictures in two columns, each with the app's rounded corners and hairline, at most at their size. */
 async function clustersSheet(pictures: Buffer[]): Promise<string> {
   const cells = await Promise.all(
@@ -675,6 +686,57 @@ export default {
         ['add-done', 'dark', '.dialog'],
       ],
     }
+    // The web UI on a phone and a tablet, from their mockups.
+    const TOP = '.tb, .ctx, .ptools, .prow'
+    const phoneSheets: Record<string, [phone.State, 'light' | 'dark', string?, number?][]> = {
+      phone: [
+        ['list', 'dark'],
+        ['list-all', 'light'],
+      ],
+      'phone-rows': [
+        ['list-long', 'light', TOP],
+        ['hit', 'dark', TOP],
+        ['overview', 'dark'],
+        ['overview', 'light'],
+      ],
+      'phone-drawer': [
+        ['drawer', 'dark'],
+        ['drawer', 'light'],
+      ],
+      'phone-sheets': [
+        ['namespace', 'light'],
+        ['sort', 'dark'],
+      ],
+      'phone-detail': [
+        ['detail', 'light'],
+        ['detail-scrolled', 'dark'],
+        ['service', 'dark'],
+        ['logs', 'light'],
+      ],
+      'phone-approval': [
+        ['approval', 'dark'],
+        ['approval-soon', 'light'],
+        ['scale', 'light'],
+        ['typed', 'dark'],
+      ],
+      'phone-landscape': [
+        ['landscape', 'light'],
+        ['landscape', 'dark'],
+      ],
+      tablet: [
+        ['tablet', 'light'],
+        ['tablet-drawer', 'dark'],
+        ['tablet-detail', 'dark'],
+        ['tablet-approval', 'light'],
+        ['tablet-menu', 'light', '.tb, .ctx, .pop44', 0],
+        ['tablet-menu', 'dark', '.tb, .ctx, .pop44', 0],
+      ],
+    }
+    for (const [name, list] of Object.entries(phoneSheets)) {
+      const views = await Promise.all(list.map(([st, sc, sel, pad]) => phoneView(st, sc, sel, pad)))
+      await ctx.png(`guidelines/images/${name}.png`, await shoot(await clustersSheet(views)))
+    }
+
     // Where Windows and Linux reach the app's menu.
     const menu = (html: string, height: number) =>
       renderHtml(html, { width: 760, height, scale: 2, transparent: false })

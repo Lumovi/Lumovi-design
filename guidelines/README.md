@@ -19,6 +19,7 @@ values and contrast, the type scale, the app icon's anatomy, imagery, motion and
 - [The sponsor card](#the-sponsor-card)
 - [The clusters page](#the-clusters-page)
 - [The Fleet page](#the-fleet-page)
+- [On a phone](#on-a-phone)
 - [The menu on Windows and Linux](#the-menu-on-windows-and-linux)
 - [Typography](#typography)
 - [Imagery](#imagery)
@@ -546,6 +547,158 @@ boxes are the clusters page's (see its build table). What's new:
 
 The command's values (`agent.joinToken`, the release's name) stand for what the agent's chart
 defines. The mockups are drawn from [`src/fleet.ts`](../src/fleet.ts).
+
+## On a phone
+
+<img src="images/phone.png" alt="The server's web UI on a phone, 390 px wide, a list of pods in dark and in light: a top bar with a menu button, the title Pods, Search and Refresh; under it two chips, the cluster production-eu and the namespace; a filter field with two buttons, the label filter and Sort; the count and the health chips; then rows two lines high, a pod's name and its status pill, and under them how many are ready, its restarts and its age." />
+
+The server's web UI works in a browser on a phone and a tablet. The desktop app never gets this
+small: its window stops at 1024 px, and from 1024 px nothing here applies. Narrower than that,
+every screen is built from the same few parts, drawn here once, with the app's own type sizes,
+colors and icons and nothing new.
+
+- **Under 1024 px, the shell changes:** the sidebar becomes a **drawer**, and the header becomes
+  a **top bar** with a **context row** under it, which says which cluster and which namespace
+  you're looking at.
+- **Under 640 px, the content changes too:** a list is **two-line rows**, a detail is a **page**
+  with Back, and every menu, picker and dialog is a **sheet** from the bottom.
+- **A finger gets 44 px, at any width.** What's tapped answers on at least 44 × 44 px wherever
+  the pointer is coarse (`pointer: coarse`), and nothing is shown on hover only where there is
+  no hover (`hover: none`). An iPad on its side is wider than 1024 px and still a finger, so
+  this follows the pointer and not the width; a narrow window with a mouse keeps the desktop's
+  sizes.
+- **A field's text is 16 px under 640 px.** Below that, Safari on a phone zooms the page when a
+  field takes focus. This goes for every field, select and text area.
+- **Nothing scrolls sideways** except a strip of tabs.
+
+### The list
+
+<img src="images/phone-rows.png" alt="Four views. The longest names, in light: two pods whose names differ only at their end, each cut in the middle so the end shows, beside the pills CreateContainerConfigError and Init:CrashLoopBackOff, whole. The context row's two chips in dark, each with a dashed outline 44 px high around it: what a finger gets. The overview in dark and in light: two tiles side by side, then Needs attention and Recent warnings, whose rows are the list's." />
+
+- **A row is 60 px high and two lines.** The first has the name, and its status at the right:
+  the app's pill, unchanged, with its icon. A status is never a dot alone, and each keeps the
+  level the app gives it. The second has what's worth knowing, from the kind's own columns in
+  their order (a pod's ready count and restarts), and its age at the right.
+- **A name gives way in the middle,** never at its end: replicas differ only in their last
+  characters, so a name cut at its end makes two pods read the same. Its last six characters
+  always show, and the ellipsis meets them with no gap: the head is cut to whole characters by
+  measuring, since CSS's own ellipsis leaves up to a character of slack. The pill keeps its
+  whole word up to 200 px; the name keeps at least 120 px.
+- **Figures line up; names don't stretch.** Tabular figures go on the numbers alone (the count,
+  a chip's number, the age), never on a line that holds a name or a message: they widen its
+  hyphens too.
+- **A row says its namespace only when every namespace is listed,** as the table does.
+- **The toolbar is two rows.** A filter field with two buttons beside it, the label filter and
+  Sort; then the count and the health chips, which wrap to a second line and never scroll.
+  There's no header row, no checkboxes and no selection.
+- **The overview's cards use the same row,** and its tiles stay two across, their chevrons
+  always shown.
+
+### The drawer
+
+<img src="images/phone-drawer.png" alt="The drawer open over the list, in dark and in light: the cluster switcher on top, then Overview, Workloads, Pods (selected), Metrics and Helm releases, the Cluster, Network and Configuration groups, the sponsor card, and a footer with the theme, AI assistants, the audit log, the account and the version. The page behind it is dimmed and blurred." />
+
+The sidebar as it is, from the left: the cluster switcher, the same items in the same order at
+44 px, the sponsor card, and the footer's buttons. It's 320 px wide and always leaves 56 px of
+the page showing. It closes when an item is chosen, on a tap outside it, and on Escape. Its
+open edge has a hairline and the pop shadow, which is what sets it apart from the page in dark.
+
+### Sheets
+
+<img src="images/phone-sheets.png" alt="Two sheets from the bottom of the screen. In light, Namespace: a grabber, the title and a close button, a field reading Find a namespace…, then All namespaces, shop with a blue check, payments, search, monitoring, kube-system, ingress-nginx, and old-shop marked Terminating. In dark, Sort by: Status, marked Worst first with an arrow and a check, then Name, Restarts, CPU, Memory and Age." />
+
+Under 640 px every menu and picker opens as a sheet: the namespace picker, the cluster switcher,
+the theme, a row's actions, Sort.
+
+- **It always has a title,** and a close button beside it. The grabber says it can be dragged
+  down; the title says what it is.
+- **Items are 44 px high.** The chosen one has the blue check at its right, as in the app's
+  menus, and no fill: a fill is where the pointer is, and a finger has none until it presses.
+- **It's at most 85% of the screen's height;** its list scrolls inside it, and it keeps clear of
+  the home bar (`env(safe-area-inset-bottom)`).
+- **Sort** lists the columns the table can sort by. The chosen one says its direction; choosing
+  it again turns it around.
+
+### A detail
+
+<img src="images/phone-detail.png" alt="Four pages. A Deployment in light: Back and Deployments in the top bar, then Deployment, shop, production-eu, the name checkout with a copy button, the pill Degraded, the buttons Scale and Restart, tabs, and its facts stacked, each label above its value. The same page scrolled, in dark: the top bar now reads checkout. A Service in dark: its ports as cards, a port each. A pod's logs in light: lines wrap, and what wraps is indented." />
+
+- **A detail is a page over the list,** with Back in the top bar. The top bar names the list it
+  came from while the object's own header is on screen, and the object once that has scrolled
+  away. The tabs stay under the top bar.
+- **Its header says the cluster:** kind, namespace, cluster. That's where Restart and Scale are,
+  and the context row isn't on this page. The age moves to the facts.
+- **The status has a line of its own, and so do the actions,** at 44 px. A phone offers at most
+  two actions for an object, so there is no ⋯ menu.
+- **Facts stack:** a label, at 12 px, above its value. **A table becomes cards,** one for each
+  row, its columns side by side under the row's name.
+- **Wrapped text hangs.** Where a log line or a diff's line wraps, what follows is indented by
+  two characters, so one long line doesn't read as two. A long value breaks anywhere, and never
+  gets a hyphen it didn't have.
+
+### An approval, and Lumovi's own dialogs
+
+<img src="images/phone-approval.png" alt="Four sheets. An assistant's change to approve, in dark, nearly the height of the screen: Claude Code asks, Change Deployment checkout, the cluster and the Production mark, why, the diff, the equivalent command, and a footer with Waits 4:12 more on its own line, Reject… at the left and Approve at the right. The same in light with under a minute left, the wait in amber. Scale checkout in light: a field with minus and plus buttons, the command, Cancel and Scale. And a deletion typed to confirm, in dark, the sheet standing on the keyboard." />
+
+- **A dialog is a sheet** as tall as what it holds, to within 24 px of the top. Its header is
+  the dialog's own; the cluster and the Production mark are never cut short, and wrap to a
+  second line if they must.
+- **The footer is pinned.** The wait has a line to itself, above the buttons. The quiet button,
+  Reject… or Cancel, is at the left edge; the one that acts is at the right, at least 120 px
+  wide; both are 44 px high, with the gap between them left empty.
+- **Dragging the sheet down, or tapping outside it, puts the request aside:** it isn't Reject.
+  The request waits, and its pill stays.
+- **The footer stays above the keyboard** while a name is typed to confirm.
+
+### On its side, and on a tablet
+
+<img src="images/phone-landscape.png" alt="The phone on its side, 844 by 390 px, in light and in dark: the top bar, then the list's toolbar and rows; the context row has scrolled away with the page." />
+
+Under 500 px of height the context row scrolls away with the page, and the top bar stays.
+
+<img src="images/tablet.png" alt="A tablet, 768 px wide. In light, the list: the phone's top bar and context row, then the app's own table. In dark, the drawer. In dark, a detail: a panel 600 px wide from the right, over the dimmed list. In light, an approval: the app's dialog, its buttons 44 px high. And the namespace menu in light and dark: the app's popover, its items 44 px high." />
+
+From 640 px the content is the desktop's: lists are tables that drop columns as they do now,
+dialogs are dialogs, menus are popovers. Three things differ:
+
+- **The shell is the phone's:** the top bar, with the header's own buttons, the context row and
+  the drawer.
+- **A detail is a panel from the right,** 600 px wide, over the list, which is dimmed behind it.
+  Under 700 px it fills the screen.
+- **On a touch screen, buttons and menu items are 44 px high.**
+
+### Building it
+
+Everything keeps its classes; what's listed is what a narrow screen adds. Sizes are in CSS pixels.
+
+| Part                  | Size               | Classes                                                                                                                                                                                                                                                                                                                               |
+| --------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The page              |                    | under 1024 px the content panel loses its margin, border and corners: `bg-surface`, edge to edge                                                                                                                                                                                                                                      |
+| Top bar               | 52 tall            | `flex h-[52px] items-center border-b border-line bg-surface px-1`; the title `min-w-0 flex-1 px-1 text-[15px] leading-5 font-semibold tracking-[-0.01em]`                                                                                                                                                                             |
+| A bar button          | 44 × 44            | `grid size-11 place-items-center rounded-lg text-ink-2`, icon `size-5`: `Menu` or `ArrowLeft`, then `Search` and `RotateCw` (from 640 px also `Plus`, the forwards and `History`)                                                                                                                                                     |
+| Context row           | 44 tall            | `flex h-11 items-center gap-2 border-b border-line bg-surface px-4`                                                                                                                                                                                                                                                                   |
+| A context chip        | 32 tall, 44 to tap | `flex h-8 min-w-0 items-center gap-2 rounded-lg border border-line bg-surface-2 px-2.5 text-[13px] font-medium`; the cluster's `max-w-[60%]`, with `StatusDot` and `ChevronsUpDown`; the namespace's with `LayoutGrid` and `ChevronDown`, icons `size-3.5 text-ink-3`; "Cluster-wide" has no border and can't be tapped               |
+| A name                |                    | `flex min-w-0 whitespace-nowrap`: the head, cut to the characters that fit and ending in `…`, then the last six characters `shrink-0`; measured on resize, as the table measures its columns                                                                                                                                          |
+| List toolbar          |                    | `border-b border-line px-4 pt-3`; row one `flex gap-2`; row two `flex min-h-11 flex-wrap items-center gap-2 py-2`: the count, then `HealthChips` as they are                                                                                                                                                                          |
+| A field               | 44 tall            | `flex h-11 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-base`, icon `size-4`; focus as now                                                                                                                                                                                                                   |
+| A square button       | 44 × 44            | `grid size-11 place-items-center rounded-lg border border-line-strong bg-surface-2 text-ink-2 shadow-xs`, icon `size-4`: `Tag` (the label filter), `ArrowUpDown` (Sort)                                                                                                                                                               |
+| A row                 | 60 tall            | `flex h-[60px] flex-col justify-center gap-[3px] border-b border-line px-4`, pressed `bg-surface-3/50`; line one `flex items-center gap-3`: the name `min-w-[120px] flex-1 font-medium`, then `StatusPill` at `max-w-[200px]`; line two `flex gap-3 text-xs text-ink-3`: the facts `flex-1 truncate`, the age `shrink-0 tabular-nums` |
+| Drawer                | 320 wide           | `fixed inset-y-0 left-0 z-50 flex w-[min(320px,calc(100%-56px))] flex-col border-r border-line-strong bg-app shadow-pop`, over the dialogs' scrim; items `h-11`; the footer's buttons `size-11`                                                                                                                                       |
+| Sheet                 | up to 85% tall     | `fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col rounded-t-2xl border border-b-0 border-line-strong bg-surface-2 shadow-pop`, over the scrim; the grabber `mx-auto mt-2 h-1 w-9 rounded-full bg-line-strong`                                                                                                                |
+| A sheet's title       | 44 tall            | `flex h-11 items-center pr-1 pl-4`; the title `flex-1 text-[15px] font-semibold`; Close, a bar button with `X`                                                                                                                                                                                                                        |
+| A sheet's item        | 44 tall            | `menuItem h-11` in a list `px-2 pb-3`; the chosen one's `Check` `size-4 text-accent`; pressed `bg-surface-3`                                                                                                                                                                                                                          |
+| A dialog, as a sheet  | from 24 px down    | the sheet, with `top-6` when it's taller than the screen; the dialog's header at `pt-2 pr-1 pl-4`, its meta line `flex-wrap`; the body `px-4 pt-4 pb-5`                                                                                                                                                                               |
+| A dialog's footer     |                    | `border-t border-line bg-surface px-4 py-3`, plus the home bar's inset; the wait `mb-3 flex items-center gap-1.5 text-xs`; the buttons `flex items-center justify-between`, each `h-11 px-4`, the ghost one `-ml-4`, the other `min-w-[120px]`; no key hint                                                                           |
+| A detail's header     |                    | `px-4 pt-4 pb-3`: the meta line; the name as now, with the copy button; the pill `mt-2.5`; the actions `mt-3 flex gap-2`, secondary buttons at `h-11 px-4`; no kind tile                                                                                                                                                              |
+| Tabs                  | 44 tall            | the strip as it is, its tabs `h-11`, `px-4`, the faded edges 16 px                                                                                                                                                                                                                                                                    |
+| A stacked fact        |                    | `flex flex-col gap-3`; the label `text-xs text-ink-3`, the value `mt-0.5 text-[13px] wrap-anywhere`                                                                                                                                                                                                                                   |
+| A table, stacked      |                    | `divide-y divide-line overflow-hidden rounded-xl border border-line`; a row `px-3.5 py-2.5`: its name `font-mono text-xs font-medium`, then `grid grid-cols-3 gap-3 text-xs` as a container's resources are                                                                                                                           |
+| Wrapped mono          |                    | `whitespace-pre-wrap wrap-anywhere`, with `pl-[calc(1rem+2ch)] -indent-[2ch]`; in the diff the indent also takes the sign's column and the line's own                                                                                                                                                                                 |
+| Logs' controls        | 44 tall            | two selects side by side, `h-11 text-base`; then the search field and the toggles at `size-11`: Follow, Timestamps, and a ⋯ with the rest. Lines always wrap; timestamps start off                                                                                                                                                    |
+| A detail, on a tablet | 600 wide           | `fixed inset-y-0 right-0 z-50 w-[min(600px,100%)] border-l border-line-strong bg-surface shadow-pop`, over the scrim; inside, the panel as it is                                                                                                                                                                                      |
+
+The mockups are drawn from [`src/phone.ts`](../src/phone.ts), where `middle()` is the rule for
+names.
 
 ## The menu on Windows and Linux
 
