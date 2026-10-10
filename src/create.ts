@@ -13,6 +13,9 @@
  * - the dialog is called "Create", and the + button's tooltip, the palette's entry and the
  *   menu's item follow as "Create…";
  * - the side used last opens first; the first time, the form.
+ * Settled while building: a variable whose value comes from a ConfigMap or a Secret keeps its
+ * row in Environment, read-only, saying where its value comes from; the form doesn't step back.
+ *
  * The two options that weren't chosen stay here, marked, so the choice can be seen: don't
  * build them.
  */
