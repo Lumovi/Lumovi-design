@@ -3,6 +3,7 @@
 import sharp from 'sharp'
 import * as appMenu from '../../src/appmenu.ts'
 import * as clusters from '../../src/clusters.ts'
+import { daylight } from '../../src/daylight.ts'
 import * as fleet from '../../src/fleet.ts'
 import * as phone from '../../src/phone.ts'
 import * as site from '../../src/site.ts'
@@ -706,6 +707,35 @@ export default {
             .map((png) => `<img src="data:image/png;base64,${png.toString('base64')}" alt="">`)
             .join(''),
           'img { display: block; width: 100%; height: auto; } img + img { margin-top: 16px; } img { border-radius: 12px; box-shadow: 0 0 0 1px rgb(128 128 128 / 0.25); }',
+        ),
+      ),
+    )
+
+    // Daylight, the fifth sponsor tier's light on the website: on its wide card, and on a phone's.
+    const lights = await Promise.all(
+      (
+        [
+          ['dark', 1240, 172],
+          ['light', 1240, 172],
+          ['dark', 358, 148],
+          ['light', 358, 148],
+        ] as const
+      ).map(([scheme, w, h]) =>
+        renderHtml(daylight(scheme, w, h), { width: w, height: h, scale: 2, transparent: false }),
+      ),
+    )
+    await ctx.png(
+      'guidelines/images/site-daylight.png',
+      await shoot(
+        page(
+          `<div class="wide">${lights
+            .slice(0, 2)
+            .map((png) => `<img src="data:image/png;base64,${png.toString('base64')}" alt="">`)
+            .join('')}</div><div class="narrow">${lights
+            .slice(2)
+            .map((png) => `<img src="data:image/png;base64,${png.toString('base64')}" alt="">`)
+            .join('')}</div>`,
+          'img { display: block; height: auto; border-radius: 12px; box-shadow: 0 0 0 1px rgb(128 128 128 / 0.25); } .wide img { width: 100%; margin-bottom: 16px; } .narrow { display: flex; gap: 16px; } .narrow img { width: 358px; }',
         ),
       ),
     )

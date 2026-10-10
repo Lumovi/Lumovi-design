@@ -495,6 +495,32 @@ that says where the clusters come from, with the one added in Lumovi counted apa
 
 It's drawn from [`src/site.ts`](../src/site.ts), with the site's five clusters.
 
+### Daylight, on lumovi.dev
+
+<img src="images/site-daylight.png" alt="Daylight's light, in dark and in light, on the wide card and on a phone's: no lamp, but a floor of dots lit from edge to edge under a sky that is brightest along the horizon." />
+
+The website's sponsor tiers each have a light: a spark, a glow, a beam, the lighthouse (the
+mark). The fifth, Daylight, is the step beyond a lamp: there is no source in the picture. The
+floor of dots runs to the card's edges, a horizon crosses the card, and the sky above it is
+brightest where it meets the floor.
+
+- **It's the only light that fills its card,** and it lies across the top of the tier's wide
+  card, as the other four lie on theirs. Under 900 px the card stacks and the light keeps the
+  others' height.
+- **White only, as the other lights:** adding up on graphite, and over the light theme's gray
+  at 2.4 times the strength. No new color.
+- **On light, the floor stays gray.** It's lit at a fifth of the sky's strength there: lit
+  alike, the horizon would be white on white. The sky ends on the floor, and that edge is the
+  picture.
+- **Its numbers,** in the scene's units (k pixels to a unit): the horizon 0.95 above the floor's
+  middle; the sky from nothing at the top to white at 30% at the horizon; a glow along the horizon as wide as the card and 1.1 units tall, at 14%, falling off evenly, so the horizon is brightest at its middle with no spot that reads as a lamp; the floor's white from 18% at the
+  horizon to 3% at the foot; the dots reach 80% of the card's width from its middle and stop at
+  the horizon.
+- **Under the pointer** the horizon's glow brightens, as the other lights do; nothing moves.
+
+It's drawn from [`src/daylight.ts`](../src/daylight.ts), with the numbers the website's scene
+takes.
+
 ## The Fleet page
 
 <img src="images/fleet.png" alt="The server's Fleet page: in dark, as an admin sees it, with Add cluster beside the title and a ⋯ on a card; in light, as someone else sees it, the clusters shared with their groups and nothing new to click." />
