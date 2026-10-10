@@ -37,6 +37,15 @@ for (const { still: name, file } of sources.posters) {
   await sharp(still).webp({ lossless: true, effort: 6 }).toFile(out(file))
   console.log(`sources/${file}`)
 }
+for (const { still: name, file } of sources.site) {
+  const still = join(MARKETING, 'out', 'stills', name)
+  if (!existsSync(still)) {
+    missing.push(name)
+    continue
+  }
+  await sharp(still).webp({ lossless: true, effort: 6 }).toFile(out(file))
+  console.log(`sources/${file}`)
+}
 if (missing.length) {
   console.error(
     `\nThese frames aren't in ${MARKETING}/out/stills: render them there (npm run stills), then run this again.\n${missing.map((m) => `  ${m}`).join('\n')}`,

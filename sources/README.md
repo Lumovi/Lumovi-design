@@ -4,11 +4,12 @@ The pictures the launch art in [`social/`](../social) (LinkedIn, YouTube and Pro
 made from. They come from other repositories, so unlike the rest of this one they aren't built
 here: `npm run sources` takes them again.
 
-| File                                | What                                                                    | From                                                                                                                                                 |
-| ----------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `posters/<video>-<theme>.webp`      | A frame of each video, from its dark and its light version, 1920 × 1080 | [Lumovi-marketing](https://github.com/Lumovi/Lumovi-marketing)'s stills, `<video>-<second>.png` and `<video>-light-<second>.png`, losslessly as WebP |
-| `screenshots/<screen>-<theme>.webp` | The app's own screenshots, 2880 × 1800                                  | [Lumovi's `docs/screenshots/`](https://github.com/Lumovi/Lumovi/tree/main/docs/screenshots), through jsDelivr, as they're published                  |
-| `captures/<screen>-<theme>.webp`    | The app's screens as the videos show them, 2880 × 1800                  | [Lumovi-marketing](https://github.com/Lumovi/Lumovi-marketing)'s captures, `<screen>-<theme>.png`, at two thirds of their size, losslessly as WebP   |
+| File                                | What                                                                          | From                                                                                                                                                                      |
+| ----------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `posters/<video>-<theme>.webp`      | A frame of each video, from its dark and its light version, 1920 × 1080       | [Lumovi-marketing](https://github.com/Lumovi/Lumovi-marketing)'s stills, `<video>-<second>.png` and `<video>-light-<second>.png`, losslessly as WebP                      |
+| `screenshots/<screen>-<theme>.webp` | The app's own screenshots, 2880 × 1800                                        | [Lumovi's `docs/screenshots/`](https://github.com/Lumovi/Lumovi/tree/main/docs/screenshots), through jsDelivr, as they're published                                       |
+| `captures/<screen>-<theme>.webp`    | The app's screens as the videos show them, 2880 × 1800                        | [Lumovi-marketing](https://github.com/Lumovi/Lumovi-marketing)'s captures, `<screen>-<theme>.png`, at two thirds of their size, losslessly as WebP                        |
+| `site/<video>-<theme>.webp`         | The frame each video's poster on the website is cut from, without its caption | [Lumovi-marketing](https://github.com/Lumovi/Lumovi-marketing)'s stills, `poster-<video>-<theme>-<second>.png`, rendered with `REMOTION_CAPTIONS=off`, losslessly as WebP |
 
 Which frame each video's thumbnail uses, the part of it shown, and which screenshots go in the
 gallery are set in [`src/launch.ts`](../src/launch.ts).

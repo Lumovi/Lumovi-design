@@ -1,14 +1,17 @@
 // media/: wallpapers, the artwork the installers show (the macOS disk image's window, and the
 // Windows installer's sidebar and header), and the sidebar's sponsor card: Lumovi's own picture
 // for it, and what sponsors get (the spec, a template, a placeholder and previews).
+import { join } from 'node:path'
+import sharp from 'sharp'
 import { gray, PAPER } from '../../src/colors.ts'
 import { icon } from '../../src/icon.ts'
+import { POSTER, posters } from '../../src/launch.ts'
 import { document, VARIANTS, wordmarkOnly } from '../../src/logo.ts'
 import { FONTS, scene, type Theme } from '../../src/scene.ts'
 import * as sponsor from '../../src/sponsor.ts'
 import { bmp } from '../lib/formats.ts'
 import { renderHtml, rgba } from '../lib/render.ts'
-import type { Task } from '../lib/task.ts'
+import { root, type Task } from '../lib/task.ts'
 
 /** The wordmark in white, `height` pixels tall (to the top of the i's dot). */
 const wordmark = (height: number) =>
@@ -105,6 +108,26 @@ export default {
     if (!ctx.raster) return
     const page = (html: string, width: number, height: number, scale = 1) =>
       renderHtml(html, { width, height, scale, transparent: false })
+
+    // The website's video posters: each video's frame, cut to what tells it, at the player's size.
+    for (const p of posters) {
+      for (const theme of ['dark', 'light'] as const) {
+        const still = sharp(join(root, 'sources', 'site', `${p.id}-${theme}.webp`))
+        const part = p.crop
+          ? still.extract({
+              left: p.crop.x,
+              top: p.crop.y,
+              width: p.crop.width,
+              height: Math.round((p.crop.width * POSTER.height) / POSTER.width),
+            })
+          : still
+        const png = await part
+          .resize(POSTER.width, POSTER.height, { kernel: 'lanczos3' })
+          .png()
+          .toBuffer()
+        await ctx.png(`media/posters/${p.name}-${theme}.png`, png)
+      }
+    }
 
     // The sponsor card's pictures, at the size sponsors send theirs, and the card in the sidebar.
     const { width: w, height: h } = sponsor.asset

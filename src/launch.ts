@@ -117,7 +117,43 @@ export const gallery: Shot[] = [
 ]
 
 /** The pictures the art is made from, for npm run sources to fetch. */
+/**
+ * A video's poster on the website: what its player shows before it plays. A bare frame of the
+ * video, at the telling moment, rendered without its caption, and cut so the app fills the
+ * frame: no backdrop at a side, and a calm band along the bottom, where the browser draws its
+ * controls.
+ */
+export interface Poster {
+  /** Its file's name: the video's on the website, with its version. */
+  name: string
+  /** The video's id in Lumovi-marketing, and the second its frame is taken at. */
+  id: string
+  second: number
+  /** The part of the frame it shows, in the still's pixels; 16:9 from its width. All, if none. */
+  crop?: { x: number; y: number; width: number }
+}
+
+export const POSTER = { width: 1920, height: 1080 }
+
+export const posters: Poster[] = [
+  // The two pods that crash-loop, in their box, with the Deployment they belong to.
+  { name: '2am-v2', id: 'incident', second: 24, crop: { x: 1215, y: 215, width: 2460 } },
+  // The whole request: why, the change, the command, and Approve.
+  { name: 'asked-first-v2', id: 'approval', second: 21, crop: { x: 172, y: 20, width: 3318 } },
+  // What each profile may do, with changes lit.
+  { name: 'monday-v2', id: 'platform', second: 30, crop: { x: 100, y: 80, width: 3640 } },
+  // The app itself, under the video's own line.
+  { name: 'hero-v1', id: 'hero', second: 9 },
+]
+
 export const sources = {
+  // The website's posters: Lumovi-marketing renders them without captions, as poster-<id>-….
+  site: posters.flatMap((p) =>
+    (['dark', 'light'] as const).map((theme) => ({
+      still: `poster-${p.id}-${theme}-${p.second.toFixed(1)}.png`,
+      file: `site/${p.id}-${theme}.webp`,
+    })),
+  ),
   // Each video's frame in both themes: Lumovi-marketing names the light one <id>-light-<second>.
   posters: videos.flatMap((v) =>
     'second' in v.picture
