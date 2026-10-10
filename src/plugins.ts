@@ -12,7 +12,7 @@ import { icon, type IconName } from './lucide.ts'
 import { CSS as SHELL, pill, seg, shell } from './proposals.ts'
 import { FONTS } from './scene.ts'
 
-const CSS = `
+export const CSS = `
 .code-tag { display: inline-flex; align-items: center; gap: 4px; padding: 0 6px; border-radius: 4px; background: color-mix(in srgb, var(--warn) 12%, transparent); font-size: 11px; line-height: 18px; font-weight: 500; color: var(--warn-text); white-space: nowrap; }
 .by { display: flex; align-items: center; gap: 8px; padding: 8px 24px; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 12px; color: var(--text-2); }
 .by svg.i { color: var(--text-3); }

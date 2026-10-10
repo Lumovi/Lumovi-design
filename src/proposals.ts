@@ -175,6 +175,8 @@ export function shell(
     tag?: string
     section?: string
     current?: string
+    /** The section's other rows, in order; the one named by label is the new row. */
+    items?: [string, IconName, string?][]
   },
   body: string,
   namespace = 'shop',
@@ -193,7 +195,17 @@ export function shell(
       ? `<h3>Access control<span class="soon">LMV-158</span></h3>${ACCESS.map(([l, g]) => `<div class="n later">${icon(g, 16)}${l}</div>`).join('')}${fresh}`
       : add.section
         ? // A section of its own after Storage, as the sidebar's Add-ons is today.
-          `<h3>${add.section}</h3>${fresh}`
+          `<h3>${add.section}</h3>${
+            add.items
+              ? add.items
+                  .map(([l, g, n]) =>
+                    l === add.label
+                      ? fresh
+                      : `<div class="n">${icon(g, 16)}${l}${n ? `<span style="margin-left:auto;font-size:11px;color:var(--text-3)">${n}</span>` : ''}</div>`,
+                  )
+                  .join('')
+              : fresh
+          }`
         : ''
   return `<div class="win"><aside class="side">
     <div class="switcher"><span class="d"></span><span><b>production</b><small>Kubernetes v1.34.1</small></span>${icon('chevrons-up-down', 16)}</div>
