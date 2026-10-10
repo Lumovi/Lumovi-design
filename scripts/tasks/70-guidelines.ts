@@ -5,6 +5,7 @@ import * as appMenu from '../../src/appmenu.ts'
 import * as clusters from '../../src/clusters.ts'
 import * as fleet from '../../src/fleet.ts'
 import * as phone from '../../src/phone.ts'
+import * as site from '../../src/site.ts'
 import { blue, brand, gray, INK, PAPER, status, themes } from '../../src/colors.ts'
 import { dot, levels, pill } from '../../src/health.ts'
 import { macos, plated } from '../../src/icon.ts'
@@ -686,6 +687,29 @@ export default {
         ['add-done', 'dark', '.dialog'],
       ],
     }
+    // lumovi.dev's "Every cluster" card, from its mockup: dark over light.
+    const siteCards = await Promise.all(
+      (['dark', 'light'] as const).map((scheme) =>
+        renderHtml(site.cardSheet(scheme), {
+          width: 1356,
+          height: 'fit',
+          scale: 2,
+          transparent: false,
+        }),
+      ),
+    )
+    await ctx.png(
+      'guidelines/images/site-clusters.png',
+      await shoot(
+        page(
+          siteCards
+            .map((png) => `<img src="data:image/png;base64,${png.toString('base64')}" alt="">`)
+            .join(''),
+          'img { display: block; width: 100%; height: auto; } img + img { margin-top: 16px; } img { border-radius: 12px; box-shadow: 0 0 0 1px rgb(128 128 128 / 0.25); }',
+        ),
+      ),
+    )
+
     // The web UI on a phone and a tablet, from their mockups.
     const TOP = '.tb, .ctx, .ptools, .prow'
     const phoneSheets: Record<string, [phone.State, 'light' | 'dark', string?, number?][]> = {

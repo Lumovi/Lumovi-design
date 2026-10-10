@@ -469,6 +469,32 @@ The tile's colors need `--series-3` to `--series-8` in the app's `@theme`, besid
 The mockups are drawn from [`src/clusters.ts`](../src/clusters.ts), with the app's own icons
 ([`src/lucide.ts`](../src/lucide.ts)).
 
+### On lumovi.dev
+
+<img src="images/site-clusters.png" alt="The website's Every cluster card, in dark and in light, in three states each: asked, every tile's dot neutral and its answer reading Checking…; answered, each with its version and how fast, and legacy-onprem Unreachable in red; and with Production US open, its row filled, with a blue edge on its left. Five clusters in two groups, Shop and Lab, each with a tile of its letters in its color; a footer says ~/.kube/config and 1 added in Lumovi." />
+
+The website's "Every cluster" scene has a card beside its plates: the clusters page, small. It
+shows what the page adds: a tile in the cluster's color with its letters and its status in the
+corner, a name of its own with the context under it, groups, the Production mark, and a footer
+that says where the clusters come from, with the one added in Lumovi counted apart.
+
+- **Parts are the page's, at nine tenths:** the tile 28 px with an 8 px radius and 11 px letters,
+  its dot 11 px with a 2 px ring in the row's color; the name 12.5 px, the line under it and
+  the answer in mono at 10.5 px; a group's heading 10 px, uppercase, with its count.
+- **A named cluster says its context under its name;** an unnamed one, its server and who signs
+  in. A cluster with no color has the plain tile.
+- **The dot is neutral while a cluster is asked,** green once it answers, red when it doesn't;
+  the answer is "Checking…", then the version and the time, or "Unreachable" in the critical
+  text color, in the sans face.
+- **The open cluster's row** keeps the card's own mark: a fill and a 2 px blue edge on its left.
+- **The footer is words, with no plus:** "~/.kube/config and 1 added in Lumovi". A plus before
+  words is Add cluster's.
+- **No cluster is blue here.** Blue is one of the page's eight colors, but on this card it's the
+  open row's edge alone.
+- **No loopback addresses, and no real cluster's name.**
+
+It's drawn from [`src/site.ts`](../src/site.ts), with the site's five clusters.
+
 ## The Fleet page
 
 <img src="images/fleet.png" alt="The server's Fleet page: in dark, as an admin sees it, with Add cluster beside the title and a ⋯ on a card; in light, as someone else sees it, the clusters shared with their groups and nothing new to click." />
