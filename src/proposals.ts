@@ -23,10 +23,10 @@ const LEVELS: Record<Level, [string, IconName]> = {
 }
 
 /** A status pill, as the app's: its level's icon, then its word. */
-const pill = (level: Level, label: string) =>
+export const pill = (level: Level, label: string) =>
   `<span class="spill" style="--m:var(--${LEVELS[level][0]});color:var(--${LEVELS[level][0]}-text)">${icon(LEVELS[level][1], 14, 2.25)}${escape(label)}</span>`
 
-const CSS = `
+export const CSS = `
 .win { position: relative; display: flex; width: 100%; height: 100%; overflow: hidden; background: var(--app-bg); }
 .side { display: flex; flex: none; width: 244px; flex-direction: column; padding-top: 40px; }
 .switcher { display: flex; margin: 12px; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-panel); }
@@ -165,24 +165,36 @@ const ACCESS: [string, IconName][] = [
 ]
 
 /** The app's window: its sidebar with one more item where the proposal puts it, and a page. */
-function shell(
+export function shell(
   title: string,
   glyph: IconName,
-  add: { after: string; label: string; icon: IconName },
+  add: {
+    after: string
+    label: string
+    icon: IconName
+    tag?: string
+    section?: string
+    current?: string
+  },
   body: string,
   namespace = 'shop',
 ): string {
-  const fresh = `<div class="n on">${icon(add.icon, 16)}${add.label}<span class="new">new</span></div>`
+  const fresh = `<div class="n${add.current ? '' : ' on'}">${icon(add.icon, 16)}${add.label}${add.tag === '' ? '' : `<span class="new">${add.tag ?? 'new'}</span>`}</div>`
   const items = NAV.flatMap((n) => {
     const row =
-      typeof n === 'string' ? `<h3>${n}</h3>` : `<div class="n">${icon(n[1], 16)}${n[0]}</div>`
+      typeof n === 'string'
+        ? `<h3>${n}</h3>`
+        : `<div class="n${n[0] === add.current ? ' on' : ''}">${icon(n[1], 16)}${n[0]}</div>`
     return typeof n !== 'string' && n[0] === add.after ? [row, fresh] : [row]
   }).join('')
   // Who can sits in a section of its own, which another ticket brings.
   const access =
     add.after === 'Access control'
       ? `<h3>Access control<span class="soon">LMV-158</span></h3>${ACCESS.map(([l, g]) => `<div class="n later">${icon(g, 16)}${l}</div>`).join('')}${fresh}`
-      : ''
+      : add.section
+        ? // A section of its own after Storage, as the sidebar's Add-ons is today.
+          `<h3>${add.section}</h3>${fresh}`
+        : ''
   return `<div class="win"><aside class="side">
     <div class="switcher"><span class="d"></span><span><b>production</b><small>Kubernetes v1.34.1</small></span>${icon('chevrons-up-down', 16)}</div>
     <nav class="nav">${items}${access}</nav>
@@ -195,7 +207,7 @@ function shell(
 const select = (glyph: IconName, text: string, mono = false) =>
   `<span class="field${mono ? ' mono' : ''}">${icon(glyph, 14)}${escape(text)}<span class="end">${icon('chevrons-up-down', 14)}</span></span>`
 
-const seg = (items: string[], on: string) =>
+export const seg = (items: string[], on: string) =>
   `<span class="seg">${items.map((i) => `<span${i === on ? ' class="on"' : ''}>${i}</span>`).join('')}</span>`
 
 const verbs = (list: string, writes = 'create update patch delete deletecollection *') =>
