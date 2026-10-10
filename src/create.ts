@@ -60,14 +60,18 @@ const CSS = `
 .full .panes { grid-template-columns: 480px minmax(0, 1fr); }
 
 /* The form: a label, the YAML path it writes, and its field. */
-.fpane { position: relative; display: flex; min-height: 0; flex-direction: column; gap: 14px; overflow: hidden; padding: 16px 20px 20px; }
+.fpane { position: relative; min-height: 0; overflow: hidden; padding: 16px 20px 20px; }
+.fin { display: flex; flex-direction: column; gap: 14px; }
+.fpane.locked .add { color: var(--text-3); }
 .fpane::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 28px; background: linear-gradient(to bottom, transparent, var(--surface-2)); }
-.fpane.locked > :not(.note) { opacity: 0.45; }
+.fpane.locked .fin > :not(.note) { opacity: 0.45; }
 .frow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
 .frow > * { min-width: 0; }
 .fgroup { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .fgroup .path { letter-spacing: 0; text-transform: none; font-weight: 400; }
 .fl { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.fl.stack { display: block; }
+.fl.stack .path { display: block; text-align: left; direction: ltr; }
 .fl label { flex: none; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--text-2); }
 .fl label small { margin-left: 4px; font-size: 11px; font-weight: 400; color: var(--text-3); }
 .path { min-width: 0; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; line-height: 16px; color: var(--text-3); white-space: nowrap; text-overflow: ellipsis; direction: rtl; text-align: right; }
@@ -110,10 +114,10 @@ const CSS = `
 .code { position: relative; flex: 1; min-height: 0; overflow: hidden; padding: 12px 0; background: color-mix(in srgb, var(--surface-2) 60%, transparent); font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 20.4px; color: var(--text-1); white-space: pre; }
 .code .ln { display: flex; }
 .code .ln > i { flex: none; width: 44px; padding-right: 14px; font-style: normal; text-align: right; color: color-mix(in srgb, var(--text-3) 60%, transparent); }
-.code .ln.hl { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.code .ln.hl { background: color-mix(in srgb, var(--accent) var(--tint-hl), transparent); }
 .code .ln.hl > i { color: var(--text-2); }
-.code .ln.bad { background: color-mix(in srgb, var(--critical) 10%, transparent); }
-.code .ln.extra { background: color-mix(in srgb, var(--surface-3) 80%, transparent); }
+.code .ln.bad { background: color-mix(in srgb, var(--critical) var(--tint-bad), transparent); }
+.code .ln.extra { background: color-mix(in srgb, var(--text-3) var(--tint-extra), transparent); }
 .code .k { color: var(--accent-strong); }
 .code .s { color: var(--good-text); }
 .code .n { color: var(--ansi-5); }
@@ -132,9 +136,11 @@ const CSS = `
 .status svg.i { color: var(--good-text); }
 .hint { margin: 0; font-size: 12px; color: var(--text-3); }
 .hint code { font-family: 'JetBrains Mono', monospace; }
-.narrow .body2 { display: flex; flex-direction: column; gap: 16px; padding: 4px 20px 20px; }
+.narrow .body2 { display: flex; flex: 1; min-height: 0; flex-direction: column; gap: 16px; padding: 4px 20px 20px; }
+.narrow .body2 > * { flex: none; }
+.narrow .body2 > .ypane { flex: 0 1 300px; min-height: 120px; }
 .narrow .kinds { padding: 0; }
-.narrow .code { flex: none; height: 300px; border: 1px solid var(--line); border-radius: 12px; }
+.narrow .code { flex: 1; min-height: 0; border: 1px solid var(--line); border-radius: 12px; }
 .optional { position: absolute; z-index: 40; top: 14px; left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: var(--text-1); font-size: 12px; font-weight: 500; color: var(--surface); white-space: nowrap; }
 .review { display: flex; flex: 1; min-height: 0; flex-direction: column; gap: 12px; padding: 4px 20px 20px; }
 .review .rv { display: flex; align-items: center; gap: 10px; font-size: 13px; }
@@ -168,9 +174,9 @@ function labelled(
   label: string,
   path: string,
   control: string,
-  o: { on?: boolean; note?: string } = {},
+  o: { on?: boolean; note?: string; stack?: boolean } = {},
 ) {
-  return `<div><div class="fl"><label>${label}</label><span class="path${o.on ? ' on' : ''}">&lrm;${escape(path)}</span></div>${control}${o.note ?? ''}</div>`
+  return `<div><div class="fl${o.stack ? ' stack' : ''}"><label>${label}</label><span class="path${o.on ? ' on' : ''}">&lrm;${escape(path)}</span></div>${control}${o.note ?? ''}</div>`
 }
 
 const two = (a: string, b: string) => `<div class="frow">${a}${b}</div>`
@@ -438,7 +444,7 @@ spec:
     form: `${who('reindex-nightly')}
       ${labelled('Schedule', 'spec.schedule', field('30 2 * * *', { mono: true }), { note: '<p class="reads">Every day at 02:30, in the cluster’s time zone.</p>' })}
       ${labelled('If the last run is still going', 'spec.concurrencyPolicy', select('Skip this one'))}
-      ${labelled('When a pod fails', '…template.spec.restartPolicy', select('Start a new pod'))}
+      ${labelled('When a pod fails', 'spec.jobTemplate.spec.template.spec.restartPolicy', select('Start a new pod'), { stack: true, note: '<p class="fhelp"><code>Never</code>: the failed pod is kept, to read its logs.</p>' })}
       ${group('Container', 'spec.jobTemplate.spec.template.spec.containers[0]')}
       ${labelled('Image', '.image', field('ghcr.io/acme/search-indexer:4.1.0', { mono: true }))}
       ${labelled(optional('Command'), '.command', field('indexer --all --since 24h', { mono: true }), { note: '<p class="fhelp">Run as <code>sh -c</code>. Empty runs the image’s own command.</p>' })}
@@ -586,6 +592,8 @@ interface Panes {
   cls?: string
   namespace?: string
   cmd?: string
+  /** How far the form is scrolled, in px (negative), to bring a field into view. */
+  shift?: number
   /** Create can't be pressed yet. */
   off?: boolean
   /** The first line of the YAML in view, where it's scrolled. */
@@ -598,7 +606,7 @@ function withForm(p: Panes): string {
     ${head('Create', 'Form')}
     ${kinds('Form', p.kind)}
     <div class="panes">
-      <div class="fpane${p.locked ? ' locked' : ''}${p.more ? ' more' : ''}">${p.form}</div>
+      <div class="fpane${p.locked ? ' locked' : ''}${p.more ? ' more' : ''}"><div class="fin"${p.shift ? ` style="margin-top:${p.shift}px"` : ''}>${p.form}</div></div>
       <div class="ypane">
         <div class="ybar"><b>YAML</b>${p.bar ?? '<span>Edit either side: they stay in step.</span>'}</div>
         ${code(p.yaml, p.marks, p.from)}
@@ -797,7 +805,7 @@ export const STATES: { state: State; title: string; note: string; group: string 
   },
 ]
 
-function dialog(state: State): string {
+function dialog(state: State, small: boolean): string {
   const other = (kind: Exclude<Kind, 'Deployment' | 'Secret'>) =>
     withForm({
       kind,
@@ -825,6 +833,7 @@ function dialog(state: State): string {
         form: deploymentForm({ focus: 'image' }),
         yaml: deploymentYaml(WEB),
         marks: { 18: 'hl' },
+        from: small ? 6 : 1,
       })
     case 'error': {
       const d = { ...WEB, name: 'Web_API' }
@@ -833,6 +842,7 @@ function dialog(state: State): string {
         form: deploymentForm({ d, nameBad: true }),
         yaml: deploymentYaml(d),
         marks: { 4: 'bad', 17: 'bad' },
+        from: small ? 3 : 1,
         bar: '<span>1 field to fix before it can be created.</span>',
         off: true,
       })
@@ -845,6 +855,7 @@ function dialog(state: State): string {
         }),
         yaml: EXTRA,
         marks: { 8: 'extra', 9: 'extra', 18: 'extra', 19: 'extra' },
+        from: small ? 7 : 1,
         more: true,
       })
     case 'locked':
@@ -855,6 +866,7 @@ function dialog(state: State): string {
         }),
         yaml: TWO,
         marks: { 21: 'extra', 22: 'extra', 23: 'extra', 24: 'extra' },
+        from: small ? 11 : 1,
         bar: '<span>Edited by hand. This is what gets created.</span>',
         locked: true,
       })
@@ -865,7 +877,8 @@ function dialog(state: State): string {
         form: deploymentForm({ d, requestBad: true }),
         yaml: deploymentYaml(d),
         marks: { 27: 'bad' },
-        from: 13,
+        from: small ? 19 : 13,
+        shift: small ? -262 : 0,
         more: true,
         results: `<div class="results"><div>${icon('circle-x', 14, 2, 'color:var(--critical-text)')}<span><span class="who">Deployment/web</span><span class="why">Deployment.apps "web" is invalid: spec.template.spec.containers[0].resources.requests: Invalid value: "512Mi": must be less than or equal to memory limit of 256Mi</span></span></div></div>`,
         bar: '<span>Nothing was created.</span>',
@@ -939,9 +952,9 @@ export function createPage(state: State, scheme: Scheme, size: Size): string {
   const ansi = scheme === 'dark' ? '#bc8cff' : '#8250df'
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
-:root { ${tokens(scheme)} --ansi-5: ${ansi}; }
+:root { ${tokens(scheme)} --ansi-5: ${ansi}; --tint-hl: ${scheme === 'dark' ? '20%' : '8%'}; --tint-bad: ${scheme === 'dark' ? '22%' : '10%'}; --tint-extra: ${scheme === 'dark' ? '18%' : '10%'}; }
 html, body { width: ${size.width}px; height: ${size.height}px; }
 ${PARTS}
 ${CSS}
-</style><div class="page" style="background-image:url(${behind(scheme)})"></div><i class="cover"></i>${state === 'created' ? '' : '<div class="scrim"></div>'}${dialog(state)}`
+</style><div class="page" style="background-image:url(${behind(scheme)})"></div><i class="cover"></i>${state === 'created' ? '' : '<div class="scrim"></div>'}${dialog(state, size.width < 1200)}`
 }
