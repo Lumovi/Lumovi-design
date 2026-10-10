@@ -4,6 +4,17 @@
  * templates. This adds a form for the nine common kinds, with the YAML it writes beside it:
  * either side can be edited, and they stay in step. Drawn with the app's own parts
  * (src/clusters.ts) and its dialog's sizes; nothing here is in the app yet.
+ *
+ * Approved by Péter on LMV-170 (2026-10-10), with these decided:
+ * - no review step: Create checks with the cluster and creates, as today;
+ * - the dialog is 960 px wide and 86% of the window's height;
+ * - the namespace is a field of the form, starting at the header's (`default` under All
+ *   namespaces, and it says so);
+ * - the dialog is called "Create", and the + button's tooltip, the palette's entry and the
+ *   menu's item follow as "Create…";
+ * - the side used last opens first; the first time, the form.
+ * The two options that weren't chosen stay here, marked, so the choice can be seen: don't
+ * build them.
  */
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -141,7 +152,7 @@ const CSS = `
 .narrow .body2 > .ypane { flex: 0 1 300px; min-height: 120px; }
 .narrow .kinds { padding: 0; }
 .narrow .code { flex: 1; min-height: 0; border: 1px solid var(--line); border-radius: 12px; }
-.optional { position: absolute; z-index: 40; top: 14px; left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: var(--text-1); font-size: 12px; font-weight: 500; color: var(--surface); white-space: nowrap; }
+.optional { position: absolute; z-index: 40; top: 14px; left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: var(--critical); font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; }
 .review { display: flex; flex: 1; min-height: 0; flex-direction: column; gap: 12px; padding: 4px 20px 20px; }
 .review .rv { display: flex; align-items: center; gap: 10px; font-size: 13px; }
 .review .rv b { font-weight: 600; }
@@ -733,21 +744,21 @@ export const STATES: { state: State; title: string; note: string; group: string 
   },
   {
     state: 'review',
-    group: 'For Péter',
-    title: 'Option: a review before creating',
-    note: 'Not in the app today. Create becomes Review, then Create.',
+    group: 'Decided',
+    title: 'Not chosen: a review before creating',
+    note: 'Don’t build this. Create checks with the cluster and creates, as today.',
   },
   {
     state: 'all-namespaces',
-    group: 'For Péter',
+    group: 'Decided',
     title: 'The namespace',
     note: 'A field of the form. With All namespaces in the header, it starts at default and says so.',
   },
   {
     state: 'full',
-    group: 'For Péter',
-    title: 'Option: filling the window',
-    note: 'The second candidate for its size: more YAML, but the page behind is gone.',
+    group: 'Decided',
+    title: 'Not chosen: filling the window',
+    note: 'Don’t build this. The dialog is 960 px wide and 86% of the window’s height.',
   },
   {
     state: 'statefulset',
@@ -887,7 +898,7 @@ function dialog(state: State, small: boolean): string {
     case 'created':
       return `<div class="toast">${icon('circle-check', 18)}<div><div class="t">Created deployment web</div></div><span class="act">Open</span></div>`
     case 'review':
-      return `<span class="optional">An option: this step isn’t in the app today</span><div class="dialog create">
+      return `<span class="optional">Not chosen: don’t build this step</span><div class="dialog create">
         ${head('Create', 'Form')}
         <div class="review">
           <div class="rv"><span class="btn ghost sm" style="margin-left:-8px">${icon('arrow-right', 14, 2, 'transform:rotate(180deg)')}Back to editing</span><span class="status" style="margin-left:auto">${icon('circle-check', 14)}The cluster accepts it (checked without saving it).</span></div>
@@ -907,7 +918,7 @@ function dialog(state: State, small: boolean): string {
         cmd: CREATE.replace('-n shop', '-n default'),
       })
     case 'full':
-      return `<span class="optional">An option: the dialog filling the window</span>${withForm({
+      return `<span class="optional">Not chosen: don’t build this size</span>${withForm({
         kind: 'Deployment',
         form: deploymentForm(),
         yaml: deploymentYaml(WEB),
