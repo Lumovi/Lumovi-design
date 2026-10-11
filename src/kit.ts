@@ -72,6 +72,7 @@ body { margin: 0; background: var(--app-bg); font-family: 'Inter', sans-serif; f
 .t h4:first-child { margin-top: 2px; }
 .t h4 small { font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
 .t .child { padding-left: 34px; }
+.t .child2 { padding-left: 60px; }
 .t .twist { display: grid; flex: none; width: 16px; height: 16px; margin-left: -2px; place-items: center; color: var(--text-3); }
 .t .more { align-self: flex-start; margin: 6px 0 0 0; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--accent-strong); }
 
@@ -285,6 +286,38 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .ph .kdlg .df .btn.primary { min-width: 120px; }
 .ph .kfield { height: 44px; font-size: 16px; }
 .ph .ib { width: 44px; height: 44px; }
+
+/* The graph: the app's object map, grown. Cards in rows, lines between them. */
+.gwrap { position: relative; }
+.gwrap > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.gwrap path { fill: none; stroke: var(--line-strong); stroke-width: 1.5; stroke-linejoin: round; }
+.gwrap path.dash { stroke-dasharray: 4 4; }
+.gwrap path.on { stroke: var(--accent); stroke-width: 2; }
+.gwrap path.dim { opacity: 0.2; }
+.gwrap path.bad { stroke: var(--critical); }
+.gwrap path.warnl { stroke: var(--warn); }
+.gwrap path.head { fill: var(--line-strong); stroke: none; }
+.gcard { position: absolute; display: flex; height: 56px; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-panel); }
+.gcard.dim { opacity: 0.35; }
+.gcard.focus { box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-panel); border-color: var(--accent); }
+.gcard.more { justify-content: center; border-style: dashed; border-color: var(--line-strong); box-shadow: none; font-size: 13px; font-weight: 500; color: var(--text-2); }
+.gcard .gi { display: grid; flex: none; width: 28px; height: 28px; place-items: center; border-radius: 8px; background: var(--surface-3); color: var(--text-2); }
+.gcard .gw { min-width: 0; flex: 1; }
+.gcard .g1 { display: flex; min-width: 0; align-items: center; font-size: 11px; line-height: 16px; white-space: nowrap; color: var(--text-3); }
+.gcard .g1 .m { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.gcard .g1 .st { display: flex; flex: none; align-items: center; gap: 4px; margin-left: auto; padding-left: 8px; font-weight: 500; color: var(--mt); }
+.gcard .g1 .st i { width: 6px; height: 6px; border-radius: 50%; background: var(--m); }
+.gcard .g2 { overflow: hidden; font-size: 13px; line-height: 20px; font-weight: 500; white-space: nowrap; }
+.glabel { position: absolute; padding: 0 6px; border-radius: 4px; background: var(--surface); font-size: 11px; line-height: 16px; color: var(--text-3); white-space: nowrap; transform: translate(-50%, -50%); }
+.glabel.on { color: var(--accent-strong); }
+.gbar { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-size: 12px; color: var(--text-3); }
+.gbar .leg { display: flex; align-items: center; gap: 6px; }
+.gbar .end { margin-left: auto; }
+.gseg { display: inline-flex; padding: 2px; border-radius: 8px; background: var(--surface-3); }
+.gseg span { display: flex; height: 24px; align-items: center; gap: 6px; padding: 0 10px; border-radius: 6px; font-size: 12px; color: var(--text-2); }
+.gseg span.on { background: var(--surface-2); font-weight: 500; color: var(--text-1); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.again { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); }
+.again b { font-weight: 500; color: var(--accent-strong); }
 
 `
 
@@ -539,7 +572,7 @@ function structure(): string {
         ],
       )}<span class="t"><span class="more">Show all 23</span></span>`,
     ),
-    '<b>Groups</b> are the table’s own: a heading in small capitals with its count, never one a plugin places by hand. <b>A row may hold rows</b>, one level: a chevron before the dot opens it, its rows stand set in under its name and are rows like any other. A plugin says how many rows show first; the rest are behind <b>“Show all 23”</b>, which opens them in place. The count is of rows at the top level (here 3 and 2 of 23), never of the rows inside them. Past a few hundred the table draws only the rows in view, so 2,500 feel like 25. <b>Keys:</b> right opens a row, left closes it; a group’s heading is not a stop.',
+    '<b>Groups</b> are the table’s own: a heading in small capitals with its count, never one a plugin places by hand. <b>A row may hold rows</b>, one level (the Graph’s own table is the one exception: it nests as deep as its lines go): a chevron before the dot opens it, its rows stand set in under its name and are rows like any other. A plugin says how many rows show first; the rest are behind <b>“Show all 23”</b>, which opens them in place. The count is of rows at the top level (here 3 and 2 of 23), never of the rows inside them. Past a few hundred the table draws only the rows in view, so 2,500 feel like 25. <b>Keys:</b> right opens a row, left closes it; a group’s heading is not a stop.',
   )
 }
 
@@ -672,7 +705,7 @@ interface Picked {
 const CLUSTERS: Picked[] = [
   {
     lead: { level: 'warning', name: 'orders-db', under: '2 of 3 ready · shop' },
-    status: ['warning', 'Degraded'],
+    status: ['warning', 'Not all ready'],
   },
   {
     lead: { level: 'progressing', name: 'sessions-db', under: '1 of 2 ready · shop' },
@@ -754,7 +787,7 @@ function pageWhole(): string {
     `<div class="pagebox"><div class="arr-split tag o" data-tag="split · a 300 px side, then the rest">
       ${card('Clusters', '4', pickList(CLUSTERS, 0, { mark: { 1: 'hover' } }))}
       <div class="arr-stack tag b o" data-tag="stack · 16 px apart">
-        ${header2('orders-db', ['warning', 'Degraded'], ACTS)}
+        ${header2('orders-db', ['warning', 'Not all ready'], ACTS)}
         <div class="arr-tiles tag o" style="--n:4" data-tag="tiles · 2 to 4, equal">${TILES(true)}</div>
         ${stub('Instances', '3', 'a Table')}
         ${stub('Backups', 'the last 3 of 41', 'a Table')}
@@ -794,7 +827,7 @@ function headerCases(): string {
     'the longest name, more than three actions, values that don’t fit',
     `<div class="pagebox arr-stack">
       ${header2(LONG_DB, ['critical', 'Unrecoverable'], `${btn('Switch over…', 'secondary')}${MORE}${btn('Back up now…', 'primary')}`, 40)}
-      ${header2('orders-db', ['warning', 'Degraded'], ACTS)}
+      ${header2('orders-db', ['warning', 'Not all ready'], ACTS)}
       ${header2('reports-db', ['healthy', 'Healthy'], btn('Back up now…', 'primary'))}
       <div class="arr-tiles" style="--n:4">${tile('database', 'Primary', cut('checkout-payments-reconciliation-ledger-1', 20), 'since 12 days ago', { words: true, opens: true })}${tile('clock', 'Last backup', 'Never', 'No schedule backs this cluster up', { words: true, level: 'warning' })}${tile('box', 'Storage for each instance, of what its class allows', '1.2 TiB', 'of 2 TiB')}${tile('layers', 'PostgreSQL', '17.2', '')}</div>
       <div class="arr-tiles" style="--n:3">${tile('git-branch', 'Out of sync', '2/5', '2 resources differ', { level: 'warning', opens: true })}${tile('git-branch', 'Revision', 'main at 4f1c9aa', 'platform/apps/shop', { words: true })}${tile('clock', 'Auto-sync', 'Off', 'Sync by hand', { words: true })}</div>
@@ -820,7 +853,7 @@ function pagePhone(): string {
   )
   const one = phoneFrame(
     'orders-db',
-    `<div class="under">${pill('warning', 'Degraded')}</div>
+    `<div class="under">${pill('warning', 'Not all ready')}</div>
     <p class="larger">Open Lumovi on a larger screen to back up, switch over or restart this cluster.</p>
     <div class="ptiles">${TILES()}</div>
     <div class="sec"><h3>Instances<small>3</small></h3><div class="stub" style="border:1px solid var(--line);border-radius:12px">a Table, as cards</div></div>`,
@@ -1058,6 +1091,466 @@ function formPhone(): string {
   return `<section class="spec"><h2>On a phone<i>drawn, and not offered until the phone’s rule allows a plugin’s changes</i></h2><div style="display:flex;gap:24px;align-items:flex-start"><div class="ph">${body}</div></div><p style="max-width:820px">The phone’s tall sheet, with its footer pinned: fields 44 px high with 16 px text, Cancel at the left and the action’s button at the right, at least 120 px wide. The options scroll and the change stays above the footer, as on the desktop. <b>Today a phone doesn’t offer a plugin’s changes at all</b> (the page’s frame says where they are instead), so this is the form it takes if that rule is widened, and nothing to build before then.</p></section>`
 }
 
+// ─── The graph ─────────────────────────────────────────────────────────────────────────────
+
+const CARD_W = 232
+const CARD_H = 56
+const ROW = CARD_H + 44
+
+interface GNode {
+  id: string
+  glyph: Parameters<typeof icon>[0]
+  kind: string
+  meta?: string
+  name: string
+  status?: [Level, string]
+  col: number
+  row: number
+  cls?: string
+  more?: number
+}
+
+type GEdge = [from: string, to: string, o?: { dash?: boolean; label?: string; cls?: string }]
+
+const TEXT: Record<Level, string> = {
+  critical: 'critical-text',
+  warning: 'warn-text',
+  progressing: 'text-2',
+  healthy: 'text-2',
+  neutral: 'text-2',
+}
+
+function gcard(n: GNode, x: number, y: number): string {
+  if (n.more)
+    return `<div class="gcard more" style="left:${x}px;top:${y}px;width:${CARD_W}px">${icon('plus', 16)}${n.more} more</div>`
+  const st = n.status
+    ? `<span class="st" style="--m:var(--${LEVEL[n.status[0]]});--mt:var(--${TEXT[n.status[0]]})"><i></i>${n.status[1]}</span>`
+    : ''
+  const name = n.name.length > 23 ? cut(n.name, 23) : escape(n.name)
+  return `<div class="gcard ${n.cls ?? ''}" style="left:${x}px;top:${y}px;width:${CARD_W}px"><span class="gi">${icon(n.glyph, 15)}</span><span class="gw"><span class="g1"><span class="m">${n.kind}${n.meta ? ` · ${n.meta}` : ''}</span>${st}</span><span class="g2">${name}</span></span></div>`
+}
+
+/** Cards in rows, and the lines between them; a back edge runs up the side and ends in a head. */
+function graph(
+  nodes: GNode[],
+  edges: GEdge[],
+  cols: number,
+  rows: number,
+  back?: [string, string],
+): string {
+  const gap = 12
+  const width = cols * CARD_W + (cols - 1) * gap + (back ? 40 : 0)
+  const at = (id: string) => {
+    const n = nodes.find((x) => x.id === id)!
+    return { x: n.col * (CARD_W + gap), y: n.row * ROW }
+  }
+  const paths = edges
+    .map(([f, t, o]) => {
+      const a = at(f)
+      const b = at(t)
+      const x1 = a.x + CARD_W / 2
+      const y1 = a.y + CARD_H
+      const x2 = b.x + CARD_W / 2
+      const y2 = b.y
+      const m = (y1 + y2) / 2
+      return `<path class="${o?.dash ? 'dash ' : ''}${o?.cls ?? ''}" d="M${x1} ${y1} C${x1} ${m} ${x2} ${m} ${x2} ${y2}"/>`
+    })
+    .join('')
+  let loop = ''
+  if (back) {
+    const a = at(back[0])
+    const b = at(back[1])
+    const xr = width - 12
+    const y1 = a.y + CARD_H / 2
+    const y2 = b.y + CARD_H / 2
+    const x1 = a.x + CARD_W
+    const x2 = b.x + CARD_W
+    loop = `<path d="M${x1} ${y1} H${xr - 10} Q${xr} ${y1} ${xr} ${y1 - 10} V${y2 + 10} Q${xr} ${y2} ${xr - 10} ${y2} H${x2 + 7}"/><path class="head" d="M${x2} ${y2} l8 -4.5 v9 z"/>`
+  }
+  const labels = edges
+    .filter(([, , o]) => o?.label)
+    .map(([f, t, o]) => {
+      const a = at(f)
+      const b = at(t)
+      return `<span class="glabel ${o?.cls === 'on' ? 'on' : ''}" style="left:${(a.x + b.x) / 2 + CARD_W / 2}px;top:${(a.y + CARD_H + b.y) / 2}px">${o!.label}</span>`
+    })
+    .join('')
+  return `<div class="gwrap" style="width:${width}px;height:${(rows - 1) * ROW + CARD_H}px"><svg>${paths}${loop}</svg>${nodes
+    .map((n) => {
+      const p = at(n.id)
+      return gcard(n, p.x, p.y)
+    })
+    .join('')}${labels}</div>`
+}
+
+const legend = (view: 'Graph' | 'Table') =>
+  `<div class="gbar"><span class="leg"><svg width="22" height="6"><path d="M0 3h22" stroke="var(--text-3)" stroke-width="1.5" fill="none"/></svg>Owns</span><span class="leg"><svg width="22" height="6"><path d="M0 3h22" stroke="var(--text-3)" stroke-width="1.5" stroke-dasharray="3 3" fill="none"/></svg>Uses</span><span class="end gseg"><span class="${view === 'Graph' ? 'on' : ''}">Graph</span><span class="${view === 'Table' ? 'on' : ''}">Table</span></span></div>`
+
+const APP_NODES: GNode[] = [
+  {
+    id: 'app',
+    glyph: 'git-branch',
+    kind: 'Application',
+    meta: '4f1c9aa',
+    name: 'shop',
+    status: ['critical', 'Degraded'],
+    col: 1,
+    row: 0,
+    cls: 'dim',
+  },
+  {
+    id: 'd1',
+    glyph: 'layers',
+    kind: 'Deployment',
+    name: 'storefront',
+    status: ['healthy', 'Healthy'],
+    col: 0,
+    row: 1,
+    cls: 'dim',
+  },
+  {
+    id: 'd2',
+    glyph: 'layers',
+    kind: 'Deployment',
+    name: 'cart',
+    status: ['critical', 'Degraded'],
+    col: 1,
+    row: 1,
+    cls: 'lit',
+  },
+  {
+    id: 'svc',
+    glyph: 'server',
+    kind: 'Service',
+    name: 'storefront',
+    status: ['healthy', 'Healthy'],
+    col: 2,
+    row: 1,
+    cls: 'dim',
+  },
+  {
+    id: 'ing',
+    glyph: 'box',
+    kind: 'Ingress',
+    name: 'shop',
+    status: ['healthy', 'Healthy'],
+    col: 3,
+    row: 1,
+    cls: 'dim',
+  },
+  {
+    id: 'p1',
+    glyph: 'box',
+    kind: 'Pod',
+    name: 'storefront-7d9f6c5b8-x2kqp',
+    status: ['healthy', 'Running'],
+    col: 0,
+    row: 2,
+    cls: 'dim',
+  },
+  {
+    id: 'p2',
+    glyph: 'box',
+    kind: 'Pod',
+    name: 'cart-6c9d7f5b44-8xk2p',
+    status: ['healthy', 'Running'],
+    col: 1,
+    row: 2,
+    cls: 'dim',
+  },
+  {
+    id: 'p3',
+    glyph: 'box',
+    kind: 'Pod',
+    name: 'cart-6c9d7f5b44-w4nq7',
+    status: ['critical', 'CrashLoopBackOff'],
+    col: 2,
+    row: 2,
+    cls: 'lit focus',
+  },
+  {
+    id: 'cm',
+    glyph: 'file-text',
+    kind: 'ConfigMap',
+    name: 'cart-config',
+    col: 3,
+    row: 2,
+    cls: 'dim',
+  },
+]
+
+const APP_EDGES: GEdge[] = [
+  ['app', 'd1', { cls: 'dim' }],
+  ['app', 'd2', { cls: 'dim' }],
+  ['app', 'svc', { cls: 'dim' }],
+  ['app', 'ing', { cls: 'dim' }],
+  ['d1', 'p1', { cls: 'dim' }],
+  ['d2', 'p2', { cls: 'dim' }],
+  ['d2', 'p3', { cls: 'on' }],
+  ['d2', 'cm', { dash: true, cls: 'dim', label: 'mounts' }],
+  ['d1', 'cm', { dash: true, cls: 'dim' }],
+]
+
+/** 1. The graph: the map's card and lines, a selected card, the switch. */
+function graphWhole(): string {
+  return spec(
+    'The graph',
+    'the app’s object map, grown',
+    card('Resources', '9', `${legend('Graph')}${graph(APP_NODES, APP_EDGES, 4, 3)}`),
+    '<b>The card is the Map tab’s card as it is</b>: 56 px high and 210 to 252 wide; a kind’s icon in a 28 px tile; on its first line the kind, a quiet word after it, and at the right a Status as a dot with its word (quiet for healthy and neutral, in the level’s color for anything else); under it the name. Nothing else goes in a card. One thing changes: <b>a name too long takes the middle cut</b>, last six kept, where the map cuts its end today. <b>A line</b> is solid or dashed, and the plugin says what each means in the legend’s two words; it may carry <b>a label</b> of at most 16 characters, set on the line where it’s halfway. Lines carry no arrowheads: what leads to a card is above it. <b>Under the pointer or with the focus</b>, as on the map: that card’s own lines turn blue and 2 px, the cards at their other ends stay as they are, and everything else fades (cards to 35%, lines to 20%). Here Pod cart-…w4nq7 has the keyboard’s focus, so it has the ring, its one line is blue, and Deployment cart is the one card left unfaded. A card that names an object Lumovi gave the plugin <b>opens it</b>; another opens nothing and isn’t a button.',
+  )
+}
+
+/** 2. The hard cases: a loop, five parents, more than fit, the longest name and label. */
+function graphHard(): string {
+  const loopNodes: GNode[] = [
+    {
+      id: 'a',
+      glyph: 'play',
+      kind: 'Step',
+      meta: '1 of 4',
+      name: 'checkout',
+      status: ['healthy', 'Succeeded'],
+      col: 0,
+      row: 0,
+    },
+    {
+      id: 'b',
+      glyph: 'play',
+      kind: 'Step',
+      meta: '2 of 4',
+      name: 'build-and-push-the-image-for-every-architecture',
+      status: ['healthy', 'Succeeded'],
+      col: 0,
+      row: 1,
+    },
+    {
+      id: 'c',
+      glyph: 'play',
+      kind: 'Step',
+      meta: '3 of 4',
+      name: 'integration-tests',
+      status: ['critical', 'Failed'],
+      col: 0,
+      row: 2,
+    },
+    {
+      id: 'd',
+      glyph: 'play',
+      kind: 'Step',
+      meta: '4 of 4',
+      name: 'deploy',
+      status: ['neutral', 'Skipped'],
+      col: 0,
+      row: 3,
+    },
+  ]
+  const fan: GNode[] = [
+    ...['gateway', 'storefront', 'cart', 'checkout', 'reports'].map((n, i) => ({
+      id: `s${i}`,
+      glyph: 'server' as const,
+      kind: 'Service',
+      name: n,
+      status: ['healthy', 'Healthy'] as [Level, string],
+      col: i,
+      row: 0,
+    })),
+    {
+      id: 'db',
+      glyph: 'database',
+      kind: 'Cluster',
+      meta: '17 pods',
+      name: 'orders-db',
+      status: ['warning', 'Not all ready'],
+      col: 2,
+      row: 1,
+    },
+    {
+      id: 'i1',
+      glyph: 'box',
+      kind: 'Pod',
+      name: 'orders-db-1',
+      status: ['healthy', 'Running'],
+      col: 0,
+      row: 2,
+    },
+    {
+      id: 'i2',
+      glyph: 'box',
+      kind: 'Pod',
+      name: 'orders-db-2',
+      status: ['healthy', 'Running'],
+      col: 1,
+      row: 2,
+    },
+    {
+      id: 'i3',
+      glyph: 'box',
+      kind: 'Pod',
+      name: 'orders-db-3',
+      status: ['critical', 'CrashLoopBackOff'],
+      col: 2,
+      row: 2,
+    },
+    { id: 'm', glyph: 'plus', kind: '', name: '', col: 3, row: 2, more: 14 },
+  ]
+  const fanEdges: GEdge[] = [
+    ...[0, 1, 2, 3, 4].map(
+      (i) =>
+        [
+          `s${i}`,
+          'db',
+          { dash: true, cls: 'warnl', label: i === 0 ? 'reads and writes' : undefined },
+        ] as GEdge,
+    ),
+    ['db', 'i1'],
+    ['db', 'i2'],
+    ['db', 'i3', { cls: 'bad' }],
+    ['db', 'm'],
+  ]
+  return spec(
+    'A loop, five parents, more than fit',
+    'what breaks a picture first',
+    `<div class="arr-stack" style="align-items:flex-start">
+      ${card(
+        'Steps',
+        '4',
+        graph(
+          loopNodes,
+          [
+            ['a', 'b'],
+            ['b', 'c'],
+            ['c', 'd'],
+          ],
+          1,
+          4,
+          ['c', 'b'],
+        ),
+      )}
+      ${card('What uses orders-db', '23', graph(fan, fanEdges, 5, 3))}
+    </div>`,
+    '<b>A loop</b> is broken where it turns back: that one line runs up the card’s right side and ends in an arrowhead, the only place a head is drawn, since there the position can’t say the direction (first: a failed test sends the workflow back to the build). <b>A card with many parents</b> gets a line from each, and a label that’s the same on all of them is set once, on the first. A line to a card that’s a warning or worse takes that level’s color, as on the map (all five into orders-db; the one to its failing pod). A Status’s word and its level are the plugin’s to give, one level to a word. <b>A row with more cards than fit</b> ends in “14 more”, which opens that row whole in place, as the map’s does. The longest name takes the middle cut (second step). A label longer than 16 characters is cut at its end; the whole label is said to a screen reader.',
+  )
+}
+
+/** 3. The same data as a table, the switch, and the ceiling. */
+function graphTable(): string {
+  const cols = 'minmax(0,1.4fr) minmax(0,1fr) 144px'
+  const R = (
+    l: Lead,
+    a: string,
+    st: string,
+    o: { twist?: 'open' | 'closed'; cls?: string } = {},
+  ) => ({
+    cells: [lead(l, { twist: o.twist }), `<span class="q">${a}</span>`, `<span>${st}</span>`],
+    cls: o.cls,
+  })
+  const again = (name: string, under: string) => ({
+    cells: [
+      `<span class="lead"><span class="nodot"></span><span class="w"><span class="nm"><b style="font-weight:400;color:var(--text-2)">${name}</b></span><small>ConfigMap</small></span></span>`,
+      `<span class="again" style="grid-column:2 / 4">${icon('corner-down-left', 14)}Listed again; first under <b>${under}</b></span>`,
+    ],
+    cls: 'child',
+  })
+  return spec(
+    'The same data as a table, and the ceiling',
+    'for a phone, for the keyboard, for too many',
+    `<div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start">
+      ${card(
+        'Resources',
+        '9',
+        `${legend('Table')}${table(
+          cols,
+          [head('Name'), head('Sync'), head('Health')],
+          [
+            R(
+              { level: 'critical', name: 'shop', under: 'Application' },
+              '4f1c9aa',
+              pill('critical', 'Degraded'),
+              { twist: 'open' },
+            ),
+            R(
+              { level: 'critical', name: 'cart', under: 'Deployment' },
+              'Out of sync',
+              pill('critical', 'Degraded'),
+              { twist: 'open', cls: 'child' },
+            ),
+            {
+              ...R(
+                { level: 'critical', name: 'cart-6c9d7f5b44-w4nq7', under: 'Pod' },
+                '',
+                pill('critical', 'CrashLoopBackOff'),
+              ),
+              cls: 'child2',
+            },
+            {
+              ...R(
+                { level: 'healthy', name: 'cart-6c9d7f5b44-8xk2p', under: 'Pod' },
+                '',
+                pill('healthy', 'Running'),
+              ),
+              cls: 'child2',
+            },
+            { ...R({ name: 'cart-config', under: 'ConfigMap · mounts' }, '', ''), cls: 'child2' },
+            R(
+              { level: 'healthy', name: 'storefront', under: 'Deployment' },
+              'Synced',
+              pill('healthy', 'Healthy'),
+              { twist: 'open', cls: 'child' },
+            ),
+            {
+              ...R(
+                { level: 'healthy', name: 'storefront-7d9f6c5b8-x2kqp', under: 'Pod' },
+                '',
+                pill('healthy', 'Running'),
+              ),
+              cls: 'child2',
+            },
+            { ...again('cart-config', 'cart'), cls: 'child2' },
+            R(
+              { level: 'healthy', name: 'storefront', under: 'Service' },
+              'Synced',
+              pill('healthy', 'Healthy'),
+              { cls: 'child' },
+            ),
+            R(
+              { level: 'healthy', name: 'shop', under: 'Ingress' },
+              'Synced',
+              pill('healthy', 'Healthy'),
+              { cls: 'child' },
+            ),
+          ],
+        )}`,
+      )}
+      ${card('Resources', '412', `<div class="gbar"><span class="end gseg"><span style="opacity:.45">Graph</span><span class="on">Table</span></span></div><div class="said">${icon('info', 16)}<span>412 are too many to draw as a graph (300 at most), so they’re listed. Filter the list to see fewer.</span></div><div class="stub">the same Table, 412 rows, only those in view drawn</div>`)}
+    </div>`,
+    '<b>The table is derived by the part</b>, never described twice by the plugin: the cards nothing leads to come first, each card’s rows are the cards its lines lead to, in the picture’s order, worst first among equals. It is the kit’s own Table whose rows nest, so its keys, its sorting and its phone form are Table’s. In the table rows nest as deep as the lines go, set in a step at each level; this is the one place Table nests past one level. <b>A card with two parents is listed under each</b>: whole under the first, and under the others as one quiet row, “Listed again; first under cart”, whose name jumps to the first. An edge’s label joins the row’s line under (“ConfigMap · mounts”). <b>The switch</b>, Graph or Table, sits at the right of the part’s own bar, beside the legend, and is remembered for that plugin’s page. <b>The ceiling</b> is 300 cards or 600 lines: past it Graph can’t be chosen, and one line says why and how many there are.',
+  )
+}
+
+/** 4. On a phone: the table; and the keys. */
+function graphPhone(): string {
+  const f = phoneFrame(
+    'shop',
+    `<div class="sec"><h3>Resources<small>9</small><span class="tapb">${icon('arrow-up-down', 16)}</span></h3>
+      <ul class="cards">
+        <li><div class="top">${lead({ level: 'critical', name: 'shop', under: 'Application' })}<span class="twist">${icon('chevron-down', 16)}</span></div><dl>${fact('Sync', '4f1c9aa')}${fact('Health', 'Degraded')}</dl></li>
+        <li class="kid"><div class="top">${lead({ level: 'critical', name: 'cart', under: 'Deployment' })}<span class="twist">${icon('chevron-down', 16)}</span></div><dl>${fact('Sync', 'Out of sync')}${fact('Health', 'Degraded')}</dl></li>
+        <li class="kid" style="padding-left:62px"><div class="top">${lead({ level: 'critical', name: 'cart-6c9d7f5b44-w4nq7', under: 'Pod' }, { fit: 20 })}</div><dl class="one">${fact('Health', 'CrashLoopBackOff')}</dl></li>
+        <li class="kid" style="padding-left:62px"><div class="top">${lead({ level: 'healthy', name: 'cart-6c9d7f5b44-8xk2p', under: 'Pod' }, { fit: 20 })}</div><dl class="one">${fact('Health', 'Running')}</dl></li>
+        <li class="kid" style="padding-left:62px"><div class="top">${lead({ name: 'cart-config', under: 'ConfigMap · mounts' })}</div></li>
+        <li class="kid"><div class="top">${lead({ level: 'healthy', name: 'storefront', under: 'Deployment' })}<span class="twist">${icon('chevron-down', 16)}</span></div><dl>${fact('Sync', 'Synced')}${fact('Health', 'Healthy')}</dl></li>
+        <li class="kid" style="padding-left:62px"><div class="top">${lead({ level: 'healthy', name: 'storefront-7d9f6c5b8-x2kqp', under: 'Pod' }, { fit: 20 })}</div><dl class="one">${fact('Health', 'Running')}</dl></li>
+        <li class="kid" style="padding-left:62px;min-height:44px;display:flex;align-items:center"><span class="again">${icon('corner-down-left', 14)}cart-config, listed again; first under <b>cart</b></span></li>
+        <li class="kid"><div class="top">${lead({ level: 'healthy', name: 'storefront', under: 'Service' })}</div><dl>${fact('Sync', 'Synced')}${fact('Health', 'Healthy')}</dl></li>
+        <li class="kid"><div class="top">${lead({ level: 'healthy', name: 'shop', under: 'Ingress' })}</div><dl>${fact('Sync', 'Synced')}${fact('Health', 'Healthy')}</dl></li>
+      </ul>
+    </div>`,
+    true,
+  )
+  return `<section class="spec"><h2>On a phone, and with the keys<i>one order for all three</i></h2><div style="display:flex;gap:32px;align-items:flex-start">${f}<div class="spec" style="max-width:420px;padding-top:8px"><p><b>Under 640 px the part is its table</b>, as Table’s cards, each level set in; there is no picture and no switch. “Listed again” is a row 44 px high that jumps to the first.</p><p><b>One order serves the phone, the keys and a screen reader</b>: the table’s. In the picture, Tab reaches the graph and then each card in that order; the arrow keys follow lines (down to the first card a line leads to, up to what leads here, left and right along a row); Enter opens a card that opens something. A screen reader hears it as the nested list, each card as “Deployment cart, Degraded, 2 of 9, leads to 3”, never as a picture.</p><p><b>When the Map tab is moved onto this part</b>, every difference from today’s pictures is counted, shown and accepted by name, as Karpenter’s rows were. Two are expected and accepted here: a long name’s middle cut, and its lines’ meaning said by this part’s legend. Anything else is looked at when it’s measured.</p></div></div></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -1069,6 +1562,8 @@ export type KitFrame =
   | 'reference-phone'
   | 'form'
   | 'form-phone'
+  | 'graph'
+  | 'graph-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -1083,6 +1578,12 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'reference-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
   { id: 'form', title: 'A form inside Lumovi’s confirmation', size: { width: 1440, height: 1800 } },
   { id: 'form-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
+  { id: 'graph', title: 'The graph', size: { width: 1440, height: 1900 } },
+  {
+    id: 'graph-phone',
+    title: 'The graph on a phone, and its keys',
+    size: { width: 920, height: 1040 },
+  },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -1105,7 +1606,11 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                 ? refPhone()
                 : id === 'form'
                   ? `<header><h1>A form inside Lumovi’s confirmation</h1><p>For a plugin’s change that asks for options first. The plugin describes the fields; Lumovi shows them in its own dialog with the change it will make.</p></header>${formStates()}${formHard()}`
-                  : formPhone()
+                  : id === 'form-phone'
+                    ? formPhone()
+                    : id === 'graph'
+                      ? `<header><h1>Graph</h1><p>For things that lead to other things: an application’s resources, a workflow’s steps, who talks to whom. A plugin gives cards and lines; Lumovi lays them out, and derives the table from the same data.</p></header>${graphWhole()}${graphHard()}${graphTable()}`
+                      : graphPhone()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
