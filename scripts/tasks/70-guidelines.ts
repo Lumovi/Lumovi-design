@@ -773,6 +773,18 @@ export default {
         ['scale', 'light'],
         ['typed', 'dark'],
       ],
+      'phone-moment': [
+        ['approval-not-yet', 'light'],
+        ['approval-wrapped', 'dark'],
+        ['approval-wrapped', 'light'],
+        ['note', 'dark'],
+      ],
+      'phone-facts': [
+        ['service-long', 'light'],
+        ['role-long', 'dark'],
+        ['role', 'light'],
+        ['role', 'dark'],
+      ],
       'phone-landscape': [
         ['landscape', 'light'],
         ['landscape', 'dark'],

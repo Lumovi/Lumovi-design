@@ -305,6 +305,26 @@ const CSS = `
 /* 4. The sheet: every menu and picker on a phone. */
 .sheet { position: absolute; z-index: 30; right: 0; bottom: 0; left: 0; display: flex; max-height: 85%; flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-bottom: 0; border-radius: 16px 16px 0 0; background: var(--surface-2); box-shadow: var(--shadow-pop); }
 .sheet.tall { top: 24px; max-height: none; }
+/* A note on a phone: at the top when nothing is open; inside a sheet, its first line. */
+.ppill { position: absolute; z-index: 40; right: 16px; bottom: 16px; left: 16px; display: flex; height: 56px; align-items: center; gap: 10px; padding: 0 14px 0 10px; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line-strong)); border-radius: 14px; background: var(--surface-2); box-shadow: var(--shadow-pop); font-size: 13px; line-height: 18px; }
+.ppill .glyph { display: grid; flex: none; width: 32px; height: 32px; place-items: center; border-radius: 10px; background: var(--accent-soft); color: var(--accent-strong); }
+.ppill > span:nth-child(2) { flex: 1; min-width: 0; }
+.ppill b { flex: none; font-weight: 500; color: var(--accent-strong); }
+.pnote { position: absolute; z-index: 50; bottom: 80px; right: 16px; left: 16px; display: flex; height: 64px; align-items: center; gap: 10px; padding: 0 4px 0 14px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.pnote > svg.i { flex: none; color: var(--good); }
+.pnote > span:not(.tap) { flex: 1; min-width: 0; }
+.pnote b { display: block; font-size: 13px; line-height: 20px; font-weight: 500; }
+.pnote small { display: block; overflow: hidden; font-size: 12px; line-height: 16px; color: var(--text-3); white-space: nowrap; text-overflow: ellipsis; }
+.pnote .tap { color: var(--text-3); }
+.nstrip { display: flex; flex: none; min-height: 32px; align-items: flex-start; gap: 8px; margin-top: 4px; padding: 8px 16px; border-bottom: 1px solid var(--line); font-size: 12px; line-height: 16px; color: var(--text-2); }
+.nstrip > svg.i { flex: none; margin-top: 1px; color: var(--good); }
+.nstrip > span { display: -webkit-box; flex: 1; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.nstrip > span b { font-weight: 500; color: var(--text-1); }
+.nstrip > small { flex: none; font-size: 12px; color: var(--text-3); }
+.qnav { display: flex; flex: none; height: 44px; align-items: center; padding: 0 16px 0 52px; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.qnav .tap { color: var(--text-2); }
+.qnav .tap.off { opacity: 0.4; }
+.qnav > span:not(.tap) { padding: 0 4px; }
 .grab { flex: none; width: 36px; height: 4px; margin: 8px auto 0; border-radius: 2px; background: var(--line-strong); }
 .shead { display: flex; flex: none; height: 44px; align-items: center; padding: 0 4px 0 16px; }
 .shead h2 { flex: 1; margin: 0; font-size: 15px; line-height: 21px; font-weight: 600; }
@@ -404,6 +424,16 @@ const CSS = `
 .stack dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 8px 0 0; font-size: 12px; line-height: 16px; }
 .stack dt { color: var(--text-3); }
 .stack dd { margin: 2px 0 0; font-family: 'JetBrains Mono', monospace; color: var(--text-1); }
+.stack dl.one { grid-template-columns: minmax(0, 1fr); }
+.stack dd.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.stack dd.chips span { padding: 0 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface-2); color: var(--text-2); }
+.stack dd small { display: block; font-family: 'Inter', sans-serif; color: var(--text-3); }
+/* Running text that names objects: 24 px lines on touch, each link answering on its own line. */
+.runtext { margin: 0; font-size: 13px; line-height: 21px; color: var(--text-2); }
+.runtext + .runtext { margin-top: 8px; }
+.runtext.touch { line-height: 24px; }
+.lnk { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-strong); }
+.runtext .lnk.reach { outline: 1px dashed var(--accent); outline-offset: 1px; border-radius: 2px; }
 
 /* Logs: wrapped lines hang, like the diff's. */
 .lctl { flex: none; padding: 12px 16px; border-bottom: 1px solid var(--line); }
@@ -636,9 +666,9 @@ function command(text: string): string {
 const APPLY =
   'kubectl apply --server-side --field-manager=lumovi -f checkout.yaml -n shop --context production-eu'
 
-function approvalHead(): string {
+function approvalHead(title = 'Change Deployment checkout'): string {
   return `<div class="glyph ask">${icon('file-code-2', 18)}</div>
-    <div class="t"><p class="eyebrow" style="margin:0">${icon('sparkles', 12)}Claude Code asks</p><h2>Change Deployment checkout</h2><div class="sub"><span>Deployment · shop · <b>${CLUSTER}</b></span>${PRODUCTION}</div></div>`
+    <div class="t"><p class="eyebrow" style="margin:0">${icon('sparkles', 12)}Claude Code asks</p><h2>${title}</h2><div class="sub"><span>Deployment · shop · <b>${CLUSTER}</b></span>${PRODUCTION}</div></div>`
 }
 
 const WHY =
@@ -650,12 +680,36 @@ function approvalBody(): string {
     ${command(APPLY)}`
 }
 
-/** The approval on a phone: a tall sheet, its footer pinned, the wait on a line of its own. */
-function approvalSheet(soon = false): string {
-  return `<div class="scrim"></div><div class="sheet tall"><i class="grab"></i>
-    <div class="head">${approvalHead()}${closeX}</div>
-    <div class="sbody">${approvalBody()}</div>
-    <div class="pfoot"><div class="wait${soon ? ' soon' : ''}">${icon('timer', 14)}Waits ${soon ? '0:48' : '4:12'} more</div><div class="buttons"><span class="btn ghost tall">Reject…</span><span class="btn primary tall">Approve</span></div></div>
+/** A note on a phone when nothing is open: at the bottom, above the waiting pill. */
+const note = (title: string, line: string) =>
+  `<div class="pnote">${icon('circle-check', 18)}<span><b>${title}</b><small>${line}</small></span><span class="tap">${icon('x', 16)}</span></div>`
+
+/** A note while a sheet is open: the sheet's own first line, so it covers nothing. */
+const strip = (text: string, more = 0) =>
+  `<div class="nstrip">${icon('circle-check', 14)}<span>${text}</span>${more ? `<small>and ${more} more</small>` : ''}</div>`
+
+/**
+ * The approval on a phone: a tall sheet, its footer pinned, the wait on a line of its own.
+ * `notYet` is the 600 ms after it opens or moves to another change, when Approve can't be
+ * pressed; `queue` is the row that steps between several changes; `title` wraps.
+ */
+function approvalSheet(
+  o: {
+    soon?: boolean
+    notYet?: boolean
+    queue?: [number, number]
+    title?: string
+    strip?: string
+    body?: string
+  } = {},
+): string {
+  const queue = o.queue
+    ? `<div class="qnav"><span class="tap${o.queue[0] === 1 ? ' off' : ''}">${icon('chevron-left', 16)}</span><span>${o.queue[0]} of ${o.queue[1]}</span><span class="tap${o.queue[0] === o.queue[1] ? ' off' : ''}">${icon('chevron-right', 16)}</span></div>`
+    : ''
+  return `<div class="scrim"></div><div class="sheet tall"><i class="grab"></i>${o.strip ?? ''}
+    <div class="head">${approvalHead(o.title)}${closeX}</div>${queue}
+    <div class="sbody">${o.body ?? approvalBody()}</div>
+    <div class="pfoot"><div class="wait${o.soon ? ' soon' : ''}">${icon('timer', 14)}Waits ${o.soon ? '0:48' : '4:12'} more</div><div class="buttons"><span class="btn ghost tall">Reject…</span><span class="btn primary tall${o.notYet ? ' off' : ''}">Approve</span></div></div>
   </div>`
 }
 
@@ -734,8 +788,23 @@ function detailHead(
 
 /** A Service's ports: a table on the desktop, a card a port here. */
 const PORTS = `<div class="stack">
-  <div><div class="top"><span class="mono12">http</span><span class="end">TCP</span></div><dl><div><dt>Port</dt><dd>80</dd></div><div><dt>Target</dt><dd>8080</dd></div><div><dt>Node port</dt><dd>—</dd></div></dl></div>
-  <div><div class="top"><span class="mono12">metrics</span><span class="end">TCP</span></div><dl><div><dt>Port</dt><dd>9090</dd></div><div><dt>Target</dt><dd>metrics</dd></div><div><dt>Node port</dt><dd>—</dd></div></dl></div>
+  <div><div class="top"><span class="mono12">http</span></div><dl><div><dt>Port</dt><dd>80</dd></div><div><dt>Target</dt><dd>8080</dd></div><div><dt>Node port</dt><dd>—</dd></div><div><dt>Protocol</dt><dd>TCP</dd></div></dl></div>
+  <div><div class="top"><span class="mono12">metrics</span></div><dl><div><dt>Port</dt><dd>9090</dd></div><div><dt>Target</dt><dd>metrics</dd></div><div><dt>Node port</dt><dd>—</dd></div><div><dt>Protocol</dt><dd>TCP</dd></div></dl></div>
+</div>`
+
+/** A card whose value doesn't fit a third of it: every fact of the list takes a line. */
+const PORTS_LONG = `<div class="stack">
+  <div><div class="top"><span class="mono12">grpc</span></div><dl class="one"><div><dt>Port</dt><dd>443</dd></div><div><dt>Target</dt><dd>grpc-web-public</dd></div><div><dt>Node port</dt><dd>—</dd></div><div><dt>Protocol</dt><dd>TCP</dd></div></dl></div>
+  <div><div class="top"><span class="mono12">metrics</span></div><dl class="one"><div><dt>Port</dt><dd>9090</dd></div><div><dt>Target</dt><dd>metrics</dd></div><div><dt>Node port</dt><dd>—</dd></div><div><dt>Protocol</dt><dd>TCP</dd></div></dl></div>
+</div>`
+
+/** A role's rules: no row has a name, so every column is a labelled fact. */
+const RULES = `<div class="stack">
+  <div><dl style="margin:0"><div><dt>API groups</dt><dd>batch</dd></div><div><dt>Resources</dt><dd>cronjobs</dd></div><div><dt>Verbs</dt><dd class="chips"><span>get</span><span>list</span></dd></div></dl></div>
+</div>`
+const RULES_LONG = `<div class="stack">
+  <div><dl class="one" style="margin:0"><div><dt>API groups</dt><dd>core</dd></div><div><dt>Resources</dt><dd>secrets<small>only those named <span class="mono12" style="color:var(--text-2)">payments-credentials</span></small></dd></div><div><dt>Verbs</dt><dd class="chips"><span>get</span></dd></div></dl></div>
+  <div><dl class="one" style="margin:0"><div><dt>API groups</dt><dd>batch</dd></div><div><dt>Resources</dt><dd>jobs</dd></div><div><dt>Verbs</dt><dd class="chips"><span>create</span><span>delete</span></dd></div></dl></div>
 </div>`
 
 const LOG = `<div class="log">
@@ -781,6 +850,12 @@ export type State =
   | 'logs'
   | 'approval'
   | 'approval-soon'
+  | 'approval-not-yet'
+  | 'approval-wrapped'
+  | 'note'
+  | 'service-long'
+  | 'role'
+  | 'role-long'
   | 'scale'
   | 'typed'
   | 'hit'
@@ -790,6 +865,7 @@ export type State =
   | 'tablet-detail'
   | 'tablet-menu'
   | 'tablet-approval'
+  | 'tablet-approval-note'
 
 export const STATES: { state: State; title: string; note: string }[] = [
   {
@@ -825,6 +901,20 @@ export const STATES: { state: State; title: string; note: string }[] = [
   { state: 'logs', title: 'Logs', note: 'Lines wrap, and hang.' },
   { state: 'approval', title: 'An approval', note: 'A tall sheet with its footer pinned.' },
   { state: 'approval-soon', title: 'A minute left', note: 'The wait turns amber, as it does now.' },
+  {
+    state: 'approval-not-yet',
+    title: 'Just opened',
+    note: 'For 600 ms Approve can’t be pressed.',
+  },
+  {
+    state: 'approval-wrapped',
+    title: 'A long title, and a note',
+    note: 'The title wraps; the note is the sheet’s first line.',
+  },
+  { state: 'note', title: 'A note', note: 'At the bottom, above the pill, when nothing is open.' },
+  { state: 'service-long', title: 'A long value', note: 'Then every fact takes a line.' },
+  { state: 'role', title: 'Text that names objects', note: 'Lines 24 px apart on touch.' },
+  { state: 'role-long', title: 'Rows without a name', note: 'Every column is a labelled fact.' },
   { state: 'scale', title: 'A dialog', note: 'Lumovi’s own, as a sheet.' },
   { state: 'typed', title: 'Typed to confirm', note: 'The footer stays above the keyboard.' },
   { state: 'hit', title: 'What a finger gets', note: 'Each chip answers on 44 px.' },
@@ -841,6 +931,11 @@ export const STATES: { state: State; title: string; note: string }[] = [
     state: 'tablet-approval',
     title: 'A tablet’s approval',
     note: 'The app’s dialog, its buttons 44 px high.',
+  },
+  {
+    state: 'tablet-approval-note',
+    title: 'Proposed: a note in a dialog',
+    note: 'Wider than a phone, the same first line. Not built.',
   },
 ]
 
@@ -924,7 +1019,42 @@ function screen(state: State): string {
     case 'approval':
       return `${list(PODS, 'shop')}${approvalSheet()}`
     case 'approval-soon':
-      return `${list(PODS, 'shop')}${approvalSheet(true)}`
+      return `${list(PODS, 'shop')}${approvalSheet({ soon: true })}`
+    case 'approval-not-yet':
+      return `${list(PODS, 'shop')}${approvalSheet({ notYet: true, queue: [2, 4] })}`
+    case 'approval-wrapped':
+      return `${list(PODS, 'shop')}${approvalSheet({
+        queue: [3, 4],
+        title:
+          'Scale Deployment checkout-payments-reconciliation-worker-eu-west-1-blue-canary to 4 replicas',
+        strip: strip('<b>The change before:</b> scaled cart to 3 replicas, in demo.', 2),
+        body: `<figure class="why"><div class="cap">Why</div><p>The reconciliation queue is 40 minutes behind.</p></figure>
+    <div><p class="accepts"><b>The cluster accepts it</b><span><span class="plus">+1</span> <span class="minus">−1</span> lines</span></p><div class="diff">
+${diffLine('same', 0, 'spec:')}
+${diffLine('del', 2, 'replicas: 2')}
+${diffLine('add', 2, 'replicas: 4')}
+<div class="gap">⋯ 85 unchanged lines</div>
+</div></div>
+    ${command('kubectl scale deployment/checkout-payments-reconciliation-worker-eu-west-1-blue-canary --replicas=4 -n shop --context production-eu')}`,
+      })}`
+    case 'note':
+      return `${list(PODS, 'shop')}${note('Scaled cart to 3 replicas', `As Claude Code asked, in ${CLUSTER}.`)}<div class="ppill"><span class="glyph">${icon('sparkles', 16)}</span><span>1 change from Claude Code waits for you</span><b>Review</b></div>`
+    case 'service-long':
+      return `${topBar('Services', 'back', false, false)}<div class="dhead"><div class="kline">Service · shop · ${CLUSTER}</div><div class="name"><h2>gateway</h2><span class="tap">${icon('copy', 16)}</span></div></div>${tabs('Overview', ['Overview', 'Pods', 'Events', 'Audit', 'YAML'])}<div class="dbody">
+        <section class="dsec"><h3>Details</h3><dl class="sfacts"><div><dt>Type</dt><dd>ClusterIP</dd></div><div><dt>Cluster IP</dt><dd class="mono">10.96.20.7</dd></div></dl></section>
+        <section class="dsec"><h3>Ports</h3>${PORTS_LONG}</section>
+      </div>`
+    case 'role':
+    case 'role-long':
+      return `${topBar(state === 'role' ? 'Cluster\u00a0Roles' : 'Roles', 'back', false, false)}<div class="dhead"><div class="kline">${state === 'role' ? `ClusterRole · ${CLUSTER}` : `Role · shop · ${CLUSTER}`}</div><div class="name"><h2>${state === 'role' ? 'shop-reports' : 'config-reader'}</h2><span class="tap">${icon('copy', 16)}</span></div></div>${tabs('Overview', ['Overview', 'Events', 'Audit', 'YAML'])}<div class="dbody">
+        <section class="dsec"><h3>Details</h3><dl class="sfacts"><div><dt>Rules</dt><dd>${state === 'role' ? 1 : 2}</dd></div></dl></section>
+        <section class="dsec"><h3>Rules</h3>${state === 'role' ? RULES : RULES_LONG}</section>
+        <section class="dsec"><h3>Granted by</h3>${
+          state === 'role'
+            ? `<p class="runtext">No binding grants it by its own name.</p><p class="runtext touch">Its rules are also part of <span class="lnk reach">ClusterRole/everything</span> and <span class="lnk reach">ClusterRole/shop-admin</span>, which gather them: whoever those are granted to has them too.</p>`
+            : `<div class="stack"><div style="padding:14px"><span class="lnk">RoleBinding/checkout-reads-config</span><dl class="one"><div><dt>To</dt><dd>ServiceAccount shop/checkout</dd></div><div><dt>In</dt><dd>shop</dd></div></dl></div></div>`
+        }</section>
+      </div>`
     case 'scale':
       return `${deployment(false)}${scaleSheet()}`
     case 'typed':
@@ -944,7 +1074,8 @@ function screen(state: State): string {
         <div class="dbody"><section class="dsec"><h3>Details</h3>${facts2}</section><section class="dsec"><h3>Conditions</h3>${CONDITIONS}</section><section class="dsec"><h3>Labels</h3>${LABELS}</section></div>
       </aside>`
     case 'tablet-approval':
-      return `${topBar('Pods', 'menu', true)}${contextRow('shop')}${table()}<div class="scrim"></div><div class="dialog" style="top:8%;width:680px;max-width:calc(100% - 48px)">
+    case 'tablet-approval-note':
+      return `${topBar('Pods', 'menu', true)}${contextRow('shop')}${table()}<div class="scrim"></div><div class="dialog" style="top:8%;width:680px;max-width:calc(100% - 48px)">${state === 'tablet-approval-note' ? strip('<b>The change before:</b> scaled cart to 3 replicas, in demo.', 2).replace('class="nstrip"', 'class="nstrip" style="margin:0;padding:10px 20px"') : ''}
         <div class="head">${approvalHead().replace('<h2>', '<h3 style="margin-top:2px">').replace('</h2>', '</h3>')}<span class="tap" style="margin:-8px -12px 0 auto">${icon('x', 20)}</span></div>
         <div class="body">${approvalBody()}</div>
         <div class="pfoot"><div class="wait">${icon('timer', 14)}Waits 4:12 more</div><span class="btn ghost tall" style="margin:0">Reject…</span><span class="btn primary tall">Approve</span></div>
