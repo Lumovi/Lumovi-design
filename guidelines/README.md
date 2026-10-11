@@ -142,11 +142,11 @@ running text.
 | **Paper**    | `#ffffff` | Light surfaces, and the logo on dark.                |
 | **Blue**     | `#2675d3` | Only for what you can act on: links, buttons, focus. |
 
-The brand is black, white and gray: **true neutral grays**, without a tint, the way Vercel and
-Apple present themselves. Color is kept for meaning.
+The brand is black, white and gray: **true neutral grays**, without a tint. Color is kept for
+meaning.
 
-- **Blue** is for what you can act on (links, buttons, focus and selection), as in Apple's
-  interfaces. It isn't the brand: never color the logo with it. Blue 600 (`--accent`) is for
+- **Blue** is for what you can act on (links, buttons, focus and selection). It isn't the
+  brand: never color the logo with it. Blue 600 (`--accent`) is for
   fills, rings and icons, in both themes. Blue words use `--accent-strong` (Blue 700 on light,
   400 on dark), which reaches 4.5:1 on every surface; Blue 600 is only 4.00:1 on gray 150.
 - **Text** reaches 4.5:1 on every surface of its theme (WCAG AA). Quiet text (`--text-3`) is

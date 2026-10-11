@@ -200,7 +200,7 @@ export function colorSection(): Section {
       {
         title: 'Blue',
         html: `
-          ${head('04 — Color', 'Blue', 'For what you can act on, as in Apple’s interfaces. It isn’t the brand’s color.')}
+          ${head('04 — Color', 'Blue', 'For what you can act on. It isn’t the brand’s color.')}
           <div style="margin-top:32px">${chips(blue, 110)}</div>
           <div class="row" style="margin-top:36px;gap:48px">
             <div class="col fill">

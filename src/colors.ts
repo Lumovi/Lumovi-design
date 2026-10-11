@@ -3,8 +3,8 @@
  * the logo, the icons and the media) is built from here.
  *
  * The brand is black, white and gray: true neutral grays, without a tint, so the product and
- * what it shows come first. Color is kept for meaning: blue for what you can act on (as in
- * Apple's interfaces), and the app's status and chart colors for what they say.
+ * what it shows come first. Color is kept for meaning: blue for what you can act on, and the
+ * app's status and chart colors for what they say.
  */
 
 export const gray = {
