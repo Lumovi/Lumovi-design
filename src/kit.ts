@@ -194,6 +194,98 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .ph .pick .pi.press { background: var(--surface-3); }
 .ph .bar h1 { overflow: hidden; white-space: nowrap; }
 
+/* Parts that show something of Lumovi's by reference: the plugin names it, Lumovi shows it. */
+.kcard > h3 .by { margin-left: 10px; font-size: 12px; font-weight: 400; color: var(--text-3); }
+.kcard > h3 .by + small { margin-left: auto; }
+.secret { display: flex; flex-direction: column; gap: 8px; }
+.secret .sk { padding: 6px 6px 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.secret .sk > .top { display: flex; min-height: 28px; align-items: center; gap: 8px; }
+.secret .k { min-width: 0; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; white-space: nowrap; text-overflow: ellipsis; }
+.secret .top small { font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.secret .do { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.secret .val { display: block; min-width: 0; margin-top: 2px; padding-right: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 18px; color: var(--text-1); overflow-wrap: anywhere; }
+.secret .val.dots { letter-spacing: 0.1em; color: var(--text-2); }
+.secret .val.quiet { font-family: 'Inter', sans-serif; color: var(--text-3); }
+.secret .val.box { position: relative; max-height: 288px; overflow: hidden; }
+.secret .val.box::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 24px; background: linear-gradient(transparent, var(--surface)); }
+.ib { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 6px; color: var(--text-2); }
+.ib.off { opacity: 0.4; }
+.said { display: flex; gap: 10px; padding: 12px 0 4px; font-size: 13px; line-height: 20px; color: var(--text-2); }
+.said > svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
+.said.warn > svg.i { color: var(--warn-text); }
+.klog { padding: 10px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 20px; color: var(--text-2); }
+.klog > div { padding: 0 12px 0 calc(12px + 2ch); text-indent: -2ch; white-space: pre-wrap; overflow-wrap: anywhere; }
+.klog .err { background: color-mix(in srgb, var(--critical) 8%, transparent); color: var(--critical-text); }
+.ktools { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.kfield { display: flex; height: 32px; min-width: 0; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 13px; color: var(--text-1); }
+.kfield.ph { color: var(--text-3); }
+.kfield.mono { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+.kfield.bad { border-color: var(--critical); box-shadow: 0 0 0 1px var(--critical); }
+.kfield > svg.i { flex: none; color: var(--text-3); }
+.kfield > .end { margin-left: auto; padding-left: 4px; }
+.ktools .n { margin-right: auto; font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.ev { display: grid; grid-template-columns: 16px 150px minmax(0, 1fr) 40px 40px; align-items: baseline; gap: 12px; padding: 7px 0; font-size: 13px; }
+.ev + .ev { border-top: 1px solid var(--line); }
+.ev > svg.i { align-self: center; color: var(--text-3); }
+.ev.w > svg.i { color: var(--warn-text); }
+.ev b { overflow: hidden; font-weight: 500; white-space: nowrap; text-overflow: ellipsis; }
+.ev span { min-width: 0; color: var(--text-2); }
+.ev small { font-size: 12px; text-align: right; color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+/* A plugin's form inside Lumovi's own confirmation. */
+.kdlg { display: flex; width: 560px; max-height: var(--mh, none); flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.kdlg .dh { display: flex; flex: none; align-items: flex-start; gap: 12px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+.kdlg .dh .g { display: grid; flex: none; width: 36px; height: 36px; place-items: center; border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); }
+.kdlg .dh .eb { display: flex; align-items: center; gap: 5px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--accent-strong); }
+.kdlg .dh h3 { margin: 2px 0 0; font-size: 15px; line-height: 21px; font-weight: 600; }
+.kdlg .dh .sub { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin-top: 2px; font-size: 12px; line-height: 16px; color: var(--text-3); }
+.kdlg .dh .sub b { font-weight: 500; color: var(--text-2); }
+.prodm { padding: 1px 6px; border-radius: 4px; background: color-mix(in srgb, var(--critical) 10%, transparent); font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--critical-text); }
+.kdlg .db { display: flex; min-height: 0; flex: 1; flex-direction: column; }
+.kdlg .part { padding: 14px 20px; }
+.kdlg .part + .part { border-top: 1px solid var(--line); }
+.kdlg .part.opts { min-height: 0; overflow: hidden; position: relative; }
+.kdlg .part.opts.cut { flex: 1; }
+.kdlg .part.opts.cut::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 28px; background: linear-gradient(transparent, var(--surface-2)); }
+.kdlg .part.send { flex: none; }
+.kcap { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.fld + .fld { margin-top: 12px; }
+.fld > label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
+.fld > p { margin: 5px 0 0; font-size: 12px; line-height: 17px; color: var(--text-3); }
+.fld > p.bad { color: var(--critical-text); }
+.kseg { display: inline-flex; padding: 2px; border-radius: 8px; background: var(--surface-3); }
+.kseg span { padding: 4px 12px; border-radius: 6px; font-size: 13px; color: var(--text-2); }
+.kseg span.on { background: var(--surface-2); font-weight: 500; color: var(--text-1); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.ksw { display: inline-flex; width: 36px; height: 20px; padding: 2px; border-radius: 999px; background: var(--surface-3); box-shadow: inset 0 0 0 1px var(--line-strong); }
+.ksw i { width: 16px; height: 16px; border-radius: 50%; background: var(--surface-2); box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); }
+.ksw.on { justify-content: flex-end; background: var(--accent); box-shadow: none; }
+.ksw.on i { background: #fff; }
+.kdiff { padding: 8px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 20px; color: var(--text-2); }
+.kdiff > div { padding: 0 12px; white-space: pre; overflow: hidden; }
+.kdiff .add { background: color-mix(in srgb, var(--good) 10%, transparent); color: var(--good-text); }
+.kdiff .del { background: color-mix(in srgb, var(--critical) 10%, transparent); color: var(--critical-text); }
+.kcmd { margin-top: 8px; padding: 8px 12px; border-radius: 8px; background: color-mix(in srgb, var(--surface-3) 70%, transparent); }
+.kcmd .cl { display: flex; align-items: center; justify-content: space-between; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.kcmd code { display: block; margin-top: 2px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.notyet { padding: 14px 12px; border: 1px dashed var(--line-strong); border-radius: 8px; font-size: 13px; color: var(--text-3); }
+.verdict { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; font-size: 12px; line-height: 18px; color: var(--text-2); }
+.verdict > svg.i { flex: none; margin-top: 2px; }
+.verdict.ok > svg.i { color: var(--good); }
+.verdict.no { color: var(--critical-text); }
+.kdlg .df { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--surface); }
+.kdlg .df .aud { display: flex; align-items: center; gap: 6px; margin-right: auto; font-size: 12px; color: var(--text-3); }
+.ph .kdlg { width: auto; border: 0; border-radius: 0; box-shadow: none; }
+.ph .grab { width: 36px; height: 4px; margin: 8px auto 0; border-radius: 2px; background: var(--line-strong); }
+.ph .kdlg .dh { padding: 10px 16px 12px; }
+.ph .kdlg .part { padding: 14px 16px; }
+.ph .kdlg .df { justify-content: space-between; padding: 12px 16px; }
+.ph .kdlg .df .aud { flex-basis: 100%; margin: 0 0 10px; }
+.ph .kdlg .df .btn.ghost { margin-left: -16px; }
+.ph .kdlg .df .btn { height: 44px; padding: 0 16px; font-size: 13px; }
+.ph .kdlg .df .btn.primary { min-width: 120px; }
+.ph .kfield { height: 44px; font-size: 16px; }
+.ph .ib { width: 44px; height: 44px; }
+
 `
 
 const LEVEL: Record<Level, string> = {
@@ -737,9 +829,246 @@ function pagePhone(): string {
   return `<section class="spec"><h2>On a phone<i>the list is the page; what’s picked is a page of its own</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${list}${one}</div><p style="max-width:820px">Under 640 px <b>a split is two pages</b>: the pick list first, full width, under a line that says how many (and, past twelve, a filter field 44 px high above it, as the phone’s lists have), its rows 60 px high as the phone’s lists are, and nothing picked (second row, pressed). Tapping one opens the rest as a page with Back, the picked thing’s name in the top bar (middle cut) and its Status on a line of its own under it. <b>A plugin’s own actions that change the cluster aren’t offered on a phone</b>: a phone changes only what Lumovi lists for it, so the header’s buttons give way to one line saying where they are, in the app’s own words for it. Buttons that only read or open something stay, 44 px high. <b>A row of tiles</b> is two across, then wraps, the chevron in the tile’s corner; a single tile takes the width. <b>A stack</b> is a stack. Back returns to the list where it was.</p></section>`
 }
 
+// ─── Parts shown by reference: a Secret's value, logs, events ──────────────────────────────
+
+const PLUGIN = 'Argo CD'
+
+const refCard = (title: string, them: 'it' | 'them', note: string, body: string) =>
+  `<div class="kcard"><h3>${title}<span class="by">Shown by Lumovi. ${PLUGIN} can’t see ${them}.</span>${note ? `<small>${note}</small>` : ''}</h3><div class="in">${body}</div></div>`
+
+const ib = (glyph: Parameters<typeof icon>[0], off = false) =>
+  `<span class="ib${off ? ' off' : ''}">${icon(glyph, 16)}</span>`
+
+function secretKey(
+  key: string,
+  value: string | null,
+  size: string,
+  o: { box?: boolean; quiet?: string } = {},
+): string {
+  const hiddenByAccess = o.quiet !== undefined
+  const shown = hiddenByAccess
+    ? `<span class="val quiet">${o.quiet}</span>`
+    : value === null
+      ? '<span class="val dots">••••••••</span>'
+      : `<span class="val${o.box ? ' box' : ''}">${escape(value)}</span>`
+  // A value the person's access hides has nothing to reveal or copy.
+  const buttons = hiddenByAccess
+    ? ''
+    : `<span class="do">${ib(value === null ? 'eye' : 'eye-off')}${ib('copy')}</span>`
+  return `<div class="sk"><div class="top"><span class="k">${key}</span>${size ? `<small>${size}</small>` : ''}${buttons}</div>${shown}</div>`
+}
+
+const LONG_SECRET = Array.from({ length: 22 }, (_, i) =>
+  'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKjMzEfYyjiWA4R4/M2bS1GB4t7NXp98C3SC6dVMvDuictGeurT8jNbvJZHtCSuYEvuNMoSfm76oqFvAp8Gy0iz5sxjZmSnXyCdPEovGhLa0VzMaQ8s+CLOyS56YyCFGeJZ'.slice(
+    i * 3,
+  ),
+).join('')
+
+const said = (text: string, warn = false) =>
+  `<div class="said${warn ? ' warn' : ''}">${icon(warn ? 'lock' : 'info', 16)}<span>${text}</span></div>`
+
+/** 1. A Secret's value, shown by Lumovi and never held by the plugin. */
+function refSecret(): string {
+  return spec(
+    'A Secret’s value',
+    'shown and not held',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      ${refCard(
+        'Repository credentials',
+        'it',
+        `<span class="btn ghost sm" style="margin:-6px -8px -6px 0">${icon('eye', 14)}Reveal all</span>`,
+        `<div class="secret">${secretKey('username', 'deploy-bot', '10 B')}${secretKey('password', null, '40 B')}${secretKey('sshPrivateKey', LONG_SECRET, '1.6 KB', { box: true })}${secretKey('tls.crt', null, '', { quiet: 'Value hidden by your access' })}</div>`,
+      )}
+      <div class="arr-stack">
+        ${refCard('Repository credentials', 'it', '', said(`Your account isn’t allowed to read this Secret. ${PLUGIN}’s page asks Lumovi to show it here.`, true))}
+        ${refCard('Repository credentials', 'it', '', said(`There’s no Secret named repo-credentials in argocd. ${PLUGIN}’s page points at it.`))}
+        ${refCard('Repository credentials', 'it', '', `<div class="secret">${secretKey('username', null, '10 B')}</div>${said('Secret repo-credentials in argocd has no key named token.')}`)}
+      </div>
+    </div>`,
+    `A plugin says <b>which Secret and which keys</b>; Lumovi reads it as the person, under their own rights, and draws it with the Secret page’s own controls, unchanged: each key in a box of its own, its size and its buttons on the key’s line and the value under it; eight dots whatever the value’s length, Reveal and Hide for each key, Reveal all and Hide all, Copy. A value the person’s access hides says so and has no buttons. <b>Nothing goes back to the plugin</b>: not the value, not its length, not whether it was revealed; the part’s heading says so, once, and it’s only drawn by a part of which it’s true. A revealed value wraps whole and is never cut with “…” (a cut Secret looks whole): past 288 px (about sixteen lines) it scrolls inside its box, as on the Secret page, and Copy takes all of it. Where the person may not read it, or it isn’t there, Lumovi says which, by name, and that the plugin’s page asked. <b>It stands in a card or a tab of its own</b>, full width, never in a table’s cell or a tile.`,
+  )
+}
+
+const LOGS = [
+  [
+    '',
+    'time="2026-10-11T09:14:02Z" level=info msg="Reconciliation completed" application=storefront dedup_ms=0 dest-namespace=shop',
+  ],
+  [
+    '',
+    'time="2026-10-11T09:14:31Z" level=info msg="Comparing app state" application=cart revision=4f1c9aa',
+  ],
+  [
+    'err',
+    'time="2026-10-11T09:14:32Z" level=error msg="ComparisonError: failed to load target state: rpc error: code = Unavailable desc = connection error" application=cart',
+  ],
+  [
+    '',
+    'time="2026-10-11T09:14:33Z" level=info msg="Skipping auto-sync: application status is Unknown" application=cart',
+  ],
+]
+
+/** 2. A pod's logs and an object's events: Lumovi's own views, unchanged. */
+function refLogs(): string {
+  const tools = `<div class="ktools"><span class="kfield" style="flex:none;white-space:nowrap">application-controller<span class="end">${icon('chevrons-up-down', 14)}</span></span><span class="kfield ph" style="flex:1">${icon('search', 14)}Search</span><span class="ib">${icon('play', 16)}</span></div>`
+  const ev = (w: boolean, reason: string, msg: string, n: string, age: string) =>
+    `<div class="ev${w ? ' w' : ''}">${icon(w ? 'triangle-alert' : 'info', 14)}<b>${reason}</b><span>${msg}</span><small>${n}</small><small>${age}</small></div>`
+  return spec(
+    'A pod’s logs, an object’s events',
+    'Lumovi’s own views, unchanged',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="arr-stack">
+        ${refCard('Logs', 'them', 'argocd-application-controller-0', `${tools}<div class="klog">${LOGS.map(([c, l]) => `<div class="${c}">${escape(l!)}</div>`).join('')}</div>`)}
+        ${refCard('Logs', 'them', 'argocd-repo-server-7d9f6c5b8-x2kqp', `<div class="state" style="min-height:96px"><span>Nothing is running for this right now, so there are no logs to show.</span></div>`)}
+        ${refCard('Logs', 'them', '', said(`There’s no pod named argocd-repo-server-7d9f6c5b8-x2kqp in argocd: it may have been deleted.`))}
+      </div>
+      <div class="arr-stack">
+        ${refCard(
+          'Events',
+          'them',
+          'Application storefront',
+          `${ev(true, 'OperationFailed', 'Sync operation to 4f1c9aa failed: one or more objects failed to apply', '×14', '2m')}
+          ${ev(false, 'OperationStarted', 'Initiated sync to 4f1c9aa', '×14', '2m')}
+          ${ev(false, 'ResourceUpdated', 'Updated sync status: Synced → OutOfSync', '×3', '11m')}
+          ${ev(false, 'ResourceUpdated', 'Updated health status: Healthy → Degraded', '', '11m')}`,
+        )}
+        ${refCard('Events', 'them', 'Application storefront', said(`Your account isn’t allowed to read these events. ${PLUGIN}’s page asks Lumovi to show them here.`, true))}
+      </div>
+    </div>`,
+    `A plugin says <b>which pod</b> (and may say which container) or <b>which object</b>. Logs are the app’s own log view, with its container picker, Search and Follow, and its own words when there’s nothing. Events are <b>the detail’s Events tab as it is</b>: an icon, the reason, the message, how often and how long ago, newest first, with no count and no filter. That list draws every row today; for an object with thousands of events it must draw only the rows in view, which is new work for the tab and the part alike, and is the one thing here that isn’t the app’s already. The plugin never holds a line of either. Refusals and missing things are said as for a Secret. On a phone both are the phone layout’s own: log lines wrap and hang, and events are its two-line rows.`,
+  )
+}
+
+/** 3. On a phone. */
+function refPhone(): string {
+  const a = phoneFrame(
+    'storefront',
+    `<div class="sec"><h3>Repository credentials<span class="btn ghost sm" style="height:44px;margin:-12px -10px -12px auto">${icon('eye', 16)}Reveal all</span></h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi. ${PLUGIN} can’t see it.</p><div class="secret">${secretKey('username', 'deploy-bot', '10 B')}${secretKey('password', null, '40 B')}${secretKey('tls.crt', null, '', { quiet: 'Value hidden by your access' })}</div></div>
+    <div class="sec"><h3>Logs</h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi. ${PLUGIN} can’t see them.</p><div class="klog">${LOGS.slice(
+      1,
+      3,
+    )
+      .map(([c, l]) => `<div class="${c}">${escape(l!)}</div>`)
+      .join('')}</div></div>`,
+    true,
+  )
+  return `<section class="spec"><h2>On a phone<i>the same parts, a finger’s size</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${a}</div><p style="max-width:820px">The caption moves under the part’s title, since a phone’s heading has no room beside it. A key’s box is the desktop’s, with Reveal, Copy and Reveal all at 44 px. Logs wrap and hang by two characters, as the phone’s logs do. Revealing and copying are reads by the person, so a phone has them.</p></section>`
+}
+
+// ─── A plugin's form inside Lumovi's own confirmation ──────────────────────────────────────
+
+const fld = (label: string, control: string, hint = '', bad = '') =>
+  `<div class="fld"><label>${label}</label>${control}${bad ? `<p class="bad">${bad}</p>` : hint ? `<p>${hint}</p>` : ''}</div>`
+
+const kseg = (items: string[], on: string) =>
+  `<span class="kseg">${items.map((i) => `<span class="${i === on ? 'on' : ''}">${i}</span>`).join('')}</span>`
+
+const ksw = (on: boolean) => `<span class="ksw${on ? ' on' : ''}"><i></i></span>`
+
+const kfield = (
+  value: string,
+  o: { mono?: boolean; bad?: boolean; ph?: boolean; width?: number; end?: boolean } = {},
+) =>
+  `<span class="kfield${o.mono ? ' mono' : ''}${o.bad ? ' bad' : ''}${o.ph ? ' ph' : ''}"${o.width ? ` style="width:${o.width}px"` : ''}>${value}${o.end ? `<span class="end">${icon('chevrons-up-down', 14)}</span>` : ''}</span>`
+
+const diff = (lines: [string, string][]) =>
+  `<div class="kdiff">${lines.map(([k, t]) => `<div class="${k}">${k === 'add' ? '+' : k === 'del' ? '−' : ' '} ${escape(t)}</div>`).join('')}</div>`
+
+const command = (text: string) =>
+  `<div class="kcmd"><div class="cl">Equivalent command${icon('copy', 14)}</div><code>${escape(text)}</code></div>`
+
+interface Ask {
+  fields: string
+  send: string
+  approve?: boolean
+  cut?: boolean
+  maxHeight?: number
+  title?: string
+  /** The action's own word, as on the button that opened the dialog. */
+  verb?: string
+}
+
+function ask(a: Ask): string {
+  return `<div class="kdlg"${a.maxHeight ? ` style="--mh:${a.maxHeight}px"` : ''}>
+    <div class="dh"><span class="g">${icon('git-branch', 18)}</span><div><div class="eb">${icon('plug', 12)}From ${PLUGIN} 2.0.0</div><h3>${a.title ?? 'Patch Application storefront'}</h3><div class="sub"><span>Application · argocd · <b>production-eu</b></span><span class="prodm">Production</span></div></div></div>
+    <div class="db">
+      <div class="part opts${a.cut ? ' cut' : ''}"><div class="kcap">Options, in ${PLUGIN}’s words</div>${a.fields}</div>
+      <div class="part send"><div class="kcap">What Lumovi will send</div>${a.send}</div>
+    </div>
+    <div class="df"><span class="btn ghost sm">Cancel</span><span class="btn primary sm${a.approve === false ? ' off' : ''}">${a.verb ?? 'Sync'}</span></div>
+  </div>`
+}
+
+const SYNC_FIELDS = `${fld('Revision', kfield('main', { mono: true, width: 260 }), 'A branch, a tag or a commit. Empty syncs to what the application tracks.')}${fld('Prune', ksw(true), 'Delete resources that are no longer in the repository.')}${fld('Strategy', kseg(['Apply', 'Hook'], 'Apply'))}`
+
+const SYNC_SEND = (revision: string, verdict: string) =>
+  `${diff([
+    ['', 'operation:'],
+    ['add', '  sync:'],
+    ['add', `    revision: ${revision}`],
+    ['add', '    prune: true'],
+    ['add', '    syncStrategy: { apply: {} }'],
+  ])}${command(`kubectl patch application storefront -n argocd --type merge -p '{"operation":{"sync":{"revision":"${revision}","prune":true,"syncStrategy":{"apply":{}}}}}' --context production-eu`)}${verdict}`
+
+const OK = `<div class="verdict ok">${icon('circle-check', 14)}<span>The cluster accepts it, as the options stand.</span></div>`
+const ASKING = `<div class="verdict">${icon('circle-dashed', 14)}<span>Asking the cluster…</span></div>`
+
+/** 1. The dialog, and its states as the options change. */
+function formStates(): string {
+  const wrong = ask({
+    fields: `${fld('Revision', kfield('main', { mono: true, width: 260 }), 'A branch, a tag or a commit. Empty syncs to what the application tracks.')}${fld('Retries', kfield('25', { mono: true, bad: true, width: 96 }), '', 'A whole number from 1 to 10.')}${fld('Strategy', kseg(['Apply', 'Hook'], ''), '', 'Choose one.')}`,
+    send: `<div class="notyet">The change shows here once the options above are filled in.</div>`,
+    approve: false,
+  })
+  const refused = ask({
+    fields: `${fld('Revision', kfield('release/2026.10', { mono: true, bad: true, width: 260 }), '', 'The cluster refused it: revision “release/2026.10” isn’t in the repository.')}${fld('Prune', ksw(true), 'Delete resources that are no longer in the repository.')}${fld('Strategy', kseg(['Apply', 'Hook'], 'Apply'))}`,
+    send: SYNC_SEND('release/2026.10', ''),
+    approve: false,
+  })
+  return spec(
+    'A change that asks for options first',
+    'the plugin’s words above, Lumovi’s below',
+    `<div style="display:grid;grid-template-columns:repeat(2,560px);gap:28px 32px;align-items:start">
+      <div class="arr-stack"><span class="cap">1 · filled in, and the cluster accepts it</span>${ask({ fields: SYNC_FIELDS, send: SYNC_SEND('main', OK) })}</div>
+      <div class="arr-stack"><span class="cap">2 · an option changed: asking again, Sync off</span>${ask({ fields: SYNC_FIELDS.replace('>main<', '>4f1c9aa<'), send: SYNC_SEND('4f1c9aa', ASKING), approve: false })}</div>
+      <div class="arr-stack"><span class="cap">3 · an option wrong or still empty</span>${wrong}</div>
+      <div class="arr-stack"><span class="cap">4 · the cluster refused it</span>${refused}</div>
+    </div>`,
+    `When a plugin’s change needs options first (“Sync…”, “Back up now…”), <b>the form is inside Lumovi’s own confirmation</b>, never on the plugin’s page. <b>It is a confirmation, not an approval</b>: the person started this change a moment ago on the plugin’s page, and nobody is waiting for an answer. So it has no wait, its buttons are Cancel and the action’s own word (the one on the button that opened it: “Sync”), and Escape cancels, as in Lumovi’s own Scale and Restart. Three places say whose words are whose: the heading (“From ${PLUGIN} 2.0.0”, then Lumovi’s own title of the change, where, and the Production mark); <b>“Options, in ${PLUGIN}’s words”</b> over the fields, whose labels and hints are the plugin’s and are shown whole; and <b>“What Lumovi will send”</b> over the patch and the command, which are Lumovi’s and which no plugin writes. The change <b>follows the fields as they’re filled</b>: after every edit Lumovi asks the cluster again (“Asking the cluster…”, the button off), and only “The cluster accepts it, as the options stand.” makes the button live, so what’s sent is what the cluster was asked. A field that’s wrong or empty says so under itself in Lumovi’s words by its kind (“Fill this in.”, “A whole number from 1 to 10.”, “Choose one.”), and the change’s place says it shows once the options are filled in. What the cluster refuses is said under the field it names, or else under the change.`,
+  )
+}
+
+/** 2. The hard case: five fields with long labels and hints must not push the change out of sight. */
+function formHard(): string {
+  const five = `${fld('Revision', kfield('main', { mono: true, width: 260 }), 'A branch, a tag or a commit. Empty syncs to what the application tracks, which for this application is the branch main of platform/apps/shop.')}${fld('Prune resources that are gone from the repository', ksw(true), 'Delete resources that are no longer in the repository. Anything deleted this way is gone from the cluster and is not recoverable from here.')}${fld('Strategy', kseg(['Apply', 'Hook'], 'Apply'), 'Hook runs the application’s sync hooks; Apply sends the manifests as they are.')}${fld('Retries', kfield('3', { mono: true, width: 96 }), 'How many times to try again if the sync fails, from 1 to 10.')}${fld('Only these resources', kfield('Deployment/cart', { mono: true }), 'Leave empty to sync everything.')}`
+  return spec(
+    'Five fields, long labels, two-line hints',
+    'the change never leaves the screen',
+    `<div style="display:grid;grid-template-columns:560px minmax(0,1fr);gap:32px;align-items:start">
+      ${ask({ fields: five, send: SYNC_SEND('main', OK), cut: true, maxHeight: 640 })}
+      <div class="spec" style="gap:10px"><p style="max-width:none"><b>The options scroll; the change doesn’t.</b> When the fields are taller than the dialog allows, they scroll in their own box, fading at its edge, and “What Lumovi will send” stays whole above the buttons with its verdict. A person can’t confirm having read only the plugin’s words.</p><p style="max-width:none"><b>The limits are the format’s:</b> five fields at most; a label of 40 characters and a hint of about two lines (160 characters is design’s number, for app to settle as the format’s), each wrapping whole and never cut. Four kinds of field: text, a whole number, a choice (two to four as a segmented control, more as a select) and a switch. <b>No kind hides what’s typed</b>, and none is labelled or drawn as a password: a plugin’s form is for options, and a field that looks like a sign-in can’t be made.</p><p style="max-width:none"><b>Keys:</b> the focus starts in the first field, Tab goes through the fields to Cancel and the action’s button, Enter in a field doesn’t confirm, Escape cancels.</p></div>
+    </div>`,
+    'Drawn at the dialog’s greatest height, 640 px here: the first two fields show, the rest are a scroll away, and the patch, the command and the verdict are all in view.',
+  )
+}
+
+/** 3. On a phone: a tall sheet, the footer pinned. */
+function formPhone(): string {
+  const body = `<i class="grab" style="display:block"></i>${ask({ fields: SYNC_FIELDS, send: SYNC_SEND('main', OK) })}`
+  return `<section class="spec"><h2>On a phone<i>drawn, and not offered until the phone’s rule allows a plugin’s changes</i></h2><div style="display:flex;gap:24px;align-items:flex-start"><div class="ph">${body}</div></div><p style="max-width:820px">The phone’s tall sheet, with its footer pinned: fields 44 px high with 16 px text, Cancel at the left and the action’s button at the right, at least 120 px wide. The options scroll and the change stays above the footer, as on the desktop. <b>Today a phone doesn’t offer a plugin’s changes at all</b> (the page’s frame says where they are instead), so this is the form it takes if that rule is widened, and nothing to build before then.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
-export type KitFrame = 'table' | 'table-phone' | 'page' | 'page-phone'
+export type KitFrame =
+  | 'table'
+  | 'table-phone'
+  | 'page'
+  | 'page-phone'
+  | 'reference'
+  | 'reference-phone'
+  | 'form'
+  | 'form-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -750,6 +1079,10 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
     size: { width: 1440, height: 1500 },
   },
   { id: 'page-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
+  { id: 'reference', title: 'Parts shown by reference', size: { width: 1440, height: 1500 } },
+  { id: 'reference-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
+  { id: 'form', title: 'A form inside Lumovi’s confirmation', size: { width: 1440, height: 1800 } },
+  { id: 'form-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -764,7 +1097,15 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
         ? phoneCards()
         : id === 'page'
           ? `<header><h1>A page’s frame</h1><p>How a plugin lays a page out, picks one thing from several, and names it. Drawn with CloudNativePG’s clusters; Argo CD’s applications and Karpenter’s overview are the same three arrangements.</p></header>${pageWhole()}${pickCases()}${headerCases()}`
-          : pagePhone()
+          : id === 'page-phone'
+            ? pagePhone()
+            : id === 'reference'
+              ? `<header><h1>Shown by reference</h1><p>Three things a plugin’s page can show without ever holding them: a Secret’s value, a pod’s logs, an object’s events. The plugin names the thing; Lumovi reads it as the person and draws it with its own parts.</p></header>${refSecret()}${refLogs()}`
+              : id === 'reference-phone'
+                ? refPhone()
+                : id === 'form'
+                  ? `<header><h1>A form inside Lumovi’s confirmation</h1><p>For a plugin’s change that asks for options first. The plugin describes the fields; Lumovi shows them in its own dialog with the change it will make.</p></header>${formStates()}${formHard()}`
+                  : formPhone()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
