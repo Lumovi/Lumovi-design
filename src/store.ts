@@ -14,7 +14,7 @@ import { CSS as PLUGIN } from './plugins.ts'
 import { CSS as SHELL, pill, seg, shell } from './proposals.ts'
 import { FONTS } from './scene.ts'
 
-const CSS = `
+export const CSS = `
 .prow { display: grid; grid-template-columns: 36px minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1fr) 150px; align-items: center; gap: 16px; padding: 10px 24px; border-bottom: 1px solid var(--line); font-size: 13px; }
 .prow.head { padding-top: 8px; padding-bottom: 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .prow .glyph { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--text-2); }
