@@ -407,12 +407,12 @@ spec:
   },
   DaemonSet: {
     form: `${who('log-agent', { namespace: 'monitoring' })}
+      <p class="fhelp" style="margin-top:-6px">One pod on every node, so there’s no replica count.</p>
       ${group('Container')}
       ${labelled('Image', '.image', field('ghcr.io/acme/log-agent:1.8.0', { mono: true }))}
       ${labelled(optional('Port'), '.ports[0].containerPort', field('80', { mono: true, placeholder: true }))}
       ${labelled(optional('Environment'), '.env', pairs([['LOG_LEVEL', 'info']], 'Add a variable'))}
       ${resources()}
-      <p class="fhelp" style="margin-top:-6px">One pod on every node, so there’s no replica count.</p>
       ${follows('log-agent')}`,
     yaml: deploymentYaml(
       {
