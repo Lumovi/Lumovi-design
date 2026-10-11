@@ -136,6 +136,64 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .cards dd { margin: 2px 0 0; color: var(--text-1); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .cards .pnote { margin: 6px 0 0 18px; font-size: 12px; line-height: 18px; color: var(--text-2); }
 .pmore { display: flex; height: 44px; align-items: center; margin-top: 4px; font-size: 13px; font-weight: 500; color: var(--accent-strong); }
+/* The pick list: rows that are a lead with a Status at the right, one of them picked. */
+.pick { display: flex; flex-direction: column; margin: 0 -8px; }
+.pick .pi { display: flex; min-height: 52px; align-items: center; gap: 12px; padding: 8px; border-radius: 8px; }
+.pick .pi + .pi { margin-top: 2px; }
+.pick .pi .lead { flex: 1; }
+.pick .pi.on { background: var(--accent-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }
+.pick .pi.hover { background: color-mix(in srgb, var(--surface-3) 60%, transparent); }
+.pick .pi.focus { box-shadow: 0 0 0 2px var(--accent); }
+.pick .pi > .st { flex: none; }
+.pfind { display: flex; height: 32px; align-items: center; gap: 8px; margin: 2px 0 8px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 13px; color: var(--text-3); }
+.fadeb { position: relative; max-height: var(--h); margin: 0 -10px; padding: 2px 10px 0; overflow: hidden; }
+.fadeb::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 28px; background: linear-gradient(transparent, var(--surface-2)); }
+
+/* The second-level header: the thing picked, its Status, and what can be done to it. */
+.h2nd { display: flex; min-width: 0; align-items: center; gap: 10px; }
+.h2nd > b { min-width: 0; overflow: hidden; font-size: 17px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+.h2nd > .st { flex: none; }
+.h2nd > .acts { display: flex; flex: none; gap: 8px; margin-left: auto; }
+
+/* Tiles, and the three arrangements. */
+.ktile { position: relative; min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-panel); }
+.ktile.hover { border-color: var(--line-strong); background: color-mix(in srgb, var(--surface-3) 40%, var(--surface-2)); }
+.ktile .l { display: flex; min-width: 0; align-items: center; gap: 8px; font-size: 13px; line-height: 20px; color: var(--text-2); }
+.ktile .l > svg.i { flex: none; color: var(--text-3); }
+.ktile .l > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ktile .l > .go { margin-left: auto; opacity: 0; }
+.ktile.hover .l > .go { opacity: 1; }
+.ktile .v { display: flex; height: 28px; align-items: flex-end; margin-top: 10px; overflow: hidden; font-size: 28px; line-height: 28px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+.ktile .v.words { font-size: 15px; line-height: 22px; letter-spacing: -0.01em; }
+.ktile .s { display: flex; height: 20px; min-width: 0; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; color: var(--text-3); }
+.ktile .s > span:last-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ktile .s .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--m); }
+.ph .ktile .l { gap: 6px; }
+.ph .ktile .l > .go { position: absolute; top: 8px; right: 8px; opacity: 1; }
+.larger { margin: 0; padding: 12px 16px 0; font-size: 12px; line-height: 18px; color: var(--text-3); }
+.pcount { padding: 12px 16px 8px; font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.arr-stack { display: flex; min-width: 0; flex-direction: column; gap: 16px; }
+.arr-tiles { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; }
+.arr-split { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start; }
+.pagebox { padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.tag { position: relative; }
+.tag::before { content: attr(data-tag); position: absolute; z-index: 2; top: -9px; left: 10px; padding: 0 6px; border-radius: 4px; background: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; line-height: 16px; color: #fff; white-space: nowrap; }
+.tag.b::before { top: auto; bottom: -9px; }
+.tag.o { outline: 1px dashed var(--accent); outline-offset: 5px; border-radius: 12px; }
+.stub { display: flex; height: 76px; align-items: center; justify-content: center; font-size: 12px; color: var(--text-3); }
+
+/* On a phone: the page's own top bar after picking, and buttons a finger's height. */
+.ph .under { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px 0; }
+.ph .acts { display: flex; gap: 8px; padding: 12px 16px 4px; }
+.ph .acts .btn { height: 44px; padding: 0 16px; }
+.ph .acts .sq { display: grid; width: 44px; height: 44px; place-items: center; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--text-2); }
+.ph .ptiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px; }
+.ph .pick { margin: 0; }
+.ph .pick .pi { min-height: 60px; padding: 8px 16px; border-radius: 0; }
+.ph .pick .pi + .pi { margin-top: 0; border-top: 1px solid var(--line); }
+.ph .pick .pi.press { background: var(--surface-3); }
+.ph .bar h1 { overflow: hidden; white-space: nowrap; }
+
 `
 
 const LEVEL: Record<Level, string> = {
@@ -472,8 +530,8 @@ function states(): string {
 
 const fact = (label: string, value: string) => `<div><dt>${label}</dt><dd>${value}</dd></div>`
 
-function phoneFrame(title: string, body: string): string {
-  return `<div class="ph"><div class="bar"><span class="tap">${icon('arrow-left', 20)}</span><h1>${title}</h1></div>${body}</div>`
+function phoneFrame(title: string, body: string, back = false): string {
+  return `<div class="ph"><div class="bar"><span class="tap">${icon(back ? 'arrow-left' : 'menu', 20)}</span><h1>${title}</h1></div>${body}</div>`
 }
 
 /** 6. On a phone a row is a card: the lead, then its other columns as labelled facts. */
@@ -511,13 +569,187 @@ function phoneCards(): string {
   return `<section class="spec"><h2>On a phone<i>a row is a card</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${a}${b}</div><p style="max-width:820px">Under 640 px <b>a row is a card</b>, by the phone layout’s own rule: its lead first, as on the desktop, then its other columns as labelled facts. Facts stand side by side <b>only when every value in the table fits a third</b> on one line; otherwise each takes a line, in every card of that table, its groups included, so a table’s cards all read the same way (right: “Not in the repository” doesn’t fit, so all of Resources stacks; left: Node pools’ values all fit). The facts’ labels are the columns’ names, which is why a plugin names every column even where no headings show. A meter becomes its words; a Status keeps its word and the lead’s dot keeps its level. A note stands under the lead, three lines at most. A row that opens is the whole card (second card, pressed). A row that holds rows has a 44 px chevron at its right; its rows are cards set in beneath it, closed until asked. A group’s heading stands above its cards. <b>Sorting</b> is the phone’s Sort sheet, from the button in the table’s heading, listing the columns that sort.</p></section>`
 }
 
+// ─── The pick list, the three arrangements, the second-level header ────────────────────────
+
+interface Picked {
+  lead: Lead
+  status: [Level, string]
+}
+
+/** Worst first, as Table sorts a Status. */
+const CLUSTERS: Picked[] = [
+  {
+    lead: { level: 'warning', name: 'orders-db', under: '2 of 3 ready · shop' },
+    status: ['warning', 'Degraded'],
+  },
+  {
+    lead: { level: 'progressing', name: 'sessions-db', under: '1 of 2 ready · shop' },
+    status: ['progressing', 'Switching over'],
+  },
+  {
+    lead: { level: 'healthy', name: 'payments-db', under: '3 of 3 ready · shop' },
+    status: ['healthy', 'Healthy'],
+  },
+  {
+    lead: { level: 'healthy', name: 'reports-db', under: '1 of 1 ready · data' },
+    status: ['healthy', 'Healthy'],
+  },
+]
+
+const LONG_DB = 'checkout-payments-reconciliation-ledger-eu-west-1-blue-canary-db'
+const WORST: Picked = {
+  lead: { level: 'critical', name: LONG_DB, under: '0 of 3 ready · shop' },
+  status: ['critical', 'Unrecoverable'],
+}
+
+function pickList(
+  items: Picked[],
+  on: number,
+  o: { fit?: number; mark?: Record<number, string> } = {},
+): string {
+  return `<div class="pick" role="listbox">${items
+    .map(
+      (it, i) =>
+        `<div class="pi${i === on ? ' on' : ''}${o.mark?.[i] ? ` ${o.mark[i]}` : ''}" role="option">${lead(it.lead, { fit: o.fit })}<span class="st">${pill(it.status[0], it.status[1])}</span></div>`,
+    )
+    .join('')}</div>`
+}
+
+interface TileOptions {
+  /** Its value is words or a name, not a number: set smaller, a name cut in its middle. */
+  words?: boolean
+  /** A level's dot before the line under. */
+  level?: Level
+  /** It opens a named destination: a button, with a chevron (under the pointer; always on touch). */
+  opens?: boolean
+  hover?: boolean
+}
+
+/** A tile, as the app's Overview has them and Karpenter's page uses. */
+function tile(
+  glyph: Parameters<typeof icon>[0],
+  label: string,
+  value: string,
+  sub: string,
+  o: TileOptions = {},
+): string {
+  const dot = o.level ? `<span class="dot" style="--m:var(--${LEVEL[o.level]})"></span>` : ''
+  return `<div class="ktile${o.hover ? ' hover' : ''}"><div class="l">${icon(glyph, 16)}<span>${label}</span>${o.opens ? `<span class="go">${icon('chevron-right', 16)}</span>` : ''}</div><div class="v${o.words ? ' words' : ''}">${value}</div><div class="s">${dot}<span>${sub}</span></div></div>`
+}
+
+const btn = (label: string, kind: 'primary' | 'secondary' | 'ghost') =>
+  `<span class="btn ${kind} sm">${label}</span>`
+
+const MORE = `<span class="btn secondary sm" style="width:28px;padding:0">${icon('ellipsis', 14)}</span>`
+
+function header2(name: string, status: [Level, string], buttons: string, fit?: number): string {
+  const shown = fit && name.length > fit ? cut(name, fit) : escape(name)
+  return `<div class="h2nd"><b>${shown}</b><span class="st">${pill(status[0], status[1])}</span><span class="acts">${buttons}</span></div>`
+}
+
+const ACTS = `${btn('Restart…', 'ghost')}${btn('Switch over…', 'secondary')}${btn('Back up now…', 'primary')}`
+
+const TILES = (hover = false) =>
+  `${tile('server', 'Instances ready', '2/3', '1 not ready', { level: 'warning', opens: true, hover })}${tile('database', 'Primary', 'orders-db-1', 'since 12 days ago', { words: true, opens: true })}${tile('clock', 'Last backup', '3h', 'Completed', { level: 'healthy', opens: true })}${tile('layers', 'PostgreSQL', '17.2', '20Gi for each instance')}`
+
+/** 1. A page made of the three arrangements, with a pick list and a second-level header. */
+function pageWhole(): string {
+  const stub = (title: string, note: string, text: string) =>
+    card(title, note, `<div class="stub">${text}</div>`)
+  return spec(
+    'A page, from three arrangements',
+    'a split, a row of tiles, a stack',
+    `<div class="pagebox"><div class="arr-split tag o" data-tag="split · a 300 px side, then the rest">
+      ${card('Clusters', '4', pickList(CLUSTERS, 0, { mark: { 1: 'hover' } }))}
+      <div class="arr-stack tag b o" data-tag="stack · 16 px apart">
+        ${header2('orders-db', ['warning', 'Degraded'], ACTS)}
+        <div class="arr-tiles tag o" style="--n:4" data-tag="tiles · 2 to 4, equal">${TILES(true)}</div>
+        ${stub('Instances', '3', 'a Table')}
+        ${stub('Backups', 'the last 3 of 41', 'a Table')}
+      </div>
+    </div></div>`,
+    'A plugin places its parts with <b>three arrangements and nothing else</b>, and never gives a width, a gap or a position. <b>A stack</b>: one under another, 16 px apart; it’s what a page is when nothing else is said. <b>A row of tiles</b>: two to four, equal widths, 16 px apart. <b>A split</b>: a side 300 px wide, then the rest; the side holds a pick list and the rest follows what’s picked. A split holds stacks and rows of tiles; nothing holds a split, so a page has one at most. The page’s own padding and the cards’ are Lumovi’s.',
+  )
+}
+
+/** 2. The pick list by itself: its states, and the cases that break it. */
+function pickCases(): string {
+  const many: Picked[] = [
+    WORST,
+    ...CLUSTERS,
+    {
+      lead: { level: 'healthy', name: 'search-db', under: '2 of 2 ready · search' },
+      status: ['healthy', 'Healthy'],
+    },
+    { lead: { name: 'archive-db', under: 'Hibernated · data' }, status: ['neutral', 'Stopped'] },
+  ]
+  return spec(
+    'The pick list',
+    'one is always picked',
+    `<div style="display:grid;grid-template-columns:300px 300px minmax(0,1fr);gap:16px;align-items:start">
+      ${card('Clusters', '38', `<div class="pfind">${icon('search', 14)}Filter clusters</div><div class="fadeb" style="--h:300px">${pickList(many, 3, { fit: 15, mark: { 2: 'focus' } })}</div>`)}
+      ${card('Clusters', '1', pickList([CLUSTERS[2]!], 0))}
+      ${card('Clusters', '', `<div class="state"><span class="tile">${icon('database', 18)}</span><b>No clusters</b><span>CloudNativePG is installed, and nothing in demo uses it yet.</span></div>`)}
+    </div>`,
+    'A pick list’s row <b>is Table’s lead</b> with a Status at its right, 52 px high, so the two parts share one row; its card says what’s listed and how many. <b>One row is always picked</b>: the first when the page opens, and the list is sorted worst first unless the plugin says otherwise, so the first is the one to look at. The picked row has the selection’s blue wash, and never the blue alone: the rest of the page names it in its header. Under the pointer a row has the fill; from the keyboard the ring. <b>Keys:</b> up and down move the focus, Enter or Space picks; picking never needs the pointer. Past twelve rows it scrolls inside the side, with a filter above it, and the picked row is kept in view. <b>A long name</b> takes the middle cut; the Status is never cut. With nothing to list it shows Table’s empty state, and the rest of the page shows nothing.',
+  )
+}
+
+/** 3. The second-level header, and tiles: their hard cases. */
+function headerCases(): string {
+  return spec(
+    'The second-level header, and tiles',
+    'the longest name, more than three actions, values that don’t fit',
+    `<div class="pagebox arr-stack">
+      ${header2(LONG_DB, ['critical', 'Unrecoverable'], `${btn('Switch over…', 'secondary')}${MORE}${btn('Back up now…', 'primary')}`, 40)}
+      ${header2('orders-db', ['warning', 'Degraded'], ACTS)}
+      ${header2('reports-db', ['healthy', 'Healthy'], btn('Back up now…', 'primary'))}
+      <div class="arr-tiles" style="--n:4">${tile('database', 'Primary', cut('checkout-payments-reconciliation-ledger-1', 20), 'since 12 days ago', { words: true, opens: true })}${tile('clock', 'Last backup', 'Never', 'No schedule backs this cluster up', { words: true, level: 'warning' })}${tile('box', 'Storage for each instance, of what its class allows', '1.2 TiB', 'of 2 TiB')}${tile('layers', 'PostgreSQL', '17.2', '')}</div>
+      <div class="arr-tiles" style="--n:3">${tile('git-branch', 'Out of sync', '2/5', '2 resources differ', { level: 'warning', opens: true })}${tile('git-branch', 'Revision', 'main at 4f1c9aa', 'platform/apps/shop', { words: true })}${tile('clock', 'Auto-sync', 'Off', 'Sync by hand', { words: true })}</div>
+      <div class="arr-tiles" style="--n:2">${tile('server', 'Nodes ready', '9/9', 'All ready', { level: 'healthy', opens: true })}${tile('box', 'Waiting for a node', '2', 'the oldest for 11 minutes', { level: 'warning', opens: true })}</div>
+    </div>`,
+    '<b>The header</b> says what’s picked: its name at 17 px, its Status, and at most <b>three buttons</b> at the right, the one that matters most last and the only one filled. With more than three actions the filled one stays last, <b>“…” stands before it</b> and holds the rest (first header: five actions). The name stays on one line and takes the middle cut; the Status and the buttons are never cut or wrapped. A button whose change asks first ends in “…”, and the asking is Lumovi’s own dialog. <b>A tile is the app’s own</b>, the Overview’s, which Karpenter’s page uses: an icon and a label, a value at 28 px, and one line under with, optionally, a level’s dot. A value that is words or a name and not a number is set at 15 px on the same 28 px line, as the Metrics page’s small tile sets one; what’s new is that a name there takes the middle cut; the label and the line under are cut at their ends; a tile without a line under keeps its height, so tiles in a row are always the same height. A tile that <b>opens a named destination</b> is a button: its border darkens and a chevron shows under the pointer (first tile above), and the chevron always shows on touch; one that opens nothing has neither.',
+  )
+}
+
+/** 4. On a phone: the list is the page, and what's picked is a page of its own. */
+function pagePhone(): string {
+  const list = phoneFrame(
+    'CloudNativePG',
+    `<div class="pcount">5 clusters</div><div class="pick" style="border-top:1px solid var(--line)">${[
+      WORST,
+      ...CLUSTERS,
+    ]
+      .map(
+        (it, i) =>
+          `<div class="pi${i === 1 ? ' press' : ''}">${lead(it.lead, { fit: 20 })}<span class="st">${pill(it.status[0], it.status[1])}</span></div>`,
+      )
+      .join('')}</div>`,
+  )
+  const one = phoneFrame(
+    'orders-db',
+    `<div class="under">${pill('warning', 'Degraded')}</div>
+    <p class="larger">Open Lumovi on a larger screen to back up, switch over or restart this cluster.</p>
+    <div class="ptiles">${TILES()}</div>
+    <div class="sec"><h3>Instances<small>3</small></h3><div class="stub" style="border:1px solid var(--line);border-radius:12px">a Table, as cards</div></div>`,
+    true,
+  )
+  return `<section class="spec"><h2>On a phone<i>the list is the page; what’s picked is a page of its own</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${list}${one}</div><p style="max-width:820px">Under 640 px <b>a split is two pages</b>: the pick list first, full width, under a line that says how many (and, past twelve, a filter field 44 px high above it, as the phone’s lists have), its rows 60 px high as the phone’s lists are, and nothing picked (second row, pressed). Tapping one opens the rest as a page with Back, the picked thing’s name in the top bar (middle cut) and its Status on a line of its own under it. <b>A plugin’s own actions that change the cluster aren’t offered on a phone</b>: a phone changes only what Lumovi lists for it, so the header’s buttons give way to one line saying where they are, in the app’s own words for it. Buttons that only read or open something stay, 44 px high. <b>A row of tiles</b> is two across, then wraps, the chevron in the tile’s corner; a single tile takes the width. <b>A stack</b> is a stack. Back returns to the list where it was.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
-export type KitFrame = 'table' | 'table-phone'
+export type KitFrame = 'table' | 'table-phone' | 'page' | 'page-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
   { id: 'table-phone', title: 'Table, on a phone', size: { width: 920, height: 1040 } },
+  {
+    id: 'page',
+    title: 'The pick list, the arrangements and the second-level header',
+    size: { width: 1440, height: 1500 },
+  },
+  { id: 'page-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -528,7 +760,11 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
       ? `<header><h1>Table</h1><p>What a plugin lists things with. It grows from the app’s plain-row table and Karpenter’s rows, which are one thing with and without headings. A plugin gives rows as data and names each column and its kind; Lumovi draws them. When the app’s own detail tables move onto it, their rows go from about 32 to 36 px and a long name takes the middle cut where today it wraps: both meant.</p></header>
         <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">${anatomy()}${sorting()}${structure()}${hard()}</div>
         ${states()}`
-      : phoneCards()
+      : id === 'table-phone'
+        ? phoneCards()
+        : id === 'page'
+          ? `<header><h1>A page’s frame</h1><p>How a plugin lays a page out, picks one thing from several, and names it. Drawn with CloudNativePG’s clusters; Argo CD’s applications and Karpenter’s overview are the same three arrangements.</p></header>${pageWhole()}${pickCases()}${headerCases()}`
+          : pagePhone()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
