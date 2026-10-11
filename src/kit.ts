@@ -466,7 +466,7 @@ function anatomy(): string {
         },
       ])}`,
     ),
-    'A row starts with its <b>lead</b>: a dot in a status’s level (or none, and the name keeps its place), a name, optionally a quiet word beside it and one line under. After it come columns from <b>one scale</b>: narrow (88 px), normal (a share), wide (1.4 shares), a Status’s own 144 px, or as wide as its text, which is the widest value in that column, measured from the rows’ data and not from the rows drawn, so every row agrees and nothing shifts as a long table scrolls; <b>16 px between columns</b>, always. A plugin picks from the scale and never gives a width. Numbers and ages stand right and use tabular figures. A row with one line is 36 px, with a line under 52.',
+    'A row starts with its <b>lead</b>: a dot in a status’s level (or none, and the name keeps its place), a name, optionally a quiet word beside it and one line under. After it come columns from <b>one scale</b>: narrow (88 px), normal (a share), wide (1.4 shares), a Status’s own 144 px, or as wide as its text, which is the widest value in that column, measured from the rows’ data and not from the rows drawn, so every row agrees and nothing shifts as a long table scrolls; <b>16 px between columns</b>, always. A plugin picks from the scale and never gives a width. Numbers and ages stand right and use tabular figures. A row with one line is 36 px, with a line under 52; a one-line row that holds a meter is 40, since the app’s meter is its words over its bar and isn’t squeezed.',
   )
 }
 
