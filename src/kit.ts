@@ -319,6 +319,30 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .again { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); }
 .again b { font-weight: 500; color: var(--accent-strong); }
 
+/* A plugin's page: the strip that says whose it is, and the page stopped. */
+.pgframe { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
+.pgframe .whose { display: flex; min-height: 36px; align-items: center; gap: 8px; padding: 6px 8px 6px 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 12px; line-height: 18px; color: var(--text-2); }
+.pgframe .whose > svg.i { flex: none; color: var(--text-3); }
+.pgframe .whose > span:first-of-type { min-width: 0; flex: 1; }
+.pgframe .whose b { font-weight: 600; color: var(--text-1); }
+.stopped { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 40px 24px 44px; text-align: center; }
+.stopped .tile { display: grid; width: 44px; height: 44px; margin-bottom: 8px; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-3); color: var(--text-2); }
+.stopped h3 { max-width: 384px; margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; }
+.stopped p { max-width: 384px; margin: 0; font-size: 13px; line-height: 20px; color: var(--text-2); }
+.stopped p.q { margin-top: 6px; font-size: 12px; line-height: 18px; color: var(--text-3); }
+.stopped .btn { margin-top: 12px; }
+.stopped .saidbox { width: 100%; max-width: 384px; margin-top: 10px; border: 1px dashed var(--line-strong); border-radius: 10px; text-align: left; }
+.stopped .saidbox > i { display: block; padding: 6px 12px 0; font-size: 11px; font-style: normal; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.stopped .saidbox > code { display: block; padding: 4px 12px 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 18px; color: var(--text-2); overflow-wrap: anywhere; }
+.ph .pgframe { border: 0; border-radius: 0; box-shadow: none; }
+.ph .stopped { padding: 28px 16px 32px; }
+.ph .stopped .btn { height: 44px; padding: 0 16px; font-size: 13px; }
+
+.reasons { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(0, 2fr) 130px; gap: 0 16px; font-size: 12px; line-height: 18px; color: var(--text-2); }
+.reasons > span { padding: 6px 0; border-top: 1px solid var(--line); }
+.reasons > .h { border-top: 0; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.reasons b { font-weight: 500; color: var(--text-1); }
+
 `
 
 const LEVEL: Record<Level, string> = {
@@ -1551,6 +1575,109 @@ function graphPhone(): string {
   return `<section class="spec"><h2>On a phone, and with the keys<i>one order for all three</i></h2><div style="display:flex;gap:32px;align-items:flex-start">${f}<div class="spec" style="max-width:420px;padding-top:8px"><p><b>Under 640 px the part is its table</b>, as Table’s cards, each level set in; there is no picture and no switch. “Listed again” is a row 44 px high that jumps to the first.</p><p><b>One order serves the phone, the keys and a screen reader</b>: the table’s. In the picture, Tab reaches the graph and then each card in that order; the arrow keys follow lines (down to the first card a line leads to, up to what leads here, left and right along a row); Enter opens a card that opens something. A screen reader hears it as the nested list, each card as “Deployment cart, Degraded, 2 of 9, leads to 3”, never as a picture.</p><p><b>When the Map tab is moved onto this part</b>, every difference from today’s pictures is counted, shown and accepted by name, as Karpenter’s rows were. Two are expected and accepted here: a long name’s middle cut, and its lines’ meaning said by this part’s legend. Anything else is looked at when it’s measured.</p></div></div></section>`
 }
 
+// ─── A plugin's page: whose it is, and stopped ─────────────────────────────────────────────
+
+const whoseStrip = (name: string, version: string, short = false) =>
+  `<div class="whose">${icon('plug', 14)}<span>${short ? `From the plugin <b>${name}</b> ${version}` : `This page is from the plugin <b>${name}</b> ${version}. Lumovi draws it from its own parts; what it shows and says is the plugin’s.`}</span><span class="btn ghost sm">What it may do${icon('chevron-down', 14)}</span></div>`
+
+interface Stop {
+  title: string
+  why?: string
+  said?: string
+  advice?: boolean
+  again?: boolean
+}
+
+const STILL =
+  'The rest of Lumovi is as it was, and stopping the page changed nothing in your cluster.'
+const ADVICE =
+  'On a very large cluster a page can need more than a plugin is allowed. If it happens again, tell the plugin’s author.'
+
+function stopped(name: string, s: Stop): string {
+  return `<div class="stopped"><span class="tile">${icon('plug', 20)}</span><h3>${s.title}</h3>${s.why ? `<p>${s.why}</p>` : ''}${s.said ? `<div class="saidbox"><i>${name} said</i><code>${escape(s.said)}</code></div>` : ''}<p class="q">${s.again === false ? 'The rest of Lumovi is as it was.' : STILL}</p>${s.advice ? `<p class="q">${ADVICE}</p>` : ''}${s.again === false ? '' : '<span class="btn secondary sm">Open it again</span>'}</div>`
+}
+
+const pgframe = (name: string, version: string, body: string, short = false) =>
+  `<div class="pgframe">${whoseStrip(name, version, short)}${body}</div>`
+
+const LONG_PLUGIN = 'Platform Team’s Reconciliation and Settlement Workflows'
+const SAID = "Uncaught TypeError: Cannot read properties of undefined (reading 'status')"
+
+const REASONS: [string, string, string, string][] = [
+  [
+    'Using too much memory',
+    'Lumovi stopped Karpenter’s page.',
+    'It was using more memory than a plugin may.',
+    'yes, with the advice',
+  ],
+  [
+    'Using too much of the processor',
+    'Lumovi stopped Karpenter’s page.',
+    'Over the last half minute it used more than half of a processor core.',
+    'yes, with the advice',
+  ],
+  ['Going silent', 'Lumovi stopped Karpenter’s page.', 'It had stopped answering.', 'yes'],
+  [
+    'Sending too many messages',
+    'Lumovi stopped Karpenter’s page.',
+    'It sent more at once than a plugin may.',
+    'yes',
+  ],
+  [
+    'Sending too much text',
+    'Lumovi stopped Karpenter’s page.',
+    'It sent more at once than a plugin may.',
+    'yes',
+  ],
+  [
+    'Sending something that isn’t text',
+    'Lumovi stopped Karpenter’s page.',
+    'It sent something a plugin can’t.',
+    'yes',
+  ],
+  [
+    'Not in a process of its own',
+    'Lumovi stopped Karpenter’s page.',
+    'It wasn’t running apart from the rest, as a plugin must.',
+    'yes',
+  ],
+  [
+    'Failing by itself',
+    'Karpenter’s page stopped by itself.',
+    'Then “Karpenter said” and its message.',
+    'yes',
+  ],
+  [
+    'Its place never opening',
+    'Karpenter’s page couldn’t start.',
+    'Lumovi couldn’t open the place a plugin’s code runs in.',
+    'no',
+  ],
+]
+
+const reasons = () =>
+  `<div class="kcard"><h3>Every way a page ends, and what its place says</h3><div class="in"><div class="reasons"><span class="h">Why it ended</span><span class="h">The title</span><span class="h">Under it</span><span class="h">Open it again</span>${REASONS.map(([a, b, c, d]) => `<span><b>${a}</b></span><span>${b}</span><span>${c}</span><span>${d}</span>`).join('')}</div></div></div>`
+
+/** A plugin's page stopped by Lumovi, by itself, or never started. */
+function stoppedCases(): string {
+  return spec(
+    'A plugin’s page, stopped',
+    'in the page’s own place, under the strip that says whose it is',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      ${pgframe('Karpenter', '1.0.0', stopped('Karpenter', { title: 'Lumovi stopped Karpenter’s page.', why: 'Over the last half minute it used more than half of a processor core.', advice: true }))}
+      ${pgframe('Karpenter', '1.0.0', stopped('Karpenter', { title: 'Karpenter’s page stopped by itself.', said: SAID }))}
+      ${pgframe(LONG_PLUGIN, '12.104.3', stopped(LONG_PLUGIN, { title: `Lumovi stopped ${LONG_PLUGIN}’ page.`, why: 'It sent something a plugin can’t.' }))}
+      ${pgframe('Karpenter', '1.0.0', stopped('Karpenter', { title: 'Karpenter’s page couldn’t start.', why: 'Lumovi couldn’t open the place a plugin’s code runs in.', again: false }))}
+    </div>${reasons()}`,
+    `<b>The strip that says whose the page is</b> is Lumovi’s own. It must stand between the app’s header and the plugin’s page, outside the frame the plugin’s code describes, so that no plugin can draw there, cover it or scroll it away: a requirement on the app, not yet built. It names the plugin and its version and opens what it may do. <b>When a page stops, its place says so</b>, and the strip stays: the page’s content is gone whole, never left half drawn under a message. It is not an error of the person’s and not a crash to them, so it’s drawn calm, as the app’s own empty state is (its tile, its 14 px title, its lines no wider than 384 px, its button under them), with no red: the first sentence says who stopped it, the second why in Lumovi’s words, then that nothing else changed. For the processor and memory a line says a very large cluster can need more than a plugin is allowed. <b>“Open it again”</b> is offered wherever opening again can help; it’s always the person’s press, never Lumovi’s own retry, and a page that stops again says so again. Where the place a plugin’s code runs in never opened there’s no such button: opening again can’t help until the cause is fixed, and then reloading Lumovi does. <b>What the plugin itself said</b> when it failed is set apart in a dashed box under “Karpenter said”, as plain text in mono: its message alone, 200 characters at most, which is all Lumovi takes from a plugin that failed; every character that can’t be seen is shown as its code point; nothing in it is a link or is drawn as Lumovi’s. A long plugin name wraps in the sentence and the strip, and is never cut; a name ending in s takes the apostrophe alone, as in the app’s other plugin sentences.`,
+  )
+}
+
+function stoppedPhone(): string {
+  const f = `<div class="ph"><div class="bar"><span class="tap">${icon('menu', 20)}</span><h1>Karpenter</h1></div>${pgframe('Karpenter', '1.0.0', stopped('Karpenter', { title: 'Lumovi stopped Karpenter’s page.', why: 'It was using more memory than a plugin may.', advice: true }), true)}</div>`
+  return `<section class="spec"><h2>On a phone<i>the same, with a shorter strip</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${f}</div><p style="max-width:820px">Under 640 px the strip says “From the plugin Karpenter 1.0.0”, under the top bar and above the page, and stays while the page scrolls. The stopped state is the same words; “Open it again” is 44 px high. Opening a page again changes nothing in a cluster, so a phone has it.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -1564,6 +1691,8 @@ export type KitFrame =
   | 'form-phone'
   | 'graph'
   | 'graph-phone'
+  | 'stopped'
+  | 'stopped-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -1584,6 +1713,8 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
     title: 'The graph on a phone, and its keys',
     size: { width: 920, height: 1040 },
   },
+  { id: 'stopped', title: 'A plugin’s page, stopped', size: { width: 1440, height: 1200 } },
+  { id: 'stopped-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -1610,7 +1741,11 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                     ? formPhone()
                     : id === 'graph'
                       ? `<header><h1>Graph</h1><p>For things that lead to other things: an application’s resources, a workflow’s steps, who talks to whom. A plugin gives cards and lines; Lumovi lays them out, and derives the table from the same data.</p></header>${graphWhole()}${graphHard()}${graphTable()}`
-                      : graphPhone()
+                      : id === 'graph-phone'
+                        ? graphPhone()
+                        : id === 'stopped'
+                          ? `<header><h1>Whose page it is, and a page stopped</h1><p>Two things around a plugin’s page that are Lumovi’s and never the plugin’s: the strip that says the page is a plugin’s, and what stands in the page’s place when Lumovi stops it or it stops by itself.</p></header>${stoppedCases()}`
+                          : stoppedPhone()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
