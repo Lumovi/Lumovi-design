@@ -717,6 +717,51 @@ function local(): string {
   )
 }
 
+/** 10. A second tool's page from the same parts: CloudNativePG's clusters and their instances. */
+function cnpg(): string {
+  const cl = (n: string, ns: string, ready: string, health: string, sel = false) =>
+    `<div class="app${sel ? ' sel' : ''}"><b>${n}</b>${health}<small>${ready} · ${ns}</small></div>`
+  const tile = (l: string, v: string, s: string) =>
+    `<div class="tl" style="padding:12px 14px"><div class="l">${l}</div><div class="v" style="margin-top:6px;font-size:17px;letter-spacing:-0.01em">${v}</div><div class="s" style="margin-top:4px">${s}</div></div>`
+  const I = 'grid-template-columns: minmax(0, 1fr) 110px 190px minmax(0, 1fr) 90px'
+  const inst = (n: string, role: string, st: string, node: string, vol: string) =>
+    `<div class="tr" style="${I};min-height:38px"><span class="nm">${n}</span><span class="mu">${role}</span><span>${st}</span><span class="mu">${node}</span><span class="r mu">${vol}</span></div>`
+  const B = 'grid-template-columns: minmax(0, 1fr) 190px 190px 110px'
+  const bk = (n: string, method: string, st: string, at: string) =>
+    `<div class="tr" style="${B};min-height:38px"><span class="nm">${n}</span><span class="mu">${method}</span><span>${st}</span><span class="r mu">${at}</span></div>`
+  return shell(
+    'CloudNativePG',
+    'database',
+    side('CloudNativePG', 'database', { extra: ['CloudNativePG', 'database'] }),
+    `${whose('CloudNativePG', '2.0.0')}
+    <div class="argo">
+      <div class="cardx apps"><h2>Clusters<small>4</small></h2>
+        ${cl('orders-db', 'shop', '2 of 3 ready', pill('warning', 'Degraded'), true)}
+        ${cl('payments-db', 'shop', '3 of 3 ready', pill('healthy', 'Healthy'))}
+        ${cl('sessions-db', 'shop', '1 of 2 ready', pill('progressing', 'Switching over'))}
+        ${cl('reports-db', 'data', '1 of 1 ready', pill('healthy', 'Healthy'))}
+      </div>
+      <div class="one">
+        <div class="onehead"><b>orders-db</b>${pill('warning', 'Degraded')}<span class="end"><span class="btn ghost sm">Restart…</span><span class="btn secondary sm">Switch over…</span><span class="btn primary sm">Back up now…</span></span></div>
+        <div class="tiles">${tile('Instances', '2 of 3 ready', '1 primary, 2 replicas')}${tile('Primary', 'orders-db-1', 'since 12 days ago')}${tile('Last backup', '3 hours ago', 'Completed')}${tile('PostgreSQL', '17.2', '20Gi for each instance')}</div>
+        <div class="cardx"><h2>Instances<small>3</small></h2>
+          <div class="thead" style="${I}"><span>Name</span><span>Role</span><span>Status</span><span>Node</span><span style="text-align:right">Volume</span></div>
+          ${inst('orders-db-1', 'Primary', pill('healthy', 'Running'), 'worker-1', '20Gi')}
+          ${inst('orders-db-2', 'Replica', pill('healthy', 'Running'), 'worker-2', '20Gi')}
+          ${inst('orders-db-3', 'Replica', pill('critical', 'CrashLoopBackOff'), 'worker-3', '20Gi')}
+        </div>
+        <div class="cardx"><h2>Backups<small>the last 3 of 41</small></h2>
+          <div class="thead" style="${B}"><span>Name</span><span>Method</span><span>Status</span><span style="text-align:right">Started</span></div>
+          ${bk('orders-db-nightly-20261011', 'Object store', pill('healthy', 'Completed'), '3h ago')}
+          ${bk('orders-db-nightly-20261010', 'Object store', pill('healthy', 'Completed'), '27h ago')}
+          ${bk('orders-db-before-upgrade', 'Volume snapshot', pill('critical', 'Failed'), '3d ago')}
+        </div>
+      </div>
+    </div>`,
+    'All namespaces',
+  )
+}
+
 type Where = 'shared' | 'lift' | 'missing'
 
 const WHERE: Record<Where, [IconName, string]> = {
@@ -772,7 +817,17 @@ function kit(): string {
 }
 
 export type Frame =
-  'page' | 'install' | 'own' | 'custom' | 'confirm' | 'tab' | 'more' | 'server' | 'local' | 'kit'
+  | 'page'
+  | 'install'
+  | 'own'
+  | 'custom'
+  | 'confirm'
+  | 'tab'
+  | 'more'
+  | 'server'
+  | 'local'
+  | 'kit'
+  | 'cnpg'
 
 export const FRAMES: { id: Frame; title: string; today: string; fresh: string; risk: string }[] = [
   {
@@ -862,15 +917,34 @@ export const FRAMES: { id: Frame; title: string; today: string; fresh: string; r
       'The same parts, given to plugin authors as a kit with names and properties that stay stable. Two are missing: a table whose rows nest, and a graph.',
     risk: 'The kit is the largest piece of the work and a promise kept for years: every part on a phone, in both themes, named for screen readers. Design checks each one.',
   },
+  {
+    id: 'cnpg',
+    title: '10. A second tool’s page from the same parts',
+    today:
+      'CloudNativePG is an add-on made of data: a list of clusters, and a cluster’s details with Back up now, Switch over and Restart. Its instances are a related list of Pods.',
+    fresh:
+      'Clusters and one cluster’s instances and backups on one page, from the parts of frame 9 and no others: page header, card, tile, status, table and buttons. No nested rows, no graph.',
+    risk: 'Like Argo CD’s page it needs two things frame 9 does not name: a list to pick one from, with the picked row marked, and a way to place parts side by side.',
+  },
 ]
 
 export const WINDOW: Size = { width: 1440, height: 992 }
 
 /** A frame, in one theme, with its three lines under it. */
 export function fullFrame(id: Frame, scheme: Scheme): string {
-  const body = { page: () => page(), install, own, custom, confirm, tab, more, server, local, kit }[
-    id
-  ]()
+  const body = {
+    page: () => page(),
+    install,
+    own,
+    custom,
+    confirm,
+    tab,
+    more,
+    server,
+    local,
+    kit,
+    cnpg,
+  }[id]()
   const f = FRAMES.find((x) => x.id === id)!
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
