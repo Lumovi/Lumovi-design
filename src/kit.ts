@@ -525,7 +525,7 @@ function sorting(): string {
         ],
       ),
     ),
-    'A plugin <b>names every column, always</b> (a phone labels its facts with the names, a screen reader says them) and says separately whether headings show; a table without them is a list of rows, as Karpenter’s cards are. A column sorts if the plugin says it can: its heading is then a button, the sorted one in the stronger color with an arrow, and <b>a Status sorts worst first</b> by level, not by its word. A row that <b>opens something</b> is one target, edge to edge: a fill under the pointer (second row), the focus ring from the keyboard (third), and no chevron. <b>Keys</b>, as Lumovi’s own lists: the table is one stop for Tab, however many rows it has, and keeps the focus while an active row moves inside it: up and down (or k and j), Home and End for the first and last row, Page Up and Page Down by ten. Enter opens the active row; Space isn’t a row’s key (a long list scrolls by a screen, as any scrolling box does). The headings that sort are stops after the rows, as in the app’s lists, each a button for Enter or Space; a screen reader still reads headings first. Nothing here picks rows.',
+    'A plugin <b>names every column, always</b> (a phone labels its facts with the names, a screen reader says them) and says separately whether headings show; a table without them is a list of rows, as Karpenter’s cards are. A column sorts if the plugin says it can: its heading is then a button, the sorted one in the stronger color with an arrow, and <b>a Status sorts worst first</b> by level, not by its word: that is its first sort, and its arrow points down, the arrows meaning what they mean in the app’s own lists. A row that <b>opens something</b> is one target, edge to edge: a fill under the pointer (second row), the focus ring from the keyboard (third), and no chevron. <b>Keys</b>, as Lumovi’s own lists: the table is one stop for Tab, however many rows it has, and keeps the focus while an active row moves inside it: up and down (or k and j), Home and End for the first and last row, Page Up and Page Down by ten. Enter opens the active row; Space isn’t a row’s key (a long list scrolls by a screen, as any scrolling box does). The headings that sort are stops after the rows, as in the app’s lists, each a button for Enter or Space; a screen reader still reads headings first. Nothing here picks rows.',
   )
 }
 
@@ -572,17 +572,17 @@ function structure(): string {
           ),
           R(
             { level: 'healthy', name: 'cart-6c9d7f5b44-8xk2p', under: 'Pod' },
-            '',
+            '—',
             pill('healthy', 'Running'),
             { cls: 'child' },
           ),
           R(
             { level: 'critical', name: 'cart-6c9d7f5b44-w4nq7', under: 'Pod' },
-            '',
+            '—',
             pill('critical', 'CrashLoopBackOff'),
             { cls: 'child' },
           ),
-          '<h4>Network <small>2</small></h4>',
+          '<h4>Network <small>20</small></h4>',
           R(
             { level: 'healthy', name: 'storefront', under: 'Service' },
             'Synced',
@@ -596,7 +596,7 @@ function structure(): string {
         ],
       )}<span class="t"><span class="more">Show all 23</span></span>`,
     ),
-    '<b>Groups</b> are the table’s own: a heading in small capitals with its count, never one a plugin places by hand. <b>A row may hold rows</b>, one level (the Graph’s own table is the one exception: it nests as deep as its lines go): a chevron before the dot opens it, its rows stand set in under its name and are rows like any other. A plugin says how many rows show first; the rest are behind <b>“Show all 23”</b>, which opens them in place. The count is of rows at the top level (here 3 and 2 of 23), never of the rows inside them. Past a few hundred the table draws only the rows in view, so 2,500 feel like 25. <b>Keys:</b> right opens the active row if it holds rows, left closes it, and on any other row they do nothing (the kit’s Table is never paged, so they turn no page); a group’s heading is not a stop; “Show all 23” is a button after the rows.',
+    '<b>Groups</b> are the table’s own: a heading in small capitals with its count, never one a plugin places by hand. <b>A row may hold rows</b>, one level (the Graph’s own table is the one exception: it nests as deep as its lines go): a chevron before the dot opens it, its rows stand set in under its name and are rows like any other. A plugin says how many rows show first; the rest are behind <b>“Show all 23”</b>, which opens them in place. A group’s heading counts all of that group’s rows, shown or not (3 and 20 here, 23 in all, of which 5 show), and the counts are of rows at the top level, never of the rows inside them. A cell with nothing in it shows a dash where its column’s values stand, never a blank; on a phone a stacked fact with nothing is left out, and facts side by side keep their place with a dash. Past a few hundred the table draws only the rows in view, so 2,500 feel like 25. <b>Keys:</b> right opens the active row if it holds rows, left closes it, and on any other row they do nothing (the kit’s Table is never paged, so they turn no page); a group’s heading is not a stop; “Show all 23” is a button after the rows.',
   )
 }
 
@@ -707,7 +707,7 @@ function phoneCards(): string {
         <li class="kid"><div class="top">${lead({ level: 'healthy', name: 'cart-6c9d7f5b44-8xk2p', under: 'Pod' })}</div><dl class="one">${fact('Health', 'Running')}</dl></li>
         <li class="kid"><div class="top">${lead({ level: 'critical', name: 'cart-6c9d7f5b44-w4nq7', under: 'Pod' })}</div><dl class="one">${fact('Health', 'CrashLoopBackOff')}</dl></li>
       </ul>
-      <h4>Network <small>2</small></h4>
+      <h4>Network <small>20</small></h4>
       <ul class="cards">
         <li><div class="top">${lead({ level: 'healthy', name: 'storefront', under: 'Service' })}</div><dl class="one">${fact('Sync', 'Synced')}${fact('Health', 'Healthy')}</dl></li>
         <li><div class="top">${lead({ level: 'neutral', name: 'shop-old', under: 'Ingress' })}</div><dl class="one">${fact('Sync', 'Not in the repository')}${fact('Health', 'Unknown')}</dl></li>
@@ -1502,7 +1502,7 @@ function graphTable(): string {
             {
               ...R(
                 { level: 'critical', name: 'cart-6c9d7f5b44-w4nq7', under: 'Pod' },
-                '',
+                '—',
                 pill('critical', 'CrashLoopBackOff'),
               ),
               cls: 'child2',
@@ -1510,7 +1510,7 @@ function graphTable(): string {
             {
               ...R(
                 { level: 'healthy', name: 'cart-6c9d7f5b44-8xk2p', under: 'Pod' },
-                '',
+                '—',
                 pill('healthy', 'Running'),
               ),
               cls: 'child2',
@@ -1525,7 +1525,7 @@ function graphTable(): string {
             {
               ...R(
                 { level: 'healthy', name: 'storefront-7d9f6c5b8-x2kqp', under: 'Pod' },
-                '',
+                '—',
                 pill('healthy', 'Running'),
               ),
               cls: 'child2',
