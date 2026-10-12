@@ -354,6 +354,21 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .reasons > span { padding: 6px 0; border-top: 1px solid var(--line); }
 .reasons > .h { border-top: 0; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .reasons b { font-weight: 500; color: var(--text-1); }
+.pair { display: grid; gap: 16px; align-items: start; }
+.pair.wider { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 4px 0 4px; }
+.pair .counts { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.counts.one { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.cg h4 { margin: 0 0 6px; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.crow { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(40px, 1fr) 28px; gap: 10px; align-items: center; min-height: 26px; font-size: 12.5px; }
+.crow .cv { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--text-1); }
+.crow .cv.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.crow .cb { height: 6px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--series-1) 18%, transparent); }
+.crow .cb i { display: block; height: 100%; border-radius: inherit; background: var(--series-1); }
+.crow .cn { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.cmore { display: flex; align-items: center; gap: 6px; min-height: 26px; font-size: 12px; color: var(--text-3); }
+.ph .crow { min-height: 32px; }
+.ph .cmore { min-height: 44px; }
 .mk { display: inline-block; margin: 0 1px; padding: 0 2px; border: 1px solid var(--line); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.92em; font-weight: 400; line-height: 1.25; text-transform: none; letter-spacing: 0; color: var(--text-3); }
 .t .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .pwin { display: flex; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
@@ -1999,6 +2014,96 @@ function marksTable(): string {
   )
 }
 
+// ─── Counts, Card and Pair: what Karpenter's overview is drawn from ──────────────────────────
+
+/** A row of Counts: the value, a bar for its share of the whole, and its count. */
+const crow = (value: string, n: number, total: number, mono = false) =>
+  `<div class="crow"><span class="cv${mono ? ' mono' : ''}">${value}</span><span class="cb"><i style="width:${Math.max(2, Math.round((n / total) * 100))}%"></i></span><span class="cn">${n}</span></div>`
+
+const cgroup = (title: string, rows: [string, number][], total: number, mono = false, more = 0) =>
+  `<div class="cg"><h4>${title}</h4>${rows.map(([v, n]) => crow(v, n, total, mono)).join('')}${more ? `<div class="cmore">${icon('chevron-down', 14)}${more} more</div>` : ''}</div>`
+
+function countsWhole(): string {
+  const long = `eu-central-1-wl1-ber…${mk('U+202E')}wlz-1`
+  const mix = card(
+    'Node mix',
+    '',
+    `<div class="counts">${cgroup(
+      'Instance types',
+      [
+        ['m6i.2xlarge', 7],
+        ['c6i.4xlarge', 5],
+        ['r6i.xlarge', 3],
+        ['m6i.large', 1],
+      ],
+      20,
+      true,
+      4,
+    )}${cgroup(
+      'Capacity types',
+      [
+        ['On demand', 13],
+        ['Spot', 7],
+      ],
+      20,
+    )}${cgroup(
+      'Zones',
+      [
+        ['eu-central-1a', 6],
+        ['eu-central-1b', 5],
+        ['eu-central-1c', 4],
+        ['eu-west-1a', 3],
+        [long, 2],
+      ],
+      20,
+      true,
+    )}</div>`,
+  )
+  const nodes = card(
+    'Nodes',
+    '20 · 3 still starting',
+    `<div class="stub" style="height:220px">a Table of the nodes, as the kit’s Table</div>`,
+  )
+  const pair = `<div class="pair wider">${nodes}${mix}</div>`
+  return spec(
+    'Counts, in a Card, in a Pair',
+    'Node mix as Karpenter draws it, beside Nodes',
+    pair,
+    `<b>Counts</b> is a part of its own, not a meter: a meter fills against a limit and turns warning and critical; a count’s bar is a share of a whole and is never a level. Groups, each a title in the small caps of a card’s section, then rows: the value (in mono where the plugin says the values are code, like an instance type), a bar of its share of the group’s whole in the first series colour only, and the count, tabular, at the right. Rows come largest first. <b>A group of up to five rows shows them all; past five it shows four and “N more”</b>, which opens the rest in place, so a card stays a glance (Zones, at five, has no “more”; Instance types, eight, shows four and “4 more”). Bars keep one column, so rows line up; a value longer than its column is cut in its middle, taking only what doesn’t fit, and its marks are kept, drawn right after the “…”, as in Table, and it’s whole in its tooltip. Bars are 6 px, as a meter’s, the smallest share a dot, and no colour says anything but “how much”. <b>Card</b> is Lumovi’s card: a title, and a quiet note at its right if the plugin gives one, which may be words (“20 · 3 still starting”), end-cut; and exactly one part inside, never an arrangement, so cards don’t nest pages. <b>Pair</b> sets two parts side by side, <code>wider</code> (the first 7 of 12, as Karpenter’s today) or <code>even</code>; two is the most (three or four equal things are Tiles), Lumovi sets the widths, and below 960 px of page, or on a phone, the two stack, first on top. The “couldn’t refresh part of it” notice is Lumovi’s own, the app’s, above the page under the strip; never a part a plugin draws.`,
+  )
+}
+
+function countsPhone(): string {
+  const long = `eu-cen…${mk('U+202E')}wlz-1`
+  const f = phoneFrame(
+    'Karpenter',
+    `<div class="sec"><h3>Nodes<small>20 · 3 still starting</small></h3><div class="stub" style="height:64px">the Table’s cards, scrolled past</div></div><div class="sec"><h3>Node mix</h3><div class="counts one">${cgroup(
+      'Instance types',
+      [
+        ['m6i.2xlarge', 7],
+        ['c6i.4xlarge', 5],
+        ['r6i.xlarge', 3],
+        ['m6i.large', 1],
+      ],
+      20,
+      true,
+      4,
+    )}${cgroup(
+      'Zones',
+      [
+        ['eu-central-1a', 6],
+        ['eu-central-1b', 5],
+        ['eu-central-1c', 4],
+        ['eu-west-1a', 3],
+        [long, 2],
+      ],
+      20,
+      true,
+    )}</div></div>`,
+  )
+  return `<section class="spec"><h2>On a phone<i>a Pair stacks; Counts keeps its three columns</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${f}</div><p style="max-width:820px">A Pair is two stacked cards, the first on top: Nodes, then Node mix. Counts’ groups stack one under another; each row keeps value, bar and count on one line, the bars in one narrower column so rows still line up, a value longer than its column cut in its middle, its marks kept; the groups come in the plugin’s order and all are shown (Capacity types is below, scrolled); “4 more” is a 44 px row.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -2017,6 +2122,8 @@ export type KitFrame =
   | 'places'
   | 'places-phone'
   | 'marks'
+  | 'counts'
+  | 'counts-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -2046,6 +2153,8 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
     title: 'A text that isn’t Lumovi’s, in a Table',
     size: { width: 1440, height: 900 },
   },
+  { id: 'counts', title: 'Counts, Card and Pair', size: { width: 1440, height: 900 } },
+  { id: 'counts-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -2082,7 +2191,11 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                               ? `<header><h1>Where a plugin adds things</h1><p>For a plugin whose file carries code: its own pages, a tab on objects of its own kinds, and commands in the palette. Each page and tab is the door’s (the strip that says whose it is, then the plugin’s frame, or the stopped place); here is where they stand among Lumovi’s own, and how they’re told apart.</p></header>${placesPage()}${placesTabs()}${placesObject()}${placesPalette()}${placesGone()}`
                               : id === 'places-phone'
                                 ? placesPhone()
-                                : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
+                                : id === 'counts'
+                                  ? `<header><h1>Counts, Card and Pair</h1><p>Three parts Karpenter’s overview needs to be drawn from the kit: a share of a whole, the card a part stands in, and two parts side by side.</p></header>${countsWhole()}`
+                                  : id === 'counts-phone'
+                                    ? countsPhone()
+                                    : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
