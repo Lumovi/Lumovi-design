@@ -2105,6 +2105,11 @@ function countsPhone(): string {
   return `<section class="spec"><h2>On a phone<i>a Pair stacks; Counts keeps its three columns</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${f}</div><p style="max-width:820px">A Pair is two stacked cards, the first on top: Nodes, then Node mix. Counts’ groups stack one under another; each row keeps value, bar and count on one line, the bars in one narrower column so rows still line up, a value longer than its column cut in its middle, its marks kept; the groups come in the plugin’s order and all are shown (Capacity types is below, scrolled); “4 more” is a 44 px row.</p></section>`
 }
 
+/** What Karpenter's move to its plugin asked of Table and Tiles (LMV-254), written once. */
+function movedRules(): string {
+  return `<section class="spec"><h2>Four rules from Karpenter’s move<i>so nothing it shows today is lost</i></h2><p style="max-width:860px"><b>A row’s rest may carry a time</b>: drawn after the rest’s words as “Launching · 3m”, the “ · ” and the age in the rest’s own ink, tabular, at the row’s right as the rest is; the age is Lumovi’s to write from the time the plugin gives, never the plugin’s text. <b>A table’s <code>shows</code> applies to each group alike</b>: one number for the table, each group showing that many and its own “Show all N” under them, N its full count; groups can’t ask for different numbers. A table without groups has one “Show all N”. <b>A tile’s value is optional</b>: a tile still reading, or with nothing to count, is its icon and label with the value’s space kept, so a row of tiles doesn’t jump when it arrives; no “…” and no dash. <b>A read cut at Lumovi’s limit</b> draws what it read, and says so in Table’s ceiling-line form (“Showing the first 5,000; there are more.”, docs’ words); a tile counting it shows the figure “5,000+” in its value’s place, the plugin’s label unchanged, and its detail line is Lumovi’s: “Lumovi reads the first 5,000.” A cut read is never drawn as failed.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -2165,7 +2170,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
     id === 'table'
       ? `<header><h1>Table</h1><p>What a plugin lists things with. It grows from the app’s plain-row table and Karpenter’s rows, which are one thing with and without headings. A plugin gives rows as data and names each column and its kind; Lumovi draws them. When the app’s own detail tables move onto it, their rows go from about 32 to 36 px and a long name takes the middle cut where today it wraps: both meant.</p></header>
         <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">${anatomy()}${sorting()}${structure()}${hard()}</div>
-        ${states()}`
+        ${states()}${movedRules()}`
       : id === 'table-phone'
         ? phoneCards()
         : id === 'page'
