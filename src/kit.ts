@@ -314,7 +314,7 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .gcard .g1 .m { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .gcard .g1 .st { display: flex; flex: none; align-items: center; gap: 4px; margin-left: auto; padding-left: 8px; font-weight: 500; color: var(--mt); }
 .gcard .g1 .st i { width: 6px; height: 6px; border-radius: 50%; background: var(--m); }
-.gcard .g2 { overflow: hidden; font-size: 13px; line-height: 20px; font-weight: 500; white-space: nowrap; }
+.gcard .g2 { display: block; overflow: hidden; font-size: 13px; line-height: 20px; font-weight: 500; white-space: nowrap; }
 .glabel { position: absolute; padding: 0 6px; border-radius: 4px; background: var(--surface); font-size: 11px; line-height: 16px; color: var(--text-3); white-space: nowrap; transform: translate(-50%, -50%); }
 .glabel.on { color: var(--accent-strong); }
 .gbar { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-size: 12px; color: var(--text-3); }
@@ -1635,6 +1635,22 @@ function graphTable(): string {
   )
 }
 
+/** 3b. A graph with nothing in it, and names holding marks. */
+function graphEdges(): string {
+  const m = (cp: string) => `<span class="mk">${cp}</span>`
+  const nm = (drawn: string) =>
+    `<div class="gcard" style="position:static;width:${CARD_W}px"><span class="gi">${icon('box', 15)}</span><span class="gw"><span class="g1"><span class="m">Deployment</span></span><span class="g2">${drawn}</span></span></div>`
+  return spec(
+    'Nothing to draw, and names with marks',
+    'two cases the picture must say plainly',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="arr-stack">${card('Resources', '0', `<div class="state" style="min-height:120px"><span>Nothing to show: storefront has no resources yet.</span></div>`)}${card('Resources', '0 of 9', `<div class="gbar"><span class="end gseg"><span class="on">Graph</span><span>Table</span></span></div><div class="state" style="min-height:120px"><span>Nothing matches the filter.</span><span class="btn secondary sm" style="margin-top:8px">Clear the filter</span></div>`)}</div>
+      ${card('Resources', '3', `<div style="display:flex;flex-direction:column;gap:12px;padding:8px 0">${nm(`cart${m('U+202E')}ipa`)}${nm(`pay…${m('U+3164')}${m('U+180E')}st`)}${nm(`spam${m('U+3164')}${m('U+3164')}…`)}</div>`)}
+    </div>`,
+    `<b>An empty graph</b> is the app’s empty state in the card’s place, with the plugin’s sentence for why if it gave one (“Nothing to show: …”), and no switch to Table, since there’s nothing to list; the card’s count says 0. <b>A graph filtered to nothing</b> keeps its switch, says “Nothing matches the filter.” with “Clear the filter” (docs to word), and its count reads “0 of 9”, so it’s plain there are cards behind the filter. <b>A card’s name holds marks</b> by the kit’s rule, as in Table: in place, never cut away, the cut taking letters and drawing any marks from the part it takes right after the “…”, and ending “…” after the last mark that fits on the card’s line. The card’s tooltip spells them, capped. Marks are text-coloured and never tint the card.`,
+  )
+}
+
 /** 4. On a phone: the table; and the keys. */
 function graphPhone(): string {
   const f = phoneFrame(
@@ -2050,7 +2066,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                   : id === 'form-phone'
                     ? formPhone()
                     : id === 'graph'
-                      ? `<header><h1>Graph</h1><p>For things that lead to other things: an application’s resources, a workflow’s steps, who talks to whom. A plugin gives cards and lines; Lumovi lays them out, and derives the table from the same data.</p></header>${graphWhole()}${graphHard()}${graphTable()}`
+                      ? `<header><h1>Graph</h1><p>For things that lead to other things: an application’s resources, a workflow’s steps, who talks to whom. A plugin gives cards and lines; Lumovi lays them out, and derives the table from the same data.</p></header>${graphWhole()}${graphHard()}${graphEdges()}${graphTable()}`
                       : id === 'graph-phone'
                         ? graphPhone()
                         : id === 'stopped'
