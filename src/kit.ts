@@ -209,6 +209,13 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .secret .val.quiet { font-family: 'Inter', sans-serif; color: var(--text-3); }
 .secret .val.box { position: relative; max-height: 288px; overflow: hidden; }
 .secret .val.box::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 24px; background: linear-gradient(transparent, var(--surface)); }
+.sname { display: flex; gap: 8px; padding: 2px 0 10px; font-size: 13px; line-height: 20px; color: var(--text-1); }
+.sname > svg.i { flex: none; margin-top: 3px; color: var(--text-3); }
+.sname span { min-width: 0; overflow-wrap: anywhere; }
+.sname b { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 500; }
+.ib.spin { color: var(--text-3); }
+.arr-stack > .cap { margin: 0 0 -4px; font-size: 12px; color: var(--text-3); }
+.arr-stack > .kcard + .cap { margin-top: 8px; }
 .ib { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 6px; color: var(--text-2); }
 .ib.off { opacity: 0.4; }
 .said { display: flex; gap: 10px; padding: 12px 0 4px; font-size: 13px; line-height: 20px; color: var(--text-2); }
@@ -896,23 +903,38 @@ const refCard = (title: string, them: 'it' | 'them', note: string, body: string)
 const ib = (glyph: Parameters<typeof icon>[0], off = false) =>
   `<span class="ib${off ? ' off' : ''}">${icon(glyph, 16)}</span>`
 
+/** The Secret's own name and namespace, from the cluster: Lumovi's to show, whatever the plugin titled the card. */
+const secretName = (phone = false) =>
+  `<div class="sname${phone ? ' tap' : ''}">${icon('key-round', 14)}<span>Secret <b>repo-credentials</b> in <b>argocd</b></span></div>`
+
+const secretCard = (note: string, body: string, named = true) =>
+  refCard('Repository credentials', 'it', note, `${named ? secretName() : ''}${body}`)
+
+/**
+ * A key's box. Before a press it holds only what the plugin's file names: the key, hidden. What a
+ * press came back with is drawn in the box that was pressed.
+ */
 function secretKey(
   key: string,
-  value: string | null,
-  size: string,
-  o: { box?: boolean; quiet?: string } = {},
+  o: {
+    value?: string
+    size?: string
+    box?: boolean
+    reading?: boolean
+    quiet?: string
+  } = {},
 ): string {
-  const hiddenByAccess = o.quiet !== undefined
-  const shown = hiddenByAccess
+  const answered = o.quiet !== undefined
+  const shown = answered
     ? `<span class="val quiet">${o.quiet}</span>`
-    : value === null
+    : o.value === undefined
       ? '<span class="val dots">••••••••</span>'
-      : `<span class="val${o.box ? ' box' : ''}">${escape(value)}</span>`
-  // A value the person's access hides has nothing to reveal or copy.
-  const buttons = hiddenByAccess
+      : `<span class="val${o.box ? ' box' : ''}">${escape(o.value)}</span>`
+  // A box whose press came back with no value has nothing to reveal or copy.
+  const buttons = answered
     ? ''
-    : `<span class="do">${ib(value === null ? 'eye' : 'eye-off')}${ib('copy')}</span>`
-  return `<div class="sk"><div class="top"><span class="k">${key}</span>${size ? `<small>${size}</small>` : ''}${buttons}</div>${shown}</div>`
+    : `<span class="do">${o.reading ? '<span class="ib spin">' + icon('loader-circle', 16) + '</span>' : ib(o.value === undefined ? 'eye' : 'eye-off')}${ib('copy')}</span>`
+  return `<div class="sk"><div class="top"><span class="k">${key}</span>${o.size ? `<small>${o.size}</small>` : ''}${buttons}</div>${shown}</div>`
 }
 
 const LONG_SECRET = Array.from({ length: 22 }, (_, i) =>
@@ -924,25 +946,37 @@ const LONG_SECRET = Array.from({ length: 22 }, (_, i) =>
 const said = (text: string, warn = false) =>
   `<div class="said${warn ? ' warn' : ''}">${icon(warn ? 'lock' : 'info', 16)}<span>${text}</span></div>`
 
-/** 1. A Secret's value, shown by Lumovi and never held by the plugin. */
+/** 1. A Secret's value, shown by Lumovi and never held by the plugin: nothing is read until a press. */
 function refSecret(): string {
+  const revealAll = (reading = false) =>
+    `<span class="btn ghost sm" style="margin:-6px -8px -6px 0">${icon(reading ? 'loader-circle' : 'eye', 14)}Reveal all</span>`
+  const cap = (t: string) => `<p class="cap">${t}</p>`
   return spec(
     'A Secret’s value',
-    'shown and not held',
+    'shown and not held, and not read until a press',
     `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
-      ${refCard(
-        'Repository credentials',
-        'it',
-        `<span class="btn ghost sm" style="margin:-6px -8px -6px 0">${icon('eye', 14)}Reveal all</span>`,
-        `<div class="secret">${secretKey('username', 'deploy-bot', '10 B')}${secretKey('password', null, '40 B')}${secretKey('sshPrivateKey', LONG_SECRET, '1.6 KB', { box: true })}${secretKey('tls.crt', null, '', { quiet: 'Value hidden by your access' })}</div>`,
-      )}
       <div class="arr-stack">
-        ${refCard('Repository credentials', 'it', '', said(`Your account isn’t allowed to read this Secret. ${PLUGIN}’s page asks Lumovi to show it here.`, true))}
-        ${refCard('Repository credentials', 'it', '', said(`There’s no Secret named repo-credentials in argocd. ${PLUGIN}’s page points at it.`))}
-        ${refCard('Repository credentials', 'it', '', `<div class="secret">${secretKey('username', null, '10 B')}</div>${said('Secret repo-credentials in argocd has no key named token.')}`)}
+        ${cap('As the page opens: nothing read')}
+        ${secretCard(
+          revealAll(),
+          `<div class="secret">${secretKey('username')}${secretKey('password')}${secretKey('sshPrivateKey')}${secretKey('token')}${secretKey('tls.crt')}</div>`,
+        )}
+        ${cap('After presses: each box holds what its own press came back with')}
+        ${secretCard(
+          revealAll(),
+          `<div class="secret">${secretKey('username', { value: 'deploy-bot', size: '10 B' })}${secretKey('password', { reading: true })}${secretKey('sshPrivateKey', { value: LONG_SECRET, size: '1.6 KB', box: true })}${secretKey('token', { quiet: 'Secret repo-credentials in argocd has no key named token.' })}${secretKey('tls.crt', { quiet: 'Value hidden by your access' })}</div>`,
+        )}
+      </div>
+      <div class="arr-stack">
+        ${cap('A press came back with no Secret to show: the boxes give way')}
+        ${secretCard('', said(`Your account isn’t allowed to read this Secret. ${PLUGIN}’s page asks Lumovi to show it here.`, true))}
+        ${secretCard('', said(`There’s no Secret named repo-credentials in argocd. ${PLUGIN}’s page points at it.`))}
+        ${cap('Known without a read, so said as the page opens')}
+        ${secretCard('', said('This server doesn’t show Secrets’ values on a plugin’s page.'))}
+        ${secretCard('', said('This Certificate names no Secret.'), false)}
       </div>
     </div>`,
-    `A plugin says <b>which Secret and which keys</b>; Lumovi reads it as the person, under their own rights, and draws it with the Secret page’s own controls, unchanged: each key in a box of its own, its size and its buttons on the key’s line and the value under it; eight dots whatever the value’s length, Reveal and Hide for each key, Reveal all and Hide all, Copy. A value the person’s access hides says so and has no buttons. <b>Nothing goes back to the plugin</b>: not the value, not its length, not whether it was revealed; the part’s heading says so, once, and it’s only drawn by a part of which it’s true. A revealed value wraps whole and is never cut with “…” (a cut Secret looks whole): past 288 px (about sixteen lines) it scrolls inside its box, as on the Secret page, and Copy takes all of it. Where the person may not read it, or it isn’t there, Lumovi says which, by name, and that the plugin’s page asked. <b>It stands in a card or a tab of its own</b>, full width, never in a table’s cell or a tile.`,
+    `A plugin says <b>which Secret and which keys</b>. <b>Nothing is read until the person presses</b>: a page that opens doesn’t make Lumovi fetch a Secret because a plugin drew a card, so as it opens the card holds only what’s known without one: the plugin’s title, Lumovi’s caption, <b>the Secret’s own name and namespace</b> on a line of Lumovi’s under the heading, as dark as the title (a title is the plugin’s to choose; the name is the cluster’s), and a box for each key the plugin names, hidden: eight dots, Reveal and Copy, and <b>no size</b>. Reveal, Copy and Reveal all are the presses; each reads as the person, under their own rights. While a read is on its way the pressed button turns, the dots stay and the rest stays pressable. <b>A box shows what its own press came back with</b>, and Reveal all is a press on every box: the value, with its size beside the key from then on while it’s shown; or, with no buttons left, that the Secret has no such key, or that the person’s access hides the value. Hide puts a box back exactly as it was before the press, size and all, so there’s one hidden look and not two. <b>Lumovi keeps a value only while its box shows it</b>: one read brings the whole Secret, since the cluster can’t give one key, and what it brought for boxes that weren’t pressed is let go at once; Hide lets the value go, so the next Reveal is a new read. <b>Copy on a hidden box</b> is a press like the others: it reads, copies, and leaves the box hidden, and if the read comes back with no such key, a hidden value or no Secret, the box or the card says so just as for Reveal. In “has no key named token” the key’s name is the plugin’s own text inside Lumovi’s sentence, drawn as any text that isn’t Lumovi’s. If the press finds that the person may not read the Secret, or that it isn’t there, that’s the card’s to say and not one box’s: the boxes give way to the sentence, by name, and that the plugin’s page asked. Two things are known without a read and said from the start: a server whose organisation keeps Secrets off plugins’ pages (a setting the server doesn’t have yet: a requirement on the app, not built, and its sentence is new), and an object that names no Secret, which is the one card with no name line. <b>Nothing goes back to the plugin</b>: not the value, not its length, not whether it was pressed, nor what came back. A revealed value wraps whole and is never cut with “…” (a cut Secret looks whole): past 288 px (about sixteen lines) it scrolls inside its box, as on the Secret page, and Copy takes all of it. <b>It stands in a card or a tab of its own</b>, full width, never in a table’s cell or a tile.`,
   )
 }
 
@@ -992,7 +1026,7 @@ function refLogs(): string {
         ${refCard('Events', 'them', 'Application storefront', said(`Your account isn’t allowed to read these events. ${PLUGIN}’s page asks Lumovi to show them here.`, true))}
       </div>
     </div>`,
-    `A plugin says <b>which pod</b> (and may say which container) or <b>which object</b>. Logs are the app’s own log view, with its container picker, Search and Follow, and its own words when there’s nothing. Events are <b>the detail’s Events tab as it is</b>: an icon, the reason, the message, how often and how long ago, newest first, with no count and no filter. That list draws every row today; for an object with thousands of events it must draw only the rows in view, which is new work for the tab and the part alike, and is the one thing here that isn’t the app’s already. The plugin never holds a line of either. Refusals and missing things are said as for a Secret. On a phone both are the phone layout’s own: log lines wrap and hang, and events are its two-line rows.`,
+    `A plugin says <b>which pod</b> (and may say which container) or <b>which object</b>. Logs are the app’s own log view, with its container picker, Search and Follow, and its own words when there’s nothing. Events are <b>the detail’s Events tab as it is</b>: an icon, the reason, the message, how often and how long ago, newest first, with no count and no filter up to 200 events. Past 200 the tab draws only the rows in view and gains the lists’ own filter field above the list, with how many match beside it while something is typed; the part has whatever the tab has, and nothing of its own. The plugin never holds a line of either. Refusals and missing things are said as for a Secret. On a phone both are the phone layout’s own: log lines wrap and hang, and events are its two-line rows.`,
   )
 }
 
@@ -1000,7 +1034,7 @@ function refLogs(): string {
 function refPhone(): string {
   const a = phoneFrame(
     'storefront',
-    `<div class="sec"><h3>Repository credentials<span class="btn ghost sm" style="height:44px;margin:-12px -10px -12px auto">${icon('eye', 16)}Reveal all</span></h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi. ${PLUGIN} can’t see it.</p><div class="secret">${secretKey('username', 'deploy-bot', '10 B')}${secretKey('password', null, '40 B')}${secretKey('tls.crt', null, '', { quiet: 'Value hidden by your access' })}</div></div>
+    `<div class="sec"><h3>Repository credentials<span class="btn ghost sm" style="height:44px;margin:-12px -10px -12px auto">${icon('eye', 16)}Reveal all</span></h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi. ${PLUGIN} can’t see it.</p>${secretName(true)}<div class="secret">${secretKey('username', { value: 'deploy-bot', size: '10 B' })}${secretKey('password')}${secretKey('token', { quiet: 'Secret repo-credentials in argocd has no key named token.' })}</div></div>
     <div class="sec"><h3>Logs</h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi. ${PLUGIN} can’t see them.</p><div class="klog">${LOGS.slice(
       1,
       3,
@@ -1009,7 +1043,7 @@ function refPhone(): string {
       .join('')}</div></div>`,
     true,
   )
-  return `<section class="spec"><h2>On a phone<i>the same parts, a finger’s size</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${a}</div><p style="max-width:820px">The caption moves under the part’s title, since a phone’s heading has no room beside it. A key’s box is the desktop’s, with Reveal, Copy and Reveal all at 44 px. Logs wrap and hang by two characters, as the phone’s logs do. Revealing and copying are reads by the person, so a phone has them.</p></section>`
+  return `<section class="spec"><h2>On a phone<i>the same parts, a finger’s size</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${a}</div><p style="max-width:820px">The caption moves under the part’s title, since a phone’s heading has no room beside it. The Secret’s own name is on a line under it, wrapping if it’s long. A key’s box is the desktop’s, with Reveal, Copy and Reveal all at 44 px, and as on the desktop nothing is read until one of them is pressed: here the first key was revealed, the second not pressed, and the third’s press found no such key. Logs wrap and hang by two characters, as the phone’s logs do. Revealing and copying are reads by the person, so a phone has them.</p></section>`
 }
 
 // ─── A plugin's form inside Lumovi's own confirmation ──────────────────────────────────────
