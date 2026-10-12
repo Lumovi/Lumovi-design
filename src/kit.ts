@@ -135,6 +135,7 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .cards dl.bare { margin-left: 0; }
 .cards dt { color: var(--text-3); }
 .cards dd { margin: 2px 0 0; color: var(--text-1); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.cards dd .mlv { display: inline-flex; align-items: center; gap: 4px; color: var(--mt); }
 .cards .pnote { margin: 6px 0 0 18px; font-size: 12px; line-height: 18px; color: var(--text-2); }
 .pmore { display: flex; height: 44px; align-items: center; margin-top: 4px; font-size: 13px; font-weight: 500; color: var(--accent-strong); }
 /* The pick list: rows that are a lead with a Status at the right, one of them picked. */
@@ -765,7 +766,7 @@ function phoneCards(): string {
     'Karpenter',
     `<div class="sec"><h3>Node pools<small>3</small></h3><ul class="cards">
       <li><div class="top">${lead({ level: 'healthy', name: 'general', under: 'On demand and spot · amd64' })}</div><dl>${fact('Nodes', '7')}${fact('CPU', '24 of 64')}${fact('Status', 'Ready')}</dl></li>
-      <li class="press"><div class="top">${lead({ level: 'warning', name: 'batch', under: 'Spot only · arm64' })}</div><dl>${fact('Nodes', '12')}${fact('CPU', '105 of 128')}${fact('Status', 'Near its limit')}</dl></li>
+      <li class="press"><div class="top">${lead({ level: 'warning', name: 'batch', under: 'Spot only · arm64' })}</div><dl>${fact('Nodes', '12')}${fact('CPU', `<span class="mlv" style="--mt:var(--warn-text)">${icon('triangle-alert', 12)}105 of 128</span>`)}${fact('Status', 'Near its limit')}</dl></li>
       <li><div class="top">${lead({ name: 'gpu', under: 'No nodes yet' })}</div><dl>${fact('Nodes', '0')}${fact('CPU', 'no limit')}${fact('Status', 'Idle')}</dl></li>
     </ul></div>
     <div class="sec"><h3>Waiting for a node<small>2</small></h3><ul class="cards">
@@ -791,7 +792,7 @@ function phoneCards(): string {
       <div class="pmore">Show all 23</div>
     </div>`,
   )
-  return `<section class="spec"><h2>On a phone<i>a row is a card</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${a}${b}</div><p style="max-width:820px">Under 640 px <b>a row is a card</b>, by the phone layout’s own rule: its lead first, as on the desktop, then its other columns as labelled facts. Facts stand side by side <b>only when every value in the table fits a third</b> on one line; otherwise each takes a line, in every card of that table, its groups included, so a table’s cards all read the same way (right: “Not in the repository” doesn’t fit, so all of Resources stacks; left: Node pools’ values all fit). The facts’ labels are the columns’ names, which is why a plugin names every column even where no headings show. A meter becomes its words; a Status keeps its word and the lead’s dot keeps its level. A note stands under the lead, three lines at most. A row that opens is the whole card (second card, pressed). A row that holds rows has a 44 px chevron at its right; its rows are cards set in beneath it, closed until asked. A group’s heading stands above its cards. <b>Sorting</b> is the phone’s Sort sheet, from the button in the table’s heading, listing the columns that sort.</p></section>`
+  return `<section class="spec"><h2>On a phone<i>a row is a card</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${a}${b}</div><p style="max-width:820px">Under 640 px <b>a row is a card</b>, by the phone layout’s own rule: its lead first, as on the desktop, then its other columns as labelled facts. Facts stand side by side <b>only when every value in the table fits a third</b> on one line; otherwise each takes a line, in every card of that table, its groups included, so a table’s cards all read the same way (right: “Not in the repository” doesn’t fit, so all of Resources stacks; left: Node pools’ values all fit). The facts’ labels are the columns’ names, which is why a plugin names every column even where no headings show. A meter becomes its words; a Status keeps its word and the lead’s dot keeps its level. A note stands under the lead, three lines at most. A row that opens is the whole card (second card, pressed). A row that holds rows has a 44 px chevron at its right; its rows are cards set in beneath it, closed until asked. A group’s heading stands above its cards. <b>Sorting</b> is the phone’s Sort sheet, from the button in the table’s heading, listing the columns that sort. <b>A meter</b> is its text as a fact; at its warning or critical line it carries that level’s status icon before the value, in the level’s text colour, as a status does (never colour alone), so a phone never hides a reading the desktop shows in amber or red; below the line, plain text.</p></section>`
 }
 
 // ─── The pick list, the three arrangements, the second-level header ────────────────────────
