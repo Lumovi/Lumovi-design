@@ -349,6 +349,8 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .reasons > span { padding: 6px 0; border-top: 1px solid var(--line); }
 .reasons > .h { border-top: 0; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .reasons b { font-weight: 500; color: var(--text-1); }
+.mk { display: inline-block; margin: 0 1px; padding: 0 2px; border: 1px solid var(--line); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.92em; font-weight: 400; line-height: 1.25; text-transform: none; letter-spacing: 0; color: var(--text-3); }
+.t .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .pwin { display: flex; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
 .pside { width: 240px; flex: none; padding: 8px 10px 16px; border-right: 1px solid var(--line); background: var(--app-bg); }
 .pside h3, .drawer h3 { margin: 14px 0 4px; padding: 0 10px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
@@ -1913,6 +1915,69 @@ function placesPhone(): string {
   return `<section class="spec"><h2>On a phone<i>the drawer, a plugin’s page, an object’s tab, the palette</i></h2><div class="phones">${drawer}${page}${object}${palette}</div><p style="max-width:1100px">The drawer’s Plugins section is the sidebar’s, its rows 44 px high. A plugin’s page and an object’s detail have the phone’s strip of tabs, 44 px high, scrolling sideways; a plugin’s tabs keep the plug. The strip that says whose a page is is the short one. Map isn’t on a phone, as today. The palette is the phone’s full-screen one, its rows 44 px, the plugin’s name at the right as on the desktop. Everything here only opens and reads, so a phone has all of it; a plugin’s own actions that change the cluster aren’t offered on a phone, as the kit’s header says.</p></section>`
 }
 
+// ─── A text that isn't Lumovi's, in a Table: its marks ─────────────────────────────────────
+
+/** A mark: the code point of a character that can't be seen or would act, in a hairline box. */
+const mk = (cp: string) => `<span class="mk">${cp}</span>`
+
+/** A lead cell whose name is given as drawn (text and marks), not escaped. */
+const leadDrawn = (drawn: string, under: string, level: Level = 'healthy') =>
+  `<span class="lead"><span class="dot" style="--m:var(--${LEVEL[level]})"></span><span class="w"><span class="nm"><b>${drawn}</b></span><small>${under}</small></span></span>`
+
+function marksTable(): string {
+  const rows: Row[] = [
+    {
+      cells: [
+        leadDrawn(`cart${mk('U+200B')}-api`, 'shop'),
+        `<span>Ready</span>`,
+        `<span class="mono">ghcr.io/acme/cart:v2.3.1</span>`,
+      ],
+    },
+    {
+      cells: [
+        leadDrawn(`invoice-${mk('U+202E')}fdp.exe`, 'billing', 'warning'),
+        `<span>Syncing</span>`,
+        `<span class="mono">ghcr.io/acme/${mk('U+202E')}gpj.exe:1.0</span>`,
+      ],
+    },
+    {
+      cells: [
+        leadDrawn(`platform-observ…${mk('U+200B')}${mk('U+2060')}u-west`, 'monitoring'),
+        `<span>Ready</span>`,
+        `<span class="mono">quay.io/team/collector:0.98.0</span>`,
+      ],
+    },
+    {
+      cells: [
+        leadDrawn(`<bdi dir="auto">طلبات-الدفع</bdi>`, 'payments'),
+        `<span><bdi dir="auto">جاهز</bdi></span>`,
+        `<span class="mono">ghcr.io/acme/payments:3.1.0</span>`,
+      ],
+    },
+    {
+      cells: [
+        leadDrawn(`spam${mk('U+200B')}${mk('U+200B')}${mk('U+200B')}…`, 'shop', 'critical'),
+        `<span>Failed</span>`,
+        `<span class="mono">—</span>`,
+      ],
+    },
+  ]
+  return spec(
+    'A text that isn’t Lumovi’s, in a Table',
+    'its marks in a cell, in a cut name, and in a heading',
+    `<div class="grid" style="grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)">
+      ${card('Applications', '5', table('minmax(0,1.6fr) 120px minmax(0,1.3fr)', [head(`Name`), head(`Sta${mk('U+200B')}ge`), head('Image')], rows))}
+      <div class="arr-stack">
+        <p class="cap">Under the pointer, a name holding marks: its tooltip spells them, as plain text</p>
+        <div class="kcard" style="padding:10px 14px;font-size:12.5px"><code style="font-family:'JetBrains Mono',monospace;font-size:12px">invoice- U+202E fdp.exe</code></div>
+        <p class="cap">A cut name: the cut takes letters, never a mark; marks in the part cut away are drawn after the “…”</p>
+        <div class="kcard" style="padding:10px 14px"><span style="font-size:13px;font-weight:500">platform-observ…${mk('U+200B')}${mk('U+2060')}u-west</span></div>
+      </div>
+    </div>`,
+    `<b>Every text a plugin or the cluster wrote is drawn in pieces</b>, by the kit’s own rule (<code>inPieces</code>): runs of text as written, and for each character that turns text round, isn’t text, or draws as nothing, <b>a mark of Lumovi’s</b>: its code point in mono, quiet, in a hairline box with a 4 px radius, at the text’s own size less 8%, sitting on its line. A mark is never coloured: it says “something is here”, not “something is wrong”. Three marks in a row at most, then one mark “and 117 more”; twenty in a text at most. <b>In a cell</b> the marks sit in the text where the characters were; a mono cell’s marks are the same. <b>A name cut in its middle</b> (Table’s lead, the phone’s cards, a header) cuts letters only: a mark is never split and never cut away, so any mark in the part that goes is drawn right after the “…”, and the cut takes more letters to make room. Where the marks themselves don’t fit, the name ends with “…” after the last mark that does, and the tooltip spells them, capped as <code>quotedBack</code> caps a quoted text (its first 40 characters and “…”), so a name of a thousand marks can’t make a tooltip the size of the screen. <b>A heading</b> a plugin wrote is uppercased, but its marks aren’t: “U+200B” stays as it is. <b>Right-to-left text</b> keeps its own direction inside its cell and changes nothing outside it, and starts at the cell’s left like every text of a row. <b>Where a mark can’t be drawn</b> (a tooltip, a name read out, a log line) the code point is spelled with spaces round it, “invoice- U+202E fdp.exe”; a screen reader hears “invisible character U+202E”. Sorting and filtering use the text as written; the marks are only how it’s drawn.`,
+  )
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -1930,6 +1995,7 @@ export type KitFrame =
   | 'stopped-phone'
   | 'places'
   | 'places-phone'
+  | 'marks'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -1954,6 +2020,11 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'stopped-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
   { id: 'places', title: 'Where a plugin adds things', size: { width: 1440, height: 2400 } },
   { id: 'places-phone', title: 'The same, on a phone', size: { width: 1760, height: 900 } },
+  {
+    id: 'marks',
+    title: 'A text that isn’t Lumovi’s, in a Table',
+    size: { width: 1440, height: 900 },
+  },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -1988,7 +2059,9 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                             ? stoppedPhone()
                             : id === 'places'
                               ? `<header><h1>Where a plugin adds things</h1><p>For a plugin whose file carries code: its own pages, a tab on objects of its own kinds, and commands in the palette. Each page and tab is the door’s (the strip that says whose it is, then the plugin’s frame, or the stopped place); here is where they stand among Lumovi’s own, and how they’re told apart.</p></header>${placesPage()}${placesTabs()}${placesObject()}${placesPalette()}${placesGone()}`
-                              : placesPhone()
+                              : id === 'places-phone'
+                                ? placesPhone()
+                                : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
