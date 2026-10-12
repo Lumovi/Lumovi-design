@@ -1881,7 +1881,7 @@ function placesGone(): string {
   const gone = place(
     'plug',
     'Karpenter isn’t in use any more.',
-    'Its pages, tabs and commands left Lumovi while this was open.',
+    'Its pages, its tabs and its commands were taken away while this was open. Plugins says why.',
     'Go to Plugins',
   )
   return spec(
@@ -1890,10 +1890,10 @@ function placesGone(): string {
     `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
       <div class="arr-stack"><p class="cap">No longer in use, on its page: the entry and the tabs are gone, the title stays</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}<div class="pgframe" style="border:0;box-shadow:none">${gone}</div></div></div>
       <div class="arr-stack"><p class="cap">No longer in use, on its tab of an object: the tab stays while it’s the one shown</p><div class="dpanel">${detailHead('general', 'NodePool')}<nav class="lts">${ltab('Overview')}${ltab('Map')}${ltab('Events')}${ltab('Audit')}${ltab('Capacity', { plug: true, on: true })}${ltab('YAML')}</nav>${gone}</div></div>
-      <div class="arr-stack"><p class="cap">An address to a page the plugin doesn’t have: its tabs, none current</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}<nav class="lts">${KARPENTER_TABS('')}</nav>${place('search-x', 'Karpenter has no such page.', 'Karpenter 1.0.0 has no page at this address. A link from another version of it may name one this version doesn’t have.', 'Open Karpenter')}</div></div>
-      <div class="arr-stack"><p class="cap">An address to a page of a plugin not in use here</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}${place('plug', 'Karpenter isn’t in use here.', 'Its pages are shown only where it’s in use. Plugins says where it is, and why not here.', 'Go to Plugins')}</div></div>
+      <div class="arr-stack"><p class="cap">An address to a page the plugin doesn’t have: its tabs, none current</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}<nav class="lts">${KARPENTER_TABS('')}</nav>${place('search-x', 'Karpenter has no such page.', 'Karpenter 1.0.0 has no page at this address. A link made with another version of it can name a page this one doesn’t have.', 'Open Karpenter')}</div></div>
+      <div class="arr-stack"><p class="cap">An address to a page of a plugin not in use here</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}${place('plug', 'Karpenter isn’t in use here.', 'Its pages are shown only where it’s in use. Plugins says where it is, and why it isn’t here.', 'Go to Plugins')}</div></div>
     </div>`,
-    `Both are the app’s EmptyState, in Lumovi’s words (docs to word), and neither has the strip that says whose a page is: nothing of the plugin’s is drawn. <b>When a plugin stops being in use</b> (turned off, or its file gone) its entry, tabs and commands go at once; a page or tab of it that’s open stays where it is, in this place, so nothing jumps under the person, until they go elsewhere; then it’s gone and Back doesn’t bring it. <b>Go to Plugins</b> opens the Plugins page with that plugin’s row opened. <b>An address to a page it doesn’t have</b> keeps the plugin’s tabs so another can be picked; Open Karpenter opens its first page.`,
+    `Both are the app’s EmptyState, in docs’ words, and neither has the strip that says whose a page is: nothing of the plugin’s is drawn. <b>When a plugin stops being in use</b> (turned off, or its file gone) its entry, tabs and commands go at once; a page or tab of it that’s open stays where it is, in this place, so nothing jumps under the person, until they go elsewhere; then it’s gone and Back doesn’t bring it. <b>Go to Plugins</b> opens the Plugins page with that plugin’s row opened. <b>An address to a page it doesn’t have</b> keeps the plugin’s tabs so another can be picked; Open Karpenter opens its first page.`,
   )
 }
 
