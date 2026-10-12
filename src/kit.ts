@@ -1930,35 +1930,35 @@ function marksTable(): string {
       cells: [
         leadDrawn(`cart${mk('U+3164')}-api`, 'shop'),
         `<span>Ready</span>`,
-        `<span class="mono">ghcr.io/acme/cart:v2.3.1</span>`,
+        `<span>ghcr.io/acme/cart:v2.3.1</span>`,
       ],
     },
     {
       cells: [
         leadDrawn(`invoice-${mk('U+202E')}fdp.exe`, 'billing', 'warning'),
         `<span>Syncing</span>`,
-        `<span class="mono">ghcr.io/acme/${mk('U+202E')}gpj.exe:1.0</span>`,
+        `<span>ghcr.io/acme/${mk('U+202E')}gpj.exe:1.0</span>`,
       ],
     },
     {
       cells: [
         leadDrawn(`platform-observ…${mk('U+3164')}${mk('U+180E')}u-west`, 'monitoring'),
         `<span>Ready</span>`,
-        `<span class="mono">quay.io/team/collector:0.98.0</span>`,
+        `<span>quay.io/team/collector:0.98.0</span>`,
       ],
     },
     {
       cells: [
         leadDrawn(`<bdi dir="auto">طلبات-الدفع</bdi>`, 'payments'),
         `<span><bdi dir="auto">جاهز</bdi></span>`,
-        `<span class="mono">ghcr.io/acme/payments:3.1.0</span>`,
+        `<span>ghcr.io/acme/payments:3.1.0</span>`,
       ],
     },
     {
       cells: [
         leadDrawn(`spam${mk('U+3164')}${mk('U+3164')}${mk('U+3164')}…`, 'shop', 'critical'),
         `<span>Failed</span>`,
-        `<span class="mono">—</span>`,
+        `<span>—</span>`,
       ],
     },
   ]
@@ -1974,7 +1974,7 @@ function marksTable(): string {
         <div class="kcard" style="padding:10px 14px"><span style="font-size:13px;font-weight:500">platform-observ…${mk('U+3164')}${mk('U+180E')}u-west</span></div>
       </div>
     </div>`,
-    `<b>Every text a plugin or the cluster wrote is drawn in pieces</b>, by the kit’s own rule (<code>inPieces</code>): runs of text as written, and for each character that turns text round, isn’t text, or draws as nothing, <b>a mark of Lumovi’s</b>: its code point in mono, quiet, in a hairline box with a 4 px radius, at the text’s own size less 8%, sitting on its line. A mark is never coloured: it says “something is here”, not “something is wrong”. Three marks in a row at most, then one mark “and 117 more”; twenty in a text at most. <b>In a cell</b> the marks sit in the text where the characters were; a mono cell’s marks are the same. <b>A name cut in its middle</b> (Table’s lead, the phone’s cards, a header) cuts letters only: a mark is never split and never cut away, so any mark in the part that goes is drawn right after the “…”, and the cut takes more letters to make room. Where the marks themselves don’t fit, the name ends with “…” after the last mark that does, and the tooltip spells them, capped as <code>quotedBack</code> caps a quoted text (its first 40 characters and “…”), so a name of a thousand marks can’t make a tooltip the size of the screen. <b>A heading</b> a plugin wrote is uppercased, but its marks aren’t: “U+3164” stays as it is. <b>Right-to-left text</b> keeps its own direction inside its cell and changes nothing outside it, and starts at the cell’s left like every text of a row. <b>Where a mark can’t be drawn</b> (a tooltip, a name read out, a log line) the code point is spelled with spaces round it, “invoice- U+202E fdp.exe”; a screen reader hears “invisible character U+202E”. Sorting and filtering use the text as written; the marks are only how it’s drawn.`,
+    `<b>Every text a plugin or the cluster wrote is drawn in pieces</b>, by the kit’s own rule (<code>inPieces</code>): runs of text as written, and for each character that turns text round, isn’t text, or draws as nothing, <b>a mark of Lumovi’s</b>: its code point in mono, quiet, in a hairline box with a 4 px radius, at the text’s own size less 8%, sitting on its line. A mark is never coloured: it says “something is here”, not “something is wrong”. Three marks in a row at most, then one mark “and 117 more”; twenty in a text at most. <b>In a cell</b> the marks sit in the text where the characters were. (A column is text, number, age, status or meter; there’s no mono kind, so an image’s name is text, in the sans.) <b>A name cut in its middle</b> (Table’s lead, the phone’s cards, a header) cuts letters only: a mark is never split and never cut away, so any mark in the part that goes is drawn right after the “…”, and the cut takes more letters to make room. Where the marks themselves don’t fit, the name ends with “…” after the last mark that does, and the tooltip spells them, capped as <code>quotedBack</code> caps a quoted text (its first 40 characters and “…”), so a name of a thousand marks can’t make a tooltip the size of the screen. <b>A heading</b> a plugin wrote is uppercased, but its marks aren’t: “U+3164” stays as it is. <b>Right-to-left text</b> keeps its own direction inside its cell and changes nothing outside it, and starts at the cell’s left like every text of a row. <b>Where a mark can’t be drawn</b> (a tooltip, a name read out, a log line) the code point is spelled with spaces round it, “invoice- U+202E fdp.exe”; a screen reader hears “invisible character U+202E”. Sorting and filtering use the text as written; the marks are only how it’s drawn.`,
   )
 }
 
