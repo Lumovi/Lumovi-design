@@ -349,6 +349,53 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .reasons > span { padding: 6px 0; border-top: 1px solid var(--line); }
 .reasons > .h { border-top: 0; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .reasons b { font-weight: 500; color: var(--text-1); }
+.pwin { display: flex; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
+.pside { width: 240px; flex: none; padding: 8px 10px 16px; border-right: 1px solid var(--line); background: var(--app-bg); }
+.pside h3, .drawer h3 { margin: 14px 0 4px; padding: 0 10px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.sn { display: flex; height: 32px; min-width: 0; align-items: center; gap: 10px; padding: 0 10px; border-radius: 8px; font-size: 13px; color: var(--text-1); }
+.sn > svg.i { flex: none; color: var(--text-3); }
+.sn > span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.sn.on { background: var(--surface-3); font-weight: 500; }
+.pmain { min-width: 0; flex: 1; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
+.pwin .pmain { border: 0; border-radius: 0; box-shadow: none; }
+.pwin .pgframe, .pmain .pgframe { border: 0; border-radius: 0; box-shadow: none; }
+.phd { display: flex; height: 48px; align-items: center; gap: 8px; padding: 0 20px; font-size: 15px; }
+.phd > svg.i { color: var(--text-3); }
+.phd b { font-weight: 600; }
+.lts { display: flex; gap: 4px; overflow: hidden; padding: 0 20px 1px; box-shadow: inset 0 -1px 0 var(--line); }
+.lt { position: relative; display: flex; height: 36px; flex: none; align-items: center; gap: 6px; padding: 0 10px; border-radius: 6px; font-size: 13px; font-weight: 500; white-space: nowrap; color: var(--text-3); }
+.lt small { font-size: 12px; font-weight: 400; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.lt.on { color: var(--text-1); }
+.lt.on::after { content: ''; position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; border-radius: 999px; background: var(--accent); }
+.lt.hov { color: var(--text-1); }
+.ttw { position: relative; display: flex; }
+.tt { position: absolute; top: 40px; left: 0; z-index: 2; padding: 4px 8px; border-radius: 6px; background: var(--text-1); font-size: 12px; line-height: 18px; white-space: nowrap; color: var(--surface); }
+.dpanel { max-width: 560px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
+.dpanel .pgframe { border: 0; border-radius: 0; box-shadow: none; }
+.dhd { display: flex; align-items: center; gap: 12px; padding: 14px 20px 10px; }
+.dhd > div { display: flex; min-width: 0; flex: 1; flex-direction: column; }
+.dhd b { font-size: 15px; font-weight: 600; }
+.dhd small { font-size: 12px; color: var(--text-3); }
+.pal { overflow: hidden; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
+.pin { display: flex; height: 48px; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--line); font-size: 15px; color: var(--text-1); }
+.pin .ph2 { color: var(--text-3); }
+.pl { padding: 8px; }
+.pl h4 { margin: 0; padding: 8px 8px 4px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.pr { display: flex; height: 36px; min-width: 0; align-items: center; gap: 10px; padding: 0 8px; border-radius: 8px; font-size: 13px; color: var(--text-1); }
+.pr > svg.i { flex: none; margin-right: 2px; color: var(--text-3); }
+.pr .t { flex: none; white-space: nowrap; }
+.pr .h { min-width: 0; max-width: 200px; margin-left: auto; overflow: hidden; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; color: var(--text-3); }
+.pr.on { background: var(--surface-3); }
+.phones { display: flex; gap: 24px; align-items: flex-start; }
+.ph .lts { padding: 0 8px 1px; }
+.ph .lt { height: 44px; }
+.ph .pgframe { border: 0; border-radius: 0; box-shadow: none; }
+.drawer { padding: 0 8px 12px; }
+.drawer .sn { height: 44px; }
+.ph3 { justify-content: space-between; height: 52px; padding: 0 4px 0 16px; }
+.ph3 .tap { display: grid; width: 44px; height: 44px; place-items: center; color: var(--text-2); }
+.ph .pl .pr { height: 44px; }
+.arr-stack > .cap:first-child { margin-top: 0; }
 
 `
 
@@ -1718,6 +1765,154 @@ function stoppedPhone(): string {
   return `<section class="spec"><h2>On a phone<i>the same, with a shorter strip</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${f}</div><p style="max-width:820px">Under 640 px the strip says “From the plugin Karpenter 1.0.0”, under the top bar and above the page, and stays while the page scrolls. The stopped state is the same words; “Open it again” is 44 px high. Opening a page again changes nothing in a cluster, so a phone has it.</p></section>`
 }
 
+// ─── Where a plugin adds things: its pages, a tab on its kinds' objects, palette commands ──
+
+/** A tab of the app's strip. A tab whose body is a plugin's frame carries Lumovi's plug before its name. */
+const ltab = (
+  label: string,
+  o: { on?: boolean; plug?: boolean; count?: string; hover?: boolean } = {},
+) =>
+  `<span class="lt${o.on ? ' on' : ''}${o.hover ? ' hov' : ''}">${o.plug ? icon('plug', 14) : ''}${escape(label)}${o.count ? `<small>${o.count}</small>` : ''}</span>`
+
+const KARPENTER_TABS = (on: string, more = false) =>
+  [
+    ltab('Overview', { plug: true, on: on === 'Overview' }),
+    ltab('Capacity', { plug: true, on: on === 'Capacity' }),
+    ltab('Disruptions', { plug: true, on: on === 'Disruptions' }),
+    ...(more
+      ? [
+          ltab('Consolidation and disruption budgets now', { plug: true }),
+          ltab('Spot interruptions', { plug: true }),
+          ltab('Drift', { plug: true }),
+        ]
+      : []),
+    ltab('NodePools', { count: '3' }),
+    ltab('NodeClaims', { count: '12' }),
+    ltab('EC2NodeClasses', { count: '2' }),
+  ].join('')
+
+const sideItem = (label: string, glyph: Parameters<typeof icon>[0], on = false) =>
+  `<div class="sn${on ? ' on' : ''}">${icon(glyph, 16)}<span>${label}</span></div>`
+
+const PLUGINS_SECTION = (on = 'Karpenter') =>
+  `<h3>Plugins</h3>${sideItem('Argo CD', 'git-merge', on === 'Argo CD')}${sideItem('Karpenter', 'server-cog', on === 'Karpenter')}${sideItem('Platform Team’s Reconciliation and Settlement Workflows', 'boxes')}${sideItem('All plugins', 'plug')}`
+
+const pageHead = (title: string, glyph: Parameters<typeof icon>[0]) =>
+  `<div class="phd">${icon(glyph, 16)}<b>${title}</b></div>`
+
+const frameStub = (text = 'the plugin’s frame') => `<div class="stub">${text}</div>`
+
+/** 1. The sidebar's entry and the plugin's page with its tabs. */
+function placesPage(): string {
+  return spec(
+    'A plugin’s page',
+    'its entry under Plugins; its pages first among its tabs',
+    `<div class="pwin"><aside class="pside"><h3>Storage</h3>${sideItem('Volume Claims', 'database')}${sideItem('Volumes', 'layers')}${PLUGINS_SECTION()}<h3>Custom resources</h3>${sideItem('Certificates', 'file-code-2')}</aside>
+      <div class="pmain">${pageHead('Karpenter', 'server-cog')}<nav class="lts">${KARPENTER_TABS('Overview')}</nav>${pgframe('Karpenter', '1.0.0', frameStub('Karpenter’s Overview, drawn from the kit’s parts'))}</div></div>`,
+    `<b>A plugin with pages always stands under Plugins</b>, never in one of Lumovi’s own sections, with the icon its file names and its name, end-cut. Its entry opens its first page and is current on any of its pages and its kinds’ lists. <b>The page’s tabs are the app’s strip</b>: the plugin’s pages first, in its order, then its kinds’ lists with their counts, as today. <b>A tab whose body is the plugin’s own frame carries Lumovi’s plug</b>, 14 px, before its name: the same plug as the strip under it that says whose the page is, and never the plugin’s icon, which the plugin chooses and so can’t tell anything apart. A kind’s list is Lumovi’s own drawing, so it has no plug. The plug is in the tab’s colour, quiet when the tab isn’t current.`,
+  )
+}
+
+/** 2. The tab strip's hard cases. */
+function placesTabs(): string {
+  return spec(
+    'The strip, the hard cases',
+    'long names, many pages, one page',
+    `<div class="arr-stack">
+      <p class="cap">Six pages and three kinds at 1024 px, one name of 40 characters: the strip scrolls sideways, as it does today, and keeps the current tab in view</p>
+      <div class="pmain" style="width:784px">${pageHead('Karpenter', 'server-cog')}<nav class="lts">${KARPENTER_TABS('Capacity', true)}</nav></div>
+      <p class="cap">Under the pointer: the app’s tooltip says whose the tab is</p>
+      <div class="pmain" style="width:784px;overflow:visible">${pageHead('Karpenter', 'server-cog')}<nav class="lts" style="overflow:visible">${ltab('Overview', { plug: true, on: true })}<span class="ttw">${ltab('Capacity', { plug: true, hover: true })}<span class="tt">From the plugin Karpenter 1.0.0</span></span>${ltab('Disruptions', { plug: true })}${ltab('NodePools', { count: '3' })}</nav><div style="height:36px"></div></div>
+      <p class="cap">One page and no kinds of its own: no strip; the page is under the title</p>
+      <div class="pmain" style="width:784px">${pageHead('Release calendar', 'clock')}${pgframe('Release calendar', '0.3.1', frameStub())}</div>
+    </div>`,
+    `A tab’s name is the plugin’s text, at most 40 characters, and is never cut: the strip scrolls instead, without a scrollbar, as the app’s strips do. A strip of a single tab isn’t drawn. The tooltip is the app’s, after its usual wait.`,
+  )
+}
+
+const detailHead = (name: string, kind: string) =>
+  `<div class="dhd"><div><b>${name}</b><small>${kind}</small></div>${pill('healthy', 'Ready')}</div>`
+
+/** 3. A tab on an object of the plugin's kinds. */
+function placesObject(): string {
+  const tabs = (on: string) =>
+    [
+      ltab('Overview', { on: on === 'Overview' }),
+      ltab('Map'),
+      ltab('Events'),
+      ltab('Audit'),
+      ltab('Capacity', { plug: true, on: on === 'Capacity' }),
+      ltab('YAML'),
+    ].join('')
+  return spec(
+    'A tab on an object of its kinds',
+    'after Lumovi’s own tabs, before YAML',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="arr-stack"><p class="cap">The object’s detail, on its own tab</p><div class="dpanel">${detailHead('general', 'NodePool')}<nav class="lts">${tabs('Overview')}</nav>${frameStub('Lumovi’s Overview of the NodePool')}</div></div>
+      <div class="arr-stack"><p class="cap">The plugin’s tab: under 640 px of width the strip says it shortly</p><div class="dpanel">${detailHead('general', 'NodePool')}<nav class="lts">${tabs('Capacity')}</nav>${pgframe('Karpenter', '1.0.0', frameStub(), true)}</div></div>
+    </div>`,
+    `One tab a plugin a kind, after Lumovi’s own and before YAML, so YAML stays last wherever a person looks for it. It is marked as a page’s tab is, with the plug, and its body is the door’s: the strip that says whose it is, then the plugin’s frame, or the stopped place. <b>The strip is short wherever it has less than 640 px</b>, as on a phone: a detail panel is usually narrower. A tab the person left open is opened again with the object, as Lumovi’s own tabs are.`,
+  )
+}
+
+const palRow = (glyph: Parameters<typeof icon>[0], text: string, hint: string, on = false) =>
+  `<div class="pr${on ? ' on' : ''}">${icon(glyph, 16)}<span class="t">${escape(text)}</span><span class="h">${escape(hint)}</span></div>`
+
+/** 4. Palette commands. */
+function placesPalette(): string {
+  const pal = (search: string, rows: string) =>
+    `<div class="pal"><div class="pin">${search ? escape(search) : '<span class="ph2">Jump to a page, object, namespace or cluster…</span>'}</div><div class="pl">${rows}</div></div>`
+  return spec(
+    'Palette commands',
+    'a group of their own; each only opens one of the plugin’s pages',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="arr-stack"><p class="cap">“node” typed</p>${pal('node', `<h4>Go to</h4>${palRow('server', 'Nodes', 'Cluster')}${palRow('server-cog', 'NodePools', 'karpenter.sh')}${palRow('server-cog', 'NodeClaims', 'karpenter.sh')}<h4>From plugins</h4>${palRow('plug', 'Show node pools', 'Karpenter', true)}${palRow('plug', 'Nodes waiting for capacity', 'Karpenter')}`)}</div>
+      <div class="arr-stack"><p class="cap">The longest: a 40-character command from a plugin with a long name</p>${pal('settle', `<h4>From plugins</h4>${palRow('plug', 'Settlement runs that failed in the last day', 'Platform Team’s Reconciliation and Settlement Workflows', true)}${palRow('plug', 'Settlement calendar', 'Platform Team’s Reconciliation and Settlement Workflows')}`)}</div>
+    </div>`,
+    `<b>From plugins</b> (docs to word) comes after Go to. Each row is the palette’s own with <b>Lumovi’s plug in the icon’s place</b>, as the tabs have it, and nothing a plugin chooses there: a plugin labelled “Cluster” with a command “Nodes” would otherwise read as Go to’s Nodes. Then the command’s name, and the plugin’s name at the right in the quiet colour, where Go to puts a page’s section; typing matches both. Go to’s rows are as today: Lumovi’s kinds show their key or section, a plugin’s kinds their API group. A command <b>only opens one of the plugin’s pages</b>, with nothing passed to it, so it runs nothing and changes nothing; it has no key of its own. The command’s name is never cut; the plugin’s name gives way at the end, past 200 px.`,
+  )
+}
+
+const place = (glyph: Parameters<typeof icon>[0], title: string, text: string, button?: string) =>
+  `<div class="stopped"><span class="tile">${icon(glyph, 20)}</span><h3>${title}</h3><p>${text}</p>${button ? `<span class="btn secondary">${button}</span>` : ''}</div>`
+
+/** 5. The places of Lumovi's own: a plugin no longer in use, a page it doesn't have. */
+function placesGone(): string {
+  const gone = place(
+    'plug',
+    'Karpenter isn’t in use any more.',
+    'Its pages, tabs and commands left Lumovi while this was open.',
+    'Go to Plugins',
+  )
+  return spec(
+    'Two places of Lumovi’s',
+    'a plugin that stops being in use while it’s open; an address to a page it doesn’t have',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="arr-stack"><p class="cap">No longer in use, on its page: the entry and the tabs are gone, the title stays</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}<div class="pgframe" style="border:0;box-shadow:none">${gone}</div></div></div>
+      <div class="arr-stack"><p class="cap">No longer in use, on its tab of an object: the tab stays while it’s the one shown</p><div class="dpanel">${detailHead('general', 'NodePool')}<nav class="lts">${ltab('Overview')}${ltab('Map')}${ltab('Events')}${ltab('Audit')}${ltab('Capacity', { plug: true, on: true })}${ltab('YAML')}</nav>${gone}</div></div>
+      <div class="arr-stack"><p class="cap">An address to a page the plugin doesn’t have: its tabs, none current</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}<nav class="lts">${KARPENTER_TABS('')}</nav>${place('search-x', 'Karpenter has no such page.', 'Karpenter 1.0.0 has no page at this address. A link from another version of it may name one this version doesn’t have.', 'Open Karpenter')}</div></div>
+      <div class="arr-stack"><p class="cap">An address to a page of a plugin not in use here</p><div class="pmain">${pageHead('Karpenter', 'server-cog')}${place('plug', 'Karpenter isn’t in use here.', 'Its pages are shown only where it’s in use. Plugins says where it is, and why not here.', 'Go to Plugins')}</div></div>
+    </div>`,
+    `Both are the app’s EmptyState, in Lumovi’s words (docs to word), and neither has the strip that says whose a page is: nothing of the plugin’s is drawn. <b>When a plugin stops being in use</b> (turned off, or its file gone) its entry, tabs and commands go at once; a page or tab of it that’s open stays where it is, in this place, so nothing jumps under the person, until they go elsewhere; then it’s gone and Back doesn’t bring it. <b>Go to Plugins</b> opens the Plugins page with that plugin’s row opened. <b>An address to a page it doesn’t have</b> keeps the plugin’s tabs so another can be picked; Open Karpenter opens its first page.`,
+  )
+}
+
+/** 6. On a phone. */
+function placesPhone(): string {
+  const drawer = `<div class="ph"><div class="bar"><span class="tap">${icon('x', 20)}</span><h1>production</h1></div><div class="drawer"><h3>Storage</h3>${sideItem('Volume Claims', 'database')}${sideItem('Volumes', 'layers')}${PLUGINS_SECTION()}</div></div>`
+  const page = phoneFrame(
+    'Karpenter',
+    `<nav class="lts">${KARPENTER_TABS('Overview')}</nav>${pgframe('Karpenter', '1.0.0', frameStub(), true)}`,
+  )
+  const object = phoneFrame(
+    'general',
+    `<nav class="lts">${ltab('Overview')}${ltab('Events')}${ltab('Audit')}${ltab('Capacity', { plug: true, on: true })}${ltab('YAML')}</nav>${pgframe('Karpenter', '1.0.0', frameStub(), true)}`,
+    true,
+  )
+  const palette = `<div class="ph"><div class="pin ph3"><span>node</span><span class="tap">${icon('x', 20)}</span></div><div class="pl">${'<h4>Go to</h4>' + palRow('server', 'Nodes', 'Cluster') + palRow('server-cog', 'NodePools', 'karpenter.sh') + '<h4>From plugins</h4>' + palRow('plug', 'Show node pools', 'Karpenter', true) + palRow('plug', 'Nodes waiting for capacity', 'Karpenter')}</div></div>`
+  return `<section class="spec"><h2>On a phone<i>the drawer, a plugin’s page, an object’s tab, the palette</i></h2><div class="phones">${drawer}${page}${object}${palette}</div><p style="max-width:1100px">The drawer’s Plugins section is the sidebar’s, its rows 44 px high. A plugin’s page and an object’s detail have the phone’s strip of tabs, 44 px high, scrolling sideways; a plugin’s tabs keep the plug. The strip that says whose a page is is the short one. Map isn’t on a phone, as today. The palette is the phone’s full-screen one, its rows 44 px, the plugin’s name at the right as on the desktop. Everything here only opens and reads, so a phone has all of it; a plugin’s own actions that change the cluster aren’t offered on a phone, as the kit’s header says.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -1733,6 +1928,8 @@ export type KitFrame =
   | 'graph-phone'
   | 'stopped'
   | 'stopped-phone'
+  | 'places'
+  | 'places-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -1755,6 +1952,8 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   },
   { id: 'stopped', title: 'A plugin’s page, stopped', size: { width: 1440, height: 1200 } },
   { id: 'stopped-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
+  { id: 'places', title: 'Where a plugin adds things', size: { width: 1440, height: 2400 } },
+  { id: 'places-phone', title: 'The same, on a phone', size: { width: 1760, height: 900 } },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -1785,7 +1984,11 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                         ? graphPhone()
                         : id === 'stopped'
                           ? `<header><h1>Whose page it is, and a page stopped</h1><p>Two things around a plugin’s page that are Lumovi’s and never the plugin’s: the strip that says the page is a plugin’s, and what stands in the page’s place when Lumovi stops it or it stops by itself.</p></header>${stoppedCases()}`
-                          : stoppedPhone()
+                          : id === 'stopped-phone'
+                            ? stoppedPhone()
+                            : id === 'places'
+                              ? `<header><h1>Where a plugin adds things</h1><p>For a plugin whose file carries code: its own pages, a tab on objects of its own kinds, and commands in the palette. Each page and tab is the door’s (the strip that says whose it is, then the plugin’s frame, or the stopped place); here is where they stand among Lumovi’s own, and how they’re told apart.</p></header>${placesPage()}${placesTabs()}${placesObject()}${placesPalette()}${placesGone()}`
+                              : placesPhone()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
