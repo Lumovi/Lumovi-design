@@ -863,7 +863,7 @@ export const FRAMES: { id: Frame; title: string; today: string; fresh: string; r
       'The Map draws objects and their lines, as a page of its own. No part of the app is a graph another page could reuse.',
     fresh:
       'The exception: one region the plugin draws itself, bounded and labelled, and a permission of its own at install (“Draws part of its page itself”).',
-    risk: 'In that region the plugin has pixels: it can drift from Lumovi’s look, or imitate it. Design’s view: frame 3 does the job without it. Build this only if a plugin proves the need.',
+    risk: 'In that region the plugin has pixels: it can drift from Lumovi’s look, or imitate it. Design’s view: frame 3 does the job without it. Build this only if a plugin proves the need. Decided on LMV-293 (2026-10-13): not built for 1.22.0, since no plugin needed it; a plugin that lacks something asks the kit for it.',
   },
   {
     id: 'confirm',
