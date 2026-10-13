@@ -379,6 +379,11 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .reasons > span { padding: 6px 0; border-top: 1px solid var(--line); }
 .reasons > .h { border-top: 0; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .reasons b { font-weight: 500; color: var(--text-1); }
+.fbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 4px 20px 12px; }
+.fchip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 4px 0 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); font-size: 12px; color: var(--text-2); }
+.fchip b { font-weight: 500; color: var(--text-1); }
+.fchip .x { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 6px; color: var(--text-3); }
+.go2 { display: grid; place-items: center; color: var(--text-3); }
 .kmore { padding: 10px 0 4px; font-size: 12.5px; font-weight: 500; color: var(--accent); }
 .grp-h { display: flex; align-items: baseline; gap: 8px; padding: 14px 0 6px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .grp-h small { font-size: 11px; letter-spacing: 0; }
@@ -2621,6 +2626,59 @@ function argoTab(): string {
   )
 }
 
+/** 2b. Where a resource's row goes: Lumovi's own list, filtered to it exactly. */
+function argoOpens(): string {
+  const go = `<span class="go2">${icon('chevron-right', 16)}</span>`
+  const rows = table(
+    'minmax(0,1.6fr) 120px 120px 24px',
+    [head('Name'), head('Sync'), head('Health', { sorted: 'down' }), ''],
+    [
+      {
+        cells: [
+          lead({ level: 'healthy', name: 'storefront', under: 'Deployment · shop' }),
+          `<span>${syncPill('Synced')}</span>`,
+          `<span>${pill('healthy', 'Healthy')}</span>`,
+          go,
+        ],
+        cls: 'opens hover',
+      },
+      {
+        cells: [
+          lead({ level: 'healthy', name: 'storefront', under: 'Service · shop' }),
+          `<span>${syncPill('Synced')}</span>`,
+          `<span>${pill('healthy', 'Healthy')}</span>`,
+          '<span></span>',
+        ],
+        cls: 'opens',
+      },
+      pgRow([
+        lead({ level: 'warning', name: 'storefront-canary', under: 'Rollout · shop' }),
+        `<span>${syncPill('Out of sync')}</span>`,
+        `<span>${pill('warning', 'Missing')}</span>`,
+        '<span></span>',
+      ]),
+    ],
+  )
+  const list = `<div class="pmain"><div class="phd">${icon('layers', 16)}<b>Deployments</b></div><div class="fbar"><span class="fchip">${icon('git-merge', 13)}<span>name <b>storefront</b> · namespace <b>shop</b></span><span class="x">${icon('x', 13)}</span></span><span class="q3">Opened from Argo CD’s page: only this one is shown. Clear the filter to see every Deployment.</span></div><div style="padding:0 20px 16px">${table(
+    'minmax(0,1.6fr) 96px 88px 64px',
+    [head('Name'), head('Status'), head('Ready', { r: true }), head('Age', { r: true })],
+    [
+      pgRow([
+        lead({ level: 'healthy', name: 'storefront', beside: 'shop' }),
+        `<span>${pill('healthy', 'Ready')}</span>`,
+        '<span class="r">3/3</span>',
+        '<span class="r">88d</span>',
+      ]),
+    ],
+  )}</div></div>`
+  return spec(
+    'Where a resource’s row goes',
+    'Lumovi’s own list of its kind, filtered to it exactly',
+    `<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start"><div class="arr-stack"><p class="cap">The Resources card: the first row under the pointer; the Rollout is a kind the file doesn’t name, so it doesn’t open</p>${card('Resources', '3', rows)}</div><div class="arr-stack"><p class="cap">Pressed: Lumovi’s Deployments, filtered by exact name and namespace</p>${list}</div></div>`,
+    `<b>Not built yet:</b> this is docs’ (a) ruling, to be built in Lumovi (the file’s key for the kinds it may open, the Plugins page’s line, the list’s exact filter and its chip) and then in Argo CD’s plugin; until then its rows don’t open. The plugin holds nothing of a Deployment, so a row can’t open its page; <b>it opens Lumovi’s own list of that kind, filtered to it exactly</b>, one row away (docs’ five conditions). <b>The file names the kinds it may open</b> (its own key, never one that reads), and the Plugins page lists them under what the plugin may do: “Its pages may open Lumovi’s lists of Deployments, Services and ConfigMaps.” (plurals in the file’s order; past eight, “…, Secrets and 6 more kinds”, all in its tooltip). <b>A row of a named kind opens</b> on a press, as any Table row that opens: the hover fill and a chevron under the pointer, the whole row the button, the ring from the keyboard. <b>A row of any other kind</b>, or one that’s Missing, is drawn without them and does nothing. <b>The list</b> is Lumovi’s, drawn as always, with one chip at the head of its filters: Argo CD’s mark, then the exact name and namespace, and an × that clears it; a quiet line beside it says how the person got here (docs’ words; the plugin’s name possessive, the kind plural as the list’s title has it). Nothing else of the plugin’s is on that page. If nothing matches (the object is gone, or the person may not see it), the list’s empty state says “No Deployment storefront in shop that you can see.”, true either way. On a phone the card is a card that opens, and the chip wraps under the list’s title.`,
+  )
+}
+
 /** 3. Its three proposals, each in Lumovi's dialog. */
 function argoProposals(): string {
   const refresh = ask({
@@ -2635,7 +2693,7 @@ function argoProposals(): string {
       ['', '  annotations:'],
       ['add', '    argocd.argoproj.io/refresh: normal'],
     ])}${command(
-      'kubectl annotate application storefront -n argocd argocd.argoproj.io/refresh=normal --overwrite --context production-eu',
+      'kubectl annotate application.argoproj.io/storefront argocd.argoproj.io/refresh=normal --overwrite -n argocd --context production-eu',
     )}${OK}`,
     verb: 'Refresh',
   })
@@ -2767,7 +2825,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                                       : id === 'cnpg-phone'
                                         ? pgPhone()
                                         : id === 'argo'
-                                          ? `<header><h1>Argo CD, as a plugin with code</h1><p>Its code draws an overview of every Application and a tab on each, from the kit’s parts, and proposes three changes through Lumovi’s dialog. It reads only its own kinds: Applications and AppProjects. Drawn from app’s shape (LMV-279) with its sample: storefront, payments and legacy-batch in the projects default and shop.</p></header>${argoOverview()}${argoTab()}${argoProposals()}`
+                                          ? `<header><h1>Argo CD, as a plugin with code</h1><p>Its code draws an overview of every Application and a tab on each, from the kit’s parts, and proposes three changes through Lumovi’s dialog. It reads only its own kinds: Applications and AppProjects. Drawn from app’s shape (LMV-279) with its sample: storefront, payments and legacy-batch in the projects default and shop.</p></header>${argoOverview()}${argoTab()}${argoOpens()}${argoProposals()}`
                                           : id === 'argo-phone'
                                             ? argoPhone()
                                             : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
