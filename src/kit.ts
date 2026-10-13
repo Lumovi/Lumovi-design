@@ -355,6 +355,12 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .reasons > span { padding: 6px 0; border-top: 1px solid var(--line); }
 .reasons > .h { border-top: 0; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .reasons b { font-weight: 500; color: var(--text-1); }
+.kmore { padding: 10px 0 4px; font-size: 12.5px; font-weight: 500; color: var(--accent); }
+.grp-h { display: flex; align-items: baseline; gap: 8px; padding: 14px 0 6px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.grp-h small { font-size: 11px; letter-spacing: 0; }
+.t .q { color: var(--text-2); }
+.t .r { text-align: right; font-variant-numeric: tabular-nums; }
+.pagebox .pgframe { border: 0; box-shadow: none; }
 .pair { display: grid; gap: 16px; align-items: start; }
 .pair.wider { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
 .counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 4px 0 4px; }
@@ -2110,6 +2116,188 @@ function movedRules(): string {
   return `<section class="spec"><h2>Four rules from Karpenter’s move<i>so nothing it shows today is lost</i></h2><p style="max-width:860px"><b>A row’s rest may carry a time</b>: drawn after the rest’s words as “Launching · 3m”, the “ · ” and the age in the rest’s own ink, tabular, at the row’s right as the rest is; the age is Lumovi’s to write from the time the plugin gives, never the plugin’s text. <b>A table’s <code>shows</code> applies to each group alike</b>: one number for the table, each group showing that many and its own “Show all N” under them, N its full count; groups can’t ask for different numbers. A table without groups has one “Show all N”. <b>A tile’s value is optional</b>: a tile still reading, or with nothing to count, is its icon and label with the value’s space kept, so a row of tiles doesn’t jump when it arrives; no “…” and no dash. <b>A read cut at Lumovi’s limit</b> draws what it read, and says so in Table’s ceiling-line form (“Showing the first 5,000; there are more.”, docs’ words); a tile counting from it is handed the read’s cut as a Table is, and Lumovi draws the plugin’s own figure with a “+” after it (“5,000+” for the whole read, “4,980+” for part of it), the plugin’s label unchanged, and a detail line of Lumovi’s: “Counted from the first 5,000 Lumovi read.” And whenever any read on a page was cut, the page shell says so beside the stale notice, quietly, in Lumovi’s words, so no plugin can hide it: “Some of what this page shows is from the first 5,000 of a list: the cluster has more than Lumovi reads at once.” A cut read is never drawn as failed.</p></section>`
 }
 
+// ─── CloudNativePG as a plugin: its Clusters and Backups pages, read-only (LMV-279) ──────────
+
+const PG_CLUSTERS: Picked[] = [
+  {
+    lead: { level: 'critical', name: 'reports-db', under: '0 of 2 ready · analytics' },
+    status: ['critical', 'Failed'],
+  },
+  {
+    lead: { level: 'progressing', name: 'sessions-db', under: '1 of 2 ready · shop' },
+    status: ['progressing', 'Switching over'],
+  },
+  {
+    lead: { level: 'healthy', name: 'orders-db', under: '3 of 3 ready · shop' },
+    status: ['healthy', 'Healthy'],
+  },
+  {
+    lead: {
+      level: 'healthy',
+      name: 'payments-reconciliation-ledger-db',
+      under: '3 of 3 ready · billing',
+    },
+    status: ['healthy', 'Healthy'],
+  },
+]
+
+const pgRow = (cells: string[], cls = '') => ({ cells, cls })
+
+function pgInstances(): string {
+  return table(
+    'minmax(0,1.6fr) 104px 120px minmax(0,1fr) 72px 56px',
+    [
+      head('Name'),
+      head('Role'),
+      head('Status', { sorted: 'down' }),
+      head('Node'),
+      head('Restarts', { r: true }),
+      head('Age', { r: true }),
+    ],
+    [
+      pgRow([
+        lead({ level: 'healthy', name: 'orders-db-1' }),
+        '<span>Primary</span>',
+        `<span>${pill('healthy', 'Ready')}</span>`,
+        '<span class="q">ip-10-0-1-17</span>',
+        '<span class="r">0</span>',
+        '<span class="r">12d</span>',
+      ]),
+      pgRow([
+        lead({ level: 'healthy', name: 'orders-db-2' }),
+        '<span>Replica</span>',
+        `<span>${pill('healthy', 'Ready')}</span>`,
+        '<span class="q">ip-10-0-2-44</span>',
+        '<span class="r">0</span>',
+        '<span class="r">12d</span>',
+      ]),
+      pgRow([
+        lead({ level: 'healthy', name: 'orders-db-3' }),
+        '<span>Replica</span>',
+        `<span>${pill('healthy', 'Ready')}</span>`,
+        '<span class="q">ip-10-0-3-91</span>',
+        '<span class="r">2</span>',
+        '<span class="r">3d</span>',
+      ]),
+    ],
+  )
+}
+
+const BK = (rows: [Level, string, string, string, string, string][]) =>
+  rows.map(([lv, name, method, st, started, took]) =>
+    pgRow([
+      lead({ level: lv, name }),
+      `<span>${method}</span>`,
+      `<span>${pill(lv, st)}</span>`,
+      `<span class="r">${started}</span>`,
+      `<span class="r">${took}</span>`,
+    ]),
+  )
+
+function pgBackups(empty = false): string {
+  if (empty)
+    return `<div class="state" style="min-height:96px"><span>No backups of orders-db yet.</span></div>`
+  return `${table(
+    'minmax(0,1.6fr) 140px 120px 72px 80px',
+    [
+      head('Name'),
+      head('Method'),
+      head('Status'),
+      head('Started', { r: true, sorted: 'down' }),
+      head('Took', { r: true }),
+    ],
+    BK([
+      ['progressing', 'orders-db-20261013-1200', 'Volume snapshot', 'Running', '4m', '—'],
+      ['healthy', 'orders-db-20261013-0900', 'Volume snapshot', 'Completed', '3h', '4m 12s'],
+      ['critical', 'orders-db-20261013-0600', 'Barman object store', 'Failed', '6h', '1m 03s'],
+      ['healthy', 'orders-db-20261013-0300', 'Volume snapshot', 'Completed', '9h', '4m 01s'],
+      ['healthy', 'orders-db-20261013-0000', 'Volume snapshot', 'Completed', '12h', '3m 58s'],
+    ]),
+  )}<div class="kmore">Show all 41</div>`
+}
+
+const pgTiles = () =>
+  `${tile('server', 'Instances ready', '3/3', 'All ready', { level: 'healthy', opens: true })}${tile('database', 'Primary', 'orders-db-1', 'timeline 4', { words: true, opens: true })}${tile('timer', 'Last backup', '3h', 'Volume snapshot', { opens: true })}${tile('package', 'PostgreSQL', '16.4', 'ghcr.io/cloudnative-pg/postgresql:16.4', { words: true })}`
+
+function pgClusters(): string {
+  const right = `<div class="arr-stack">
+    ${header2('orders-db', ['healthy', 'Healthy'], '')}
+    <div class="arr-tiles" style="--n:4">${pgTiles()}</div>
+    ${card('Instances', '3', pgInstances())}
+    ${card('Backups', '41', pgBackups())}
+    <div class="pair wider">${card('Schedules', '2', table('minmax(0,1fr) 88px 88px', [head('Schedule'), head('Last', { r: true }), head('Next', { r: true })], [pgRow([`<span class="lead"><span class="w"><span class="nm"><b>Every 3 hours</b></span><small>nightly-and-day</small></span></span>`, '<span class="r">3h</span>', '<span class="r">in 4m</span>']), pgRow([`<span class="lead"><span class="w"><span class="nm"><b>Every day at 02:00</b></span><small>weekly-offsite</small></span></span>`, '<span class="r">10h</span>', '<span class="r">in 14h</span>'])]))}${card('Poolers', '1', table('minmax(0,1fr) 56px 88px', [head('Name'), head('Type'), head('Ready', { r: true })], [pgRow([lead({ level: 'healthy', name: 'orders-db-rw' }), '<span>rw</span>', '<span class="r">2 of 2</span>'])]))}</div>
+  </div>`
+  return spec(
+    'Clusters',
+    'a Split: the clusters, and the one picked',
+    `<div class="pagebox">${pgframe('CloudNativePG', '1.24.1', `<div class="arr-split" style="padding:16px">${card('Clusters', '4', pickList(PG_CLUSTERS, 2, { fit: 26 }))}${right}</div>`)}</div>`,
+    `The kit’s Split with real data, read-only: no buttons, so the header is the name and its status alone. <b>The list</b> is worst first (Failed, then Switching over, then Healthy); a phase is said in a short word with its level, never colour alone. <b>Tiles</b>: Instances ready, Primary (the instance’s name, “timeline 4”), Last backup (its age and method; “No backup yet” in amber when there’s none), PostgreSQL (the version from the image tag, the image under it, end-cut). <b>Instances</b>: <i>Role</i> is a text column, not a status: Primary and Replica aren’t levels. A row opens its Pod. <b>Backups</b>: latest first, five shown and “Show all 41”; a row opens its Backup; “Took” is a dash while it runs. <b>Schedules and Poolers</b> sit in a Pair when the cluster has both. A Pair is exactly two, so when it has one of them, that one is a Card on its own, full width; when neither, there’s nothing. The schedule is said in words; the cron behind it is the row’s tooltip.`,
+  )
+}
+
+function pgBackupsPage(): string {
+  const tiles = `${tile('database', 'Backups in the last day', '23', 'across 3 clusters')}${tile('circle-x', 'Failed in the last day', '1', 'orders-db at 06:00', { level: 'critical', opens: true })}${tile('clock', 'No backup in a day', '1', 'reports-db', { level: 'warning', opens: true })}${tile('timer', 'Next scheduled', 'in 4m', 'orders-db', { words: true })}`
+  const groups = `${table(
+    'minmax(0,1.6fr) 140px 120px 72px 80px',
+    [
+      head('Name'),
+      head('Method'),
+      head('Status'),
+      head('Started', { r: true, sorted: 'down' }),
+      head('Took', { r: true }),
+    ],
+    [
+      '<div class="grp-h">orders-db<small>41</small></div>',
+      ...BK([
+        ['progressing', 'orders-db-20261013-1200', 'Volume snapshot', 'Running', '4m', '—'],
+        ['healthy', 'orders-db-20261013-0900', 'Volume snapshot', 'Completed', '3h', '4m 12s'],
+        ['critical', 'orders-db-20261013-0600', 'Barman object store', 'Failed', '6h', '1m 03s'],
+      ]),
+      '<div class="kmore">Show all 41</div>',
+      '<div class="grp-h">reports-db<small>2</small></div>',
+      ...BK([
+        ['healthy', 'reports-db-20261011-0200', 'Volume snapshot', 'Completed', '2d', '9m 40s'],
+      ]),
+      '<div class="grp-h">sessions-db<small>8</small></div>',
+      ...BK([
+        ['healthy', 'sessions-db-20261013-1100', 'Volume snapshot', 'Completed', '1h', '2m 20s'],
+      ]),
+      '<div class="kmore">Show all 8</div>',
+      '<div class="grp-h">payments-reconciliation-ledger-db<small>16</small></div>',
+      ...BK([
+        [
+          'healthy',
+          'payments-reconciliation-ledger-db-20261013-1130',
+          'Volume snapshot',
+          'Completed',
+          '30m',
+          '6m 05s',
+        ],
+      ]),
+      '<div class="kmore">Show all 16</div>',
+    ],
+  )}`
+  return spec(
+    'Backups',
+    'every cluster’s, by cluster, latest first',
+    `<div class="pagebox">${pgframe('CloudNativePG', '1.24.1', `<div class="arr-stack" style="padding:16px"><div class="arr-tiles" style="--n:4">${tiles}</div>${card('Backups', '67', groups)}</div>`)}</div>`,
+    `A Stack: four tiles, then one Table grouped by cluster, each group showing five with its own “Show all N” (the rule from Karpenter’s move). <b>Tiles</b>: a count in the last day; failed in the last day, critical past zero and opening the list filtered to those; clusters with no backup in a day, amber past zero; the next scheduled, as “in 4m” with its cluster. Groups come worst first: a cluster with a failed or missing backup above the rest. The picture shows fewer rows a group than five, for room; each group still says its full count.`,
+  )
+}
+
+function pgPhone(): string {
+  const list = phoneFrame(
+    'CloudNativePG',
+    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.24.1', true)}</div><div class="pick">${PG_CLUSTERS.map((c) => `<div class="pi">${lead(c.lead, { fit: 22 })}<span class="st">${pill(c.status[0], c.status[1])}</span></div>`).join('')}</div>`,
+  )
+  const one = phoneFrame(
+    'orders-db',
+    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.24.1', true)}</div><div class="under">${pill('healthy', 'Healthy')}</div><div class="ptiles">${pgTiles()}</div><div class="sec"><h3>Instances<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-1' })}</div><dl>${fact('Role', 'Primary')}${fact('Status', 'Ready')}${fact('Age', '12d')}${fact('Node', 'ip-10-0-1-17')}${fact('Restarts', '0')}</dl></li><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-2' })}</div><dl>${fact('Role', 'Replica')}${fact('Status', 'Ready')}${fact('Age', '12d')}${fact('Node', 'ip-10-0-2-44')}${fact('Restarts', '0')}</dl></li></ul></div>`,
+    true,
+  )
+  return `<section class="spec"><h2>On a phone<i>the Split’s two pages</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${list}${one}</div><p style="max-width:820px">By the kit’s Split: the clusters as a list page, then the picked one as a page with Back, its name in the top bar and its status under. Tiles two across, each that opens with its “›” always shown, as a touch screen has no hover (on the desktop it shows on hover, the kit’s rule). The tables as cards, every column a fact, three across where every value fits a third of the card, else one a line. No buttons here either, so nothing is held back for a larger screen.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -2130,6 +2318,8 @@ export type KitFrame =
   | 'marks'
   | 'counts'
   | 'counts-phone'
+  | 'cnpg'
+  | 'cnpg-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -2161,6 +2351,8 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   },
   { id: 'counts', title: 'Counts, Card and Pair', size: { width: 1440, height: 900 } },
   { id: 'counts-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
+  { id: 'cnpg', title: 'CloudNativePG as a plugin', size: { width: 1440, height: 2400 } },
+  { id: 'cnpg-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -2201,7 +2393,11 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                                   ? `<header><h1>Counts, Card and Pair</h1><p>Three parts Karpenter’s overview needs to be drawn from the kit: a share of a whole, the card a part stands in, and two parts side by side.</p></header>${countsWhole()}`
                                   : id === 'counts-phone'
                                     ? countsPhone()
-                                    : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
+                                    : id === 'cnpg'
+                                      ? `<header><h1>CloudNativePG, as a plugin</h1><p>Its code draws two pages in Lumovi’s box from the kit’s parts, read-only for now: Clusters, and every cluster’s Backups. It reads its own kinds, and of Kubernetes’ own only the Pods labelled cnpg.io/cluster.</p></header>${pgClusters()}${pgBackupsPage()}`
+                                      : id === 'cnpg-phone'
+                                        ? pgPhone()
+                                        : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
