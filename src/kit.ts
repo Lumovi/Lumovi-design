@@ -282,6 +282,25 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .verdict > svg.i { flex: none; margin-top: 2px; }
 .verdict.ok > svg.i { color: var(--good); }
 .verdict.no { color: var(--critical-text); }
+.moved { display: flex; gap: 8px; margin: 0 0 12px; padding: 10px 12px; border-radius: 8px; background: color-mix(in srgb, var(--warn) 12%, transparent); font-size: 12.5px; line-height: 18px; color: var(--warn-text); }
+.moved > svg.i { flex: none; margin-top: 2px; }
+.takes { display: flex; gap: 8px; margin-top: 10px; font-size: 12px; line-height: 18px; color: var(--text-2); }
+.takes > svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
+.takes code { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-1); }
+.kdlg .typed label { display: block; margin: 12px 0 6px; font-size: 12px; color: var(--text-2); }
+.kdlg .typed label code { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--text-1); }
+.kdlg .typed label .tl { display: inline-flex; align-items: center; gap: 6px; }
+.kdlg .typed label svg.i { flex: none; color: var(--critical-text); }
+.kdlg .typed .f { height: 34px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); }
+.btn.danger { border-color: var(--critical); background: var(--critical); color: #fff; }
+.over { position: relative; height: 1180px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--app-bg); }
+.ohdr { display: flex; height: 52px; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--line); background: var(--surface); font-size: 14px; }
+.ohdr .lg { width: 20px; height: 20px; border-radius: 6px; background: var(--surface-3); }
+.ohdr .grow { flex: 1; }
+.ostrip { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 12px; color: var(--text-2); }
+.obody { padding: 16px; }
+.oscrim { position: absolute; inset: 0; background: rgb(0 0 0 / 0.4); }
+.odlg { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); }
 .kdlg .df { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--surface); }
 .kdlg .df .aud { display: flex; align-items: center; gap: 6px; margin-right: auto; font-size: 12px; color: var(--text-3); }
 .ph .kdlg { width: auto; border: 0; border-radius: 0; box-shadow: none; }
@@ -1154,16 +1173,26 @@ interface Ask {
   title?: string
   /** The action's own word, as on the button that opened the dialog. */
   verb?: string
+  /** A line of Lumovi's above the change: the object moved, say. */
+  notice?: string
+  /** Fields it takes over from another manager. */
+  takes?: string
+  /** Delete: Lumovi's own verb, in the danger colour, and a typed name. */
+  danger?: boolean
+  /** A caption over the change part. */
+  sendCap?: string
+  /** No fields: the plugin asked for none. */
+  noFields?: boolean
 }
 
 function ask(a: Ask): string {
   return `<div class="kdlg"${a.maxHeight ? ` style="--mh:${a.maxHeight}px"` : ''}>
-    <div class="dh"><span class="g">${icon('git-branch', 18)}</span><div><div class="eb">${icon('plug', 12)}From ${PLUGIN} 2.0.0</div><h3>${a.title ?? 'Patch Application storefront'}</h3><div class="sub"><span>Application · argocd · <b>production-eu</b></span><span class="prodm">Production</span></div></div></div>
+    <div class="dh"><span class="g">${icon('git-branch', 18)}</span><div><div class="eb">${icon('plug', 12)}From ${PLUGIN} 2.1.0</div><h3>${a.title ?? `${PLUGIN} asks to change the Application argocd/storefront`}</h3><div class="sub"><span>Application · argocd · <b>production-eu</b></span><span class="prodm">Production</span></div></div></div>
     <div class="db">
-      <div class="part opts${a.cut ? ' cut' : ''}"><div class="kcap">Options, in ${PLUGIN}’s words</div>${a.fields}</div>
-      <div class="part send"><div class="kcap">What Lumovi will send</div>${a.send}</div>
+      ${a.noFields ? '' : `<div class="part opts${a.cut ? ' cut' : ''}"><div class="kcap">Options, in ${PLUGIN}’s words</div>${a.fields}</div>`}
+      <div class="part send">${a.notice ? `<div class="moved">${icon('triangle-alert', 14)}<span>${a.notice}</span></div>` : ''}<div class="kcap">${a.sendCap ?? 'What Lumovi will send'}</div>${a.send}${a.takes ? `<div class="takes">${icon('info', 14)}<span>${a.takes}</span></div>` : ''}${a.fields && a.danger ? a.fields : ''}</div>
     </div>
-    <div class="df"><span class="btn ghost sm">Cancel</span><span class="btn primary sm${a.approve === false ? ' off' : ''}">${a.verb ?? 'Sync'}</span></div>
+    <div class="df"><span class="btn ghost sm">Cancel</span><span class="btn ${a.danger ? 'danger' : 'primary'} sm${a.approve === false ? ' off' : ''}">${a.verb ?? 'Sync'}</span></div>
   </div>`
 }
 
@@ -1202,7 +1231,7 @@ function formStates(): string {
       <div class="arr-stack"><span class="cap">3 · an option wrong or still empty</span>${wrong}</div>
       <div class="arr-stack"><span class="cap">4 · the cluster refused it</span>${refused}</div>
     </div>`,
-    `When a plugin’s change needs options first (“Sync…”, “Back up now…”), <b>the form is inside Lumovi’s own confirmation</b>, never on the plugin’s page. <b>It is a confirmation, not an approval</b>: the person started this change a moment ago on the plugin’s page, and nobody is waiting for an answer. So it has no wait, its buttons are Cancel and the action’s own word (the one on the button that opened it: “Sync”), and Escape cancels, as in Lumovi’s own Scale and Restart. Three places say whose words are whose: the heading (“From ${PLUGIN} 2.0.0”, then Lumovi’s own title of the change, where, and the Production mark); <b>“Options, in ${PLUGIN}’s words”</b> over the fields, whose labels and hints are the plugin’s and are shown whole; and <b>“What Lumovi will send”</b> over the patch and the command, which are Lumovi’s and which no plugin writes. The change <b>follows the fields as they’re filled</b>: after every edit Lumovi asks the cluster again (“Asking the cluster…”, the button off), and only “The cluster accepts it, as the options stand.” makes the button live, so what’s sent is what the cluster was asked. A field that’s wrong or empty says so under itself in Lumovi’s words by its kind (“Fill this in.”, “A whole number from 1 to 10.”, “Choose one.”), and the change’s place says it shows once the options are filled in. What the cluster refuses is said under the field it names, or else under the change.`,
+    `When a plugin’s change needs options first (“Sync…”, “Back up now…”), <b>the form is inside Lumovi’s own confirmation</b>, never on the plugin’s page. <b>It is a confirmation, not an approval</b>: the person started this change a moment ago on the plugin’s page, and nobody is waiting for an answer. So it has no wait, its buttons are Cancel and the action’s own word (the one on the button that opened it: “Sync”), and Escape cancels, as in Lumovi’s own Scale and Restart. Three places say whose words are whose: the heading (“From ${PLUGIN} 2.1.0”, then Lumovi’s own title of the change, where, and the Production mark); <b>“Options, in ${PLUGIN}’s words”</b> over the fields, whose labels and hints are the plugin’s and are shown whole; and <b>“What Lumovi will send”</b> over the patch and the command, which are Lumovi’s and which no plugin writes. The change <b>follows the fields as they’re filled</b>: after every edit Lumovi asks the cluster again (“Asking the cluster…”, the button off), and only “The cluster accepts it, as the options stand.” makes the button live, so what’s sent is what the cluster was asked. A field that’s wrong or empty says so under itself in Lumovi’s words by its kind (“Fill this in.”, “A whole number from 1 to 10.”, “Choose one.”), and the change’s place says it shows once the options are filled in. What the cluster refuses is said under the field it names, or else under the change.`,
   )
 }
 
@@ -1220,10 +1249,82 @@ function formHard(): string {
   )
 }
 
+/** 2b. Docs' cases: the object moved, a create, a delete, what it takes over, the first moment. */
+function formMore(): string {
+  const created = `${diff([
+    ['add', 'apiVersion: postgresql.cnpg.io/v1'],
+    ['add', 'kind: Backup'],
+    ['add', 'metadata:'],
+    ['add', '  generateName: orders-db-'],
+    ['add', '  namespace: shop'],
+    ['add', 'spec:'],
+    ['add', '  cluster: { name: orders-db }'],
+    ['add', '  method: volumeSnapshot'],
+  ])}${command('kubectl create -f - -n shop --context production-eu')}${OK}`
+  const create = ask({
+    title: 'CloudNativePG asks to create a Backup in shop',
+    fields: fld('Method', kseg(['Volume snapshot', 'Object store'], 'Volume snapshot')),
+    send: created,
+    sendCap: 'The whole object Lumovi will create',
+    verb: 'Back up now',
+  })
+    .replace(new RegExp(`From ${PLUGIN} 2\\.1\\.0`), 'From the plugin CloudNativePG 0.3.0')
+    .replace(`Options, in ${PLUGIN}’s words`, 'Options, in CloudNativePG’s words')
+    .replace('Application · argocd ·', 'Backup · shop ·')
+  const moved = ask({
+    fields: SYNC_FIELDS,
+    send: SYNC_SEND('main', ASKING),
+    approve: false,
+    notice:
+      'Application storefront changed since this was shown. Here is the change again, as it stands now.',
+  })
+  const takes = ask({
+    fields: SYNC_FIELDS,
+    send: SYNC_SEND('main', OK),
+    takes:
+      'It takes over <code>operation</code> from <b>argocd-application-controller</b>, which set it last.',
+  })
+  const del = ask({
+    title: `${PLUGIN} asks to delete the Application argocd/storefront`,
+    fields: `<div class="typed"><label><span class="tl">${icon('triangle-alert', 12)}Type <code>storefront</code> to delete it on production</span></label><div class="f"></div></div>`,
+    send: `${command('kubectl delete application storefront -n argocd --context production-eu')}<div class="verdict">${icon('info', 14)}<span>It has a finalizer: the cluster deletes it once that’s done.</span></div>`,
+    sendCap: 'What Lumovi will do',
+    noFields: true,
+    danger: true,
+    approve: false,
+    verb: 'Delete',
+  })
+  return spec(
+    'Docs’ cases',
+    'Lumovi’s title, the plugin’s word on the button, and what can’t be confirmed',
+    `<div style="display:grid;grid-template-columns:repeat(2,560px);gap:28px 32px;align-items:start">
+      <div class="arr-stack"><span class="cap">5 · the object changed since it was shown: asked again, the button off</span>${moved}</div>
+      <div class="arr-stack"><span class="cap">6 · it takes over a field another manager set</span>${takes}</div>
+      <div class="arr-stack"><span class="cap">7 · a create shows the whole object, not a before→after</span>${create}</div>
+      <div class="arr-stack"><span class="cap">8 · a delete: Lumovi’s “Delete”, never the plugin’s word; the typed name on production</span>${del}</div>
+    </div>`,
+    `<b>The title is always Lumovi’s</b> and says what will happen: “Argo CD asks to change the Application argocd/storefront”, “… to create a Backup in shop”, “… to delete …”, with “From Argo CD 2.1.0” above it. <b>The button may carry the plugin’s word</b> (“Sync”, “Back up now”) for a change, a create, a scale or a restart: the plugin’s text, one line, 24 characters at most, refused if it’s Cancel, Close, Back, No, Keep, OK, Done or Don’t. <b>A delete is always Lumovi’s “Delete”</b>, in the danger colour, with the typed name where today’s rules ask for it. <b>The button is off</b> until the cluster has answered for the values shown: while it’s asked again, after the object moved, while an option is wrong, and for a moment after the dialog opens (its first 600 ms, counted from when the window has focus and the dialog is drawn, and the dialog never opens under the pointer). <b>What it takes over</b> from another manager is said under the change. Nothing here changes on a phone, which refuses a plugin’s proposals.`,
+  )
+}
+
+/** 2c. Where it stands: over Lumovi's header, the plugin's frame dimmed and inert. */
+function formOver(): string {
+  return spec(
+    'Where it stands',
+    'over Lumovi’s own header; the plugin’s page dimmed and inert',
+    `<div class="over"><div class="ohdr"><span class="lg"></span><b>Argo CD</b><span class="grow"></span><span class="ib">${icon('search', 16)}</span><span class="ib">${icon('rotate-cw', 16)}</span></div><div class="ostrip">${icon('plug', 13)}This page is from the plugin <b>Argo CD</b> 2.1.0. Lumovi draws it from its own parts; what it shows and says is the plugin’s.</div><div class="obody"><div class="stub" style="height:420px">Argo CD’s page, inert</div></div><div class="oscrim"></div><div class="odlg">${ask({ fields: SYNC_FIELDS, send: SYNC_SEND('main', OK) })}</div></div>`,
+    `Lumovi draws the dialog in its own page, above everything: the plugin’s frame is dimmed (Lumovi’s scrim, 40% black in light, 60% in dark) and takes no input, and the dialog starts 24 px from the window’s top, over Lumovi’s own header, where no plugin can draw, so nothing a plugin draws can sit beside it or look like part of it. It’s the one dialog in all of Lumovi: a proposal is refused while any other confirmation or approval is open, or while the window isn’t focused.`,
+  )
+}
+
 /** 3. On a phone: a tall sheet, the footer pinned. */
 function formPhone(): string {
-  const body = `<i class="grab" style="display:block"></i>${ask({ fields: SYNC_FIELDS, send: SYNC_SEND('main', OK) })}`
-  return `<section class="spec"><h2>On a phone<i>drawn, and not offered until the phone’s rule allows a plugin’s changes</i></h2><div style="display:flex;gap:24px;align-items:flex-start"><div class="ph">${body}</div></div><p style="max-width:820px">The phone’s tall sheet, with its footer pinned: fields 44 px high with 16 px text, Cancel at the left and the action’s button at the right, at least 120 px wide. The options scroll and the change stays above the footer, as on the desktop. <b>Today a phone doesn’t offer a plugin’s changes at all</b> (the page’s frame says where they are instead), so this is the form it takes if that rule is widened, and nothing to build before then.</p></section>`
+  const f = phoneFrame(
+    'storefront',
+    `<div class="sec"><div class="said" style="padding:0">${icon('monitor', 16)}<span>This isn’t done from a phone. Open Lumovi on a larger screen to change storefront.</span></div></div>`,
+    true,
+  )
+  return `<section class="spec"><h2>On a phone<i>a plugin’s proposals are refused, in Lumovi’s usual words</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${f}</div><p style="max-width:820px">By Péter’s ruling on LMV-187, a phone changes only what Lumovi lists for it, so a plugin’s proposal is refused with the phone’s usual sentence, naming the action in Lumovi’s own words (change, create, delete), as the title does; no sheet in version 1. The page’s own buttons that would propose aren’t drawn on a phone in the first place (the kit’s header rule), so this is only for a proposal made some other way.</p></section>`
 }
 
 // ─── The graph ─────────────────────────────────────────────────────────────────────────────
@@ -2375,7 +2476,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
               : id === 'reference-phone'
                 ? refPhone()
                 : id === 'form'
-                  ? `<header><h1>A form inside Lumovi’s confirmation</h1><p>For a plugin’s change that asks for options first. The plugin describes the fields; Lumovi shows them in its own dialog with the change it will make.</p></header>${formStates()}${formHard()}`
+                  ? `<header><h1>A form inside Lumovi’s confirmation</h1><p>For a plugin’s change that asks for options first. The plugin describes the fields; Lumovi shows them in its own dialog with the change it will make.</p></header>${formStates()}${formMore()}${formOver()}${formHard()}`
                   : id === 'form-phone'
                     ? formPhone()
                     : id === 'graph'
