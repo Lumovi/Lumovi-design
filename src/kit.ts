@@ -177,6 +177,9 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .pcount { padding: 12px 16px 8px; font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
 .arr-stack { display: flex; min-width: 0; flex-direction: column; gap: 16px; }
 .arr-tiles { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; }
+.pick.under .pi { flex-wrap: wrap; row-gap: 6px; }
+.pick.under .pi > .lead { flex-basis: 100%; }
+.pick.under .pi > .st { margin-left: 18px; }
 .bk2 { display: flex; height: 36px; align-items: center; gap: 8px; margin: -8px -8px -8px; padding: 0 8px; border-radius: 8px; font-size: 13px; color: var(--text-2); }
 .bk2 svg.i { color: var(--text-3); }
 .arr-split { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start; }
@@ -2372,7 +2375,7 @@ function pgNarrow(): string {
   const list = pgframe(
     'CloudNativePG',
     '1.24.1',
-    `<div class="arr-stack" style="padding:16px">${card('Clusters', '4', pickList(PG_CLUSTERS, 2, { fit: 18 }))}</div>`,
+    `<div class="arr-stack" style="padding:16px">${card('Clusters', '4', pickList(PG_CLUSTERS, 2).replace('class="pick"', 'class="pick under"'))}</div>`,
     true,
   )
   const pane = (body: string) =>
@@ -2380,8 +2383,8 @@ function pgNarrow(): string {
   return spec(
     'Beside a panel',
     'under 640 px of its own width, the Split is the phone’s two pages',
-    `<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap"><div class="arr-stack"><p class="cap">1024, a row of orders-db pressed: what was in view stays, with Back</p>${pane(kept)}</div><div class="arr-stack"><p class="cap">After Back: the list, its rows whole, orders-db still the picked one</p>${pane(list)}</div></div>`,
-    `The Split goes by <b>its own width</b>, not the window’s: side by side from 640 px (the list’s 300, the gap, and enough for the rest’s tiles to stand two across); under that, the phone’s two pages, in place. So at 1440 or 1024 beside a row’s panel it’s two pages, and at 1024 with no panel it stays side by side. <b>Narrowing never takes away what’s in view</b>: a picked one’s page that was showing when the panel opened keeps showing, so the row just pressed is still there beside its panel, with a Back row first: the arrow and the list’s own title (“Clusters”), 36 px, the whole row pressable, focusable as any row. No title in the top bar (that’s the phone’s app bar), since the picked one’s header names it. <b>Arriving narrow</b> (a reload, a link) starts at the list, as on a phone. On the list page the rows are whole, the picked one marked, nothing beside them. <b>Widening</b> (the panel closed) goes back side by side, the same one picked. Tiles under 320 px of row stand one across.`,
+    `<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap"><div class="arr-stack"><p class="cap">1024, a row of orders-db pressed: what was in view stays, with Back</p>${pane(kept)}</div><div class="arr-stack"><p class="cap">After Back: the list, names whole to their floor, every pill under, orders-db still picked</p>${pane(list)}</div></div>`,
+    `The Split goes by <b>its own width</b>, not the window’s: side by side from 640 px (the list’s 300, the gap, and enough for the rest’s tiles to stand two across); under that, the phone’s two pages, in place. So at 1440 or 1024 beside a row’s panel it’s two pages, and at 1024 with no panel it stays side by side. <b>Narrowing never takes away what’s in view</b>: a picked one’s page that was showing when the panel opened keeps showing, so the row just pressed is still there beside its panel, with a Back row first: the arrow and the list’s own title (“Clusters”), 36 px, the whole row pressable, focusable as any row. No title in the top bar (that’s the phone’s app bar), since the picked one’s header names it. <b>Arriving narrow</b> (a reload, a link) starts at the list, as on a phone. On the list page the picked one is marked and nothing is beside the list. <b>A name keeps the Table’s floor</b>, the least of its own width and 160 px; where any row’s pill can’t sit beside its name at that floor, <b>every</b> row’s pill goes on a line of its own under the name’s two, at the name’s edge (the list decides, so pills are never mixed), and a longer name is cut in its middle only past its floor. In the 300 px list side by side they stay beside. <b>Widening</b> (the panel closed) goes back side by side, the same one picked. Tiles under 320 px of row stand one across.`,
   )
 }
 
