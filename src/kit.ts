@@ -191,6 +191,10 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .ph .acts .btn { height: 44px; padding: 0 16px; }
 .ph .acts .sq { display: grid; width: 44px; height: 44px; place-items: center; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--text-2); }
 .ph .ptiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px; }
+.ph .ptiles > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+.finl { display: flex; justify-content: flex-end; gap: 6px; margin: 6px 0 0; font-size: 12px; line-height: 17px; color: var(--text-2); }
+.finl svg.i { flex: none; margin-top: 1px; color: var(--text-3); }
+.ph .finl { justify-content: flex-start; margin: 0; padding: 0 16px 4px; }
 .ph .pick { margin: 0; }
 .ph .pick .pi { min-height: 60px; padding: 8px 16px; border-radius: 0; }
 .ph .pick .pi + .pi { margin-top: 0; border-top: 1px solid var(--line); }
@@ -2400,6 +2404,265 @@ function pgPhone(): string {
   return `<section class="spec"><h2>On a phone<i>the Split’s two pages</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${list}${one}</div><p style="max-width:820px">By the kit’s Split: the clusters as a list page, then the picked one as a page with Back, its name in the top bar and its status under. Tiles two across, each that opens with its “›” always shown, as a touch screen has no hover (on the desktop it shows on hover, the kit’s rule). The tables as cards, every column a fact, three across where every value fits a third of the card, else one a line. No buttons here either, so nothing is held back for a larger screen.</p></section>`
 }
 
+// ─── Argo CD, as a plugin with code ────────────────────────────────────────────────────────
+
+/** Argo CD's health, as a level: Healthy, Progressing, Degraded, Missing, Suspended, Unknown. */
+const HEALTH: Record<string, Level> = {
+  Healthy: 'healthy',
+  Progressing: 'progressing',
+  Degraded: 'critical',
+  Missing: 'warning',
+  Suspended: 'neutral',
+  Unknown: 'neutral',
+}
+
+const syncPill = (s: 'Synced' | 'Out of sync' | 'Unknown') =>
+  pill(s === 'Synced' ? 'healthy' : s === 'Out of sync' ? 'warning' : 'neutral', s)
+
+type App = [
+  name: string,
+  health: string,
+  sync: 'Synced' | 'Out of sync',
+  path: string,
+  target: string,
+  dest: string,
+  synced: string,
+]
+
+const APP_ROWS = (apps: App[]) =>
+  apps.map(([name, health, sync, path, target, dest, synced]) =>
+    pgRow([
+      lead({ level: HEALTH[health], name, under: health }),
+      `<span>${syncPill(sync)}</span>`,
+      `<span class="q">github.com/acme/deploy · ${path}</span>`,
+      `<span class="q">${target}</span>`,
+      `<span>${dest}</span>`,
+      `<span class="r">${synced}</span>`,
+    ]),
+  )
+
+const ARGO_TABS =
+  ltab('Overview', { plug: true, on: true }) +
+  ltab('Applications', { count: '14' }) +
+  ltab('AppProjects', { count: '2' }) +
+  ltab('ApplicationSets', { count: '1' })
+
+const ARGO_TILES = () =>
+  `${tile('activity', 'Healthy', '12/14', '1 degraded · 1 progressing', { level: 'critical', opens: true })}${tile('git-branch', 'Out of sync', '2', 'of 14 applications', { level: 'warning', opens: true })}${tile('circle-x', 'Last sync failed', '1', 'legacy-batch', { level: 'critical', opens: true })}`
+
+/** 1. The overview: three tiles, then the applications by project, worst first. */
+function argoOverview(): string {
+  const apps = table(
+    'minmax(0,1.3fr) 112px minmax(0,1.6fr) 96px 96px 80px',
+    [
+      head('Name'),
+      head('Sync'),
+      head('Repository and path'),
+      head('Target revision'),
+      head('Destination'),
+      head('Last synced', { r: true }),
+    ],
+    [
+      '<div class="grp-h">default<small>1</small></div>',
+      ...APP_ROWS([
+        ['legacy-batch', 'Degraded', 'Out of sync', 'jobs/legacy-batch', 'main', 'batch', '2h'],
+      ]),
+      '<div class="grp-h">shop<small>13</small></div>',
+      ...APP_ROWS([
+        ['payments', 'Progressing', 'Out of sync', 'apps/payments', 'v2.4.1', 'payments', '1d'],
+        ['storefront', 'Healthy', 'Synced', 'apps/storefront', 'main', 'shop', '3m'],
+        ['checkout', 'Healthy', 'Synced', 'apps/checkout', 'main', 'shop', '3m'],
+        ['cart', 'Healthy', 'Synced', 'apps/cart', 'main', 'shop', '3m'],
+        ['search', 'Healthy', 'Synced', 'apps/search', 'v1.9.0', 'search', '6h'],
+      ]),
+      '<div class="kmore">Show all 13</div>',
+    ],
+  )
+  return spec(
+    'Overview',
+    'the plugin’s own page, first among its tabs',
+    `<div class="pwin"><aside class="pside"><h3>Configuration</h3>${sideItem('ConfigMaps', 'file-code-2')}${sideItem('Secrets', 'key-round')}${PLUGINS_SECTION('Argo CD')}</aside>
+      <div class="pmain">${pageHead('Argo CD', 'git-merge')}<nav class="lts">${ARGO_TABS}</nav>${pgframe('Argo CD', '2.1.0', `<div class="arr-stack" style="padding:16px"><div class="arr-tiles" style="--n:3">${ARGO_TILES()}</div>${card('Applications', '14', apps)}</div>`)}</div></div>`,
+    `A Stack: a row of tiles, then one Table. No header and no buttons: the page’s title is Lumovi’s, above the tabs. <b>Five counts make three tiles</b>, as a row holds two to four: <b>Healthy</b> is how many of all the applications (so “Applications” is its whole), and its line under names the rest by health, Degraded first; <b>Out of sync</b>, amber past zero; <b>Last sync failed</b>, red past zero, naming the one or how many. Each opens Lumovi’s own list of Applications filtered to those. A cut read says so on the tile, as Karpenter’s do. <b>Applications</b>, grouped by project, worst group first (a degraded or failed application lifts its project above the rest), worst first within a group, five a group with its own “Show all N”. The lead is the name, its dot the health’s level and the health’s word under it (never colour alone): Healthy green, Degraded red, Missing amber; Progressing, Suspended and Unknown grey, Progressing with the kit’s turning mark on its status (blue is only for what can be pressed or picked). <b>Sync</b> is a status: Synced, Out of sync in amber, Unknown grey. The repository and path is one quiet text, end-cut, whole in its tooltip; the target revision quiet; Destination is the namespace. A row opens the Application’s own page in Lumovi, on its Argo CD tab.`,
+  )
+}
+
+const appHead = (name: string, health: string) =>
+  `<div class="dhd"><div><b>${name}</b><small>Application · argocd</small></div>${pill(HEALTH[health]!, health)}</div>`
+
+const APP_OBJ_TABS =
+  ltab('Overview') +
+  ltab('Events') +
+  ltab('Audit') +
+  ltab('Argo CD', { plug: true, on: true }) +
+  ltab('YAML')
+
+const ARGO_ACTS = (syncOff = false) =>
+  `${btn('Delete…', 'ghost')}${btn('Refresh…', 'secondary')}<span class="btn primary sm${syncOff ? ' off' : ''}">Sync…</span>`
+
+const appTiles = () =>
+  `${tile('git-branch', 'Sync', 'Synced', '3 of 3 resources', { words: true, level: 'healthy' })}${tile('package', 'Synced revision', '4f1c9aa', 'main', { words: true })}${tile('clock', 'Last synced', '3m', 'Succeeded, by auto-sync')}${tile('rotate-cw', 'Auto-sync', 'On', 'Prune off · self-heal on', { words: true })}`
+
+/** Docs' sentence, the plugin's own, by Delete…: only when the Application has Argo CD's resources finalizer. */
+const FINALIZER = `<p class="finl">${icon('info', 14)}<span>Deleting it also deletes what it deployed (it has Argo CD’s resources finalizer).</span></p>`
+
+const RESOURCES = card(
+  'Resources',
+  '3',
+  table(
+    'minmax(0,1.6fr) 120px 120px',
+    [head('Name'), head('Sync'), head('Health', { sorted: 'down' })],
+    [
+      pgRow([
+        lead({ level: 'healthy', name: 'storefront', under: 'Deployment · shop' }),
+        `<span>${syncPill('Synced')}</span>`,
+        `<span>${pill('healthy', 'Healthy')}</span>`,
+      ]),
+      pgRow([
+        lead({ level: 'healthy', name: 'storefront', under: 'Service · shop' }),
+        `<span>${syncPill('Synced')}</span>`,
+        `<span>${pill('healthy', 'Healthy')}</span>`,
+      ]),
+      pgRow([
+        lead({ name: 'storefront-config', under: 'ConfigMap · shop' }),
+        `<span>${syncPill('Synced')}</span>`,
+        '<span class="q">—</span>',
+      ]),
+    ],
+  ),
+)
+
+const HISTORY = card(
+  'History',
+  '2',
+  table(
+    '48px 92px minmax(0,1fr) 80px',
+    [
+      head('ID'),
+      head('Revision'),
+      head('Source path'),
+      head('Deployed', { r: true, sorted: 'down' }),
+    ],
+    [
+      pgRow([
+        '<span>12</span>',
+        '<span class="q">4f1c9aa</span>',
+        '<span class="q">apps/storefront</span>',
+        '<span class="r">3m</span>',
+      ]),
+      pgRow([
+        '<span>11</span>',
+        '<span class="q">9b2e771</span>',
+        '<span class="q">apps/storefront</span>',
+        '<span class="r">2d</span>',
+      ]),
+    ],
+  ),
+)
+
+const COMPARISON =
+  "Failed to load target state: failed to generate manifest for source 1 of 1: rpc error: code = Unknown desc = Manifest generation error (cached): kustomize build jobs/legacy-batch failed: accumulating resources: accumulation err='accumulating resources from '../base'"
+
+const LEGACY_HISTORY = card(
+  'History',
+  '4',
+  table(
+    '48px 92px minmax(0,1fr) 80px',
+    [
+      head('ID'),
+      head('Revision'),
+      head('Source path'),
+      head('Deployed', { r: true, sorted: 'down' }),
+    ],
+    [
+      ['7', 'c41d0e2', '9d'],
+      ['6', '18aa3f5', '23d'],
+      ['5', 'e07b9c1', '41d'],
+      ['4', '5f2d8a4', '62d'],
+    ].map(([id, rev, age]) =>
+      pgRow([
+        `<span>${id}</span>`,
+        `<span class="q">${rev}</span>`,
+        '<span class="q">jobs/legacy-batch</span>',
+        `<span class="r">${age}</span>`,
+      ]),
+    ),
+  ),
+)
+
+/** 2. The Application's tab: the header with its three changes, the tiles, then its cards. */
+function argoTab(): string {
+  const conditions = card(
+    'Conditions',
+    '1',
+    table(
+      '144px minmax(0,1fr) 64px',
+      [head('Type'), head('Message'), head('When', { r: true })],
+      [
+        pgRow([
+          `<span>${pill('warning', 'ComparisonError')}</span>`,
+          `<span class="q" style="white-space:normal">${escape(COMPARISON.slice(0, 150))}…</span>`,
+          '<span class="r">2h</span>',
+        ]),
+      ],
+    ),
+  )
+  return spec(
+    'The Application’s tab',
+    'after Lumovi’s own tabs, before YAML',
+    `<div class="pmain">${appHead('storefront', 'Healthy')}<nav class="lts">${APP_OBJ_TABS}</nav>${pgframe('Argo CD', '2.1.0', `<div class="arr-stack" style="padding:16px"><div>${header2('storefront', ['healthy', 'Healthy'], ARGO_ACTS())}${FINALIZER}</div><div class="arr-tiles" style="--n:4">${appTiles()}</div>${RESOURCES}${HISTORY}</div>`)}</div>
+    <p class="cap" style="margin-top:20px">The header’s other cases: an operation running (Sync… off), and a degraded application with its condition</p>
+    <div class="pagebox arr-stack">
+      <div>${header2('payments', ['progressing', 'Progressing'], ARGO_ACTS(true))}<p class="h2why">Sync running: waiting for healthy state of apps/Deployment/payments</p></div>
+      <div>${header2('legacy-batch', ['critical', 'Degraded'], ARGO_ACTS())}<p class="h2why">${escape(COMPARISON)}</p></div>
+      <div class="pair wider">${LEGACY_HISTORY}${conditions}</div>
+    </div>`,
+    `The object’s own page in Lumovi, its head Lumovi’s (name, kind and namespace, and the health its data view already shows), then <b>Argo CD’s tab, after Lumovi’s own and before YAML</b>, with the plug, and the strip that says whose it is. <b>The header</b> repeats the name, as every plugin page’s header says what it’s about, then the health’s word with its level, and at most three buttons, the one that matters most last and the only one filled: <b>Delete…, Refresh…, Sync…</b>. <b>Refresh ends in “…”</b>: it asks one thing (Normal or Hard) first, and a button that asks first ends so. <b>Sync… is off while an operation runs</b>, its tooltip saying “A sync is running.”. <b>The status’s detail</b> is, in order: the running operation’s message (“Sync running: …”), the last operation’s message when it failed, else the first condition’s message; two lines, then end-cut, whole in its tooltip. <b>Nothing says “Sync started” of its own</b>: after Lumovi’s dialog, Lumovi’s notification says what it sent, and the header shows what the cluster says by reading the Application again, so the page never says it worked before the cluster does. <b>Four tiles, not five</b>: health is the header’s, so Sync (and how many resources are in sync), Synced revision (seven characters in the mono, the whole in its tooltip, the branch under), Last synced (a time value, as an age, with how it went and who), Auto-sync (with prune and self-heal under). <b>Resources</b>: kind and namespace under the name, Sync and Health as statuses, worst first; a ConfigMap has no health, so a dash. <b>By Delete…</b>, only when the Application has Argo CD’s resources finalizer, the plugin’s own line, docs’ words: “Deleting it also deletes what it deployed (it has Argo CD’s resources finalizer).”, quiet, under the buttons at the right, so it’s read before the press; payments and legacy-batch have none, so none. Lumovi’s dialog names the finalizer in its own words too. A row opens the object’s page where it’s one of Lumovi’s kinds. <b>History</b>: newest first, the revision short. <b>Conditions</b> only where there are any; with History they make a Pair, exactly two; alone, History is a Card full width.`,
+  )
+}
+
+/** 3. Its three proposals, each in Lumovi's dialog. */
+function argoProposals(): string {
+  const refresh = ask({
+    title: 'Argo CD asks to change the Application argocd/storefront',
+    fields: fld(
+      'How',
+      kseg(['Normal', 'Hard'], 'Normal'),
+      'Hard also asks the repository again, past Argo CD’s cache.',
+    ),
+    send: `${diff([
+      ['', 'metadata:'],
+      ['', '  annotations:'],
+      ['add', '    argocd.argoproj.io/refresh: normal'],
+    ])}${command(
+      'kubectl annotate application storefront -n argocd argocd.argoproj.io/refresh=normal --overwrite --context production-eu',
+    )}${OK}`,
+    verb: 'Refresh',
+  })
+  return spec(
+    'Its changes',
+    'Sync…, Refresh… and Delete…, each in Lumovi’s own dialog',
+    `<div style="display:grid;grid-template-columns:560px minmax(0,1fr);gap:32px;align-items:start">${refresh}<div class="spec" style="gap:10px"><p style="max-width:none"><b>Sync…</b> is the kit’s form frame as drawn (“A form inside Lumovi’s confirmation”): Revision, starting at the target revision; Prune, off; Strategy, Apply or Hook, starting at Hook.</p><p style="max-width:none"><b>Refresh…</b> (left): one choice, How, Normal or Hard, starting at Normal, into the refresh annotation; the verb on the dialog’s button is “Refresh”. A patch that only sets annotations is said as <code>kubectl annotate … --overwrite</code>, one that only sets labels as <code>kubectl label … --overwrite</code> (a removed key as <code>key-</code>); any other patch as <code>kubectl patch</code>.</p><p style="max-width:none"><b>Delete…</b> is Lumovi’s own Delete, its dialog and its typed name, with no fields of the plugin’s. What the finalizer will take with it is said on the page, by Delete…, before the press; the dialog names the finalizer in Lumovi’s words.</p><p style="max-width:none"><b>One Sync, one way.</b> Today’s at-once Sync and Refresh, on Lumovi’s own list of Applications, go: two Syncs that ask different things read as two different actions. The list’s row keeps opening the Application, where its tab has Sync… and Refresh…; the list keeps Lumovi’s own Delete.</p></div></div>`,
+    '',
+  )
+}
+
+/** 4. On a phone. */
+function argoPhone(): string {
+  const appCard = ([name, health, sync, path, target, dest, synced]: App) =>
+    `<li><div class="top">${lead({ level: HEALTH[health], name, under: health })}</div><dl class="one">${fact('Sync', sync)}${fact('Repository and path', `github.com/acme/deploy · ${path}`)}${fact('Target revision', target)}${fact('Destination', dest)}${fact('Last synced', synced)}</dl></li>`
+  const overview = phoneFrame(
+    'Argo CD',
+    `<nav class="lts">${ARGO_TABS}</nav><div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('Argo CD', '2.1.0', true)}</div><div class="ptiles">${ARGO_TILES()}</div><div class="sec"><h3>Applications<small>14</small></h3><h4>default <small>1</small></h4><ul class="cards">${appCard(['legacy-batch', 'Degraded', 'Out of sync', 'jobs/legacy-batch', 'main', 'batch', '2h'])}</ul><h4>shop <small>13</small></h4><ul class="cards">${appCard(['payments', 'Progressing', 'Out of sync', 'apps/payments', 'v2.4.1', 'payments', '1d'])}</ul></div>`,
+  )
+  const tab = phoneFrame(
+    'storefront',
+    `<nav class="lts">${APP_OBJ_TABS}</nav><div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('Argo CD', '2.1.0', true)}</div><div class="under">${pill('healthy', 'Healthy')}</div><p class="larger">Open Lumovi on a larger screen to use <b style="font-weight:500;color:var(--text-2)">Delete</b>, <b style="font-weight:500;color:var(--text-2)">Refresh</b> and <b style="font-weight:500;color:var(--text-2)">Sync</b>.</p>${FINALIZER}<div class="ptiles">${appTiles()}</div><div class="sec"><h3>Resources<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'storefront', under: 'Deployment · shop' })}</div><dl>${fact('Sync', 'Synced')}${fact('Health', 'Healthy')}</dl></li><li><div class="top">${lead({ level: 'healthy', name: 'storefront', under: 'Service · shop' })}</div><dl>${fact('Sync', 'Synced')}${fact('Health', 'Healthy')}</dl></li><li><div class="top">${lead({ name: 'storefront-config', under: 'ConfigMap · shop' })}</div><dl>${fact('Sync', 'Synced')}${fact('Health', '—')}</dl></li></ul></div>`,
+    true,
+  )
+  return `<section class="spec"><h2>On a phone<i>the overview, and the Application’s tab</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${overview}${tab}</div><p style="max-width:820px">The overview: the strip of tabs, the short strip of whose page it is, the three tiles two across (the third alone on its row takes the width), then the applications as cards under their projects. The repository and path doesn’t fit a third, so every fact of these cards takes a line. The tab: the health under the name, then, in the header’s place, <b>Lumovi’s one line naming the three changes</b> in the order the buttons stand, without their “…”; a phone makes none of them, Lumovi’s Delete included, as docs’ phone page says. Under it the plugin’s finalizer line stays: it’s read, not pressed. Then the four tiles two across, and Resources and History as cards; Resources’ facts fit a third, so they stand side by side.</p></section>`
+}
+
 // ─── Frames ────────────────────────────────────────────────────────────────────────────────
 
 export type KitFrame =
@@ -2422,6 +2685,8 @@ export type KitFrame =
   | 'counts-phone'
   | 'cnpg'
   | 'cnpg-phone'
+  | 'argo'
+  | 'argo-phone'
 
 export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'table', title: 'Table, on the desktop', size: { width: 1440, height: 1560 } },
@@ -2455,6 +2720,8 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
   { id: 'counts-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
   { id: 'cnpg', title: 'CloudNativePG as a plugin', size: { width: 1440, height: 2400 } },
   { id: 'cnpg-phone', title: 'The same, on a phone', size: { width: 920, height: 900 } },
+  { id: 'argo', title: 'Argo CD as a plugin with code', size: { width: 1440, height: 2400 } },
+  { id: 'argo-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
 ]
 
 /** One of the kit's frames, in one theme. */
@@ -2499,7 +2766,11 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                                       ? `<header><h1>CloudNativePG, as a plugin</h1><p>Its code draws two pages in Lumovi’s box from the kit’s parts, read-only for now: Clusters, and every cluster’s Backups. It reads its own kinds, and of Kubernetes’ own only the Pods labelled cnpg.io/cluster.</p></header>${pgClusters()}${pgBackupsPage()}`
                                       : id === 'cnpg-phone'
                                         ? pgPhone()
-                                        : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
+                                        : id === 'argo'
+                                          ? `<header><h1>Argo CD, as a plugin with code</h1><p>Its code draws an overview of every Application and a tab on each, from the kit’s parts, and proposes three changes through Lumovi’s dialog. It reads only its own kinds: Applications and AppProjects. Drawn from app’s shape (LMV-279) with its sample: storefront, payments and legacy-batch in the projects default and shop.</p></header>${argoOverview()}${argoTab()}${argoProposals()}`
+                                          : id === 'argo-phone'
+                                            ? argoPhone()
+                                            : `<header><h1>Marks</h1><p>How a text that isn’t Lumovi’s shows what can’t be seen or would act: in a Table’s cells, its lead, its headings.</p></header>${marksTable()}`
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
