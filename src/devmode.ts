@@ -38,6 +38,14 @@ const CSS = `
 .strip2 svg.i { color: var(--text-3); }
 .strip2 b { font-weight: 600; color: var(--text-1); }
 .strip2 .end { margin-left: auto; font-weight: 500; color: var(--text-1); }
+.ent { width: 1200px; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.ent .eb { padding: 14px 20px 16px 76px; border-top: 1px solid var(--line); background: var(--surface-2); }
+.ent .eh { display: flex; align-items: center; gap: 16px; max-width: 700px; font-size: 13px; font-weight: 500; color: var(--text-1); }
+.ent .eh .sw2 { margin-left: auto; }
+.ent .eh .sw2.dis { opacity: 0.5; }
+.ent .el { display: flex; align-items: center; gap: 8px; max-width: 700px; margin-top: 4px; font-size: 13px; line-height: 20px; color: var(--text-2); }
+.ent .el svg.i { flex: none; color: var(--text-3); }
+.ent .el .btn { margin-left: 8px; }
 .pagebx { width: 760px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-panel); }
 .pagebx .tabs2 { display: flex; gap: 20px; height: 40px; align-items: flex-end; padding: 0 20px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--text-2); }
 .pagebx .tabs2 span { padding-bottom: 10px; }
@@ -199,15 +207,56 @@ function states(): string {
     )
     .join('')
   const offRow = `<div class="footbox" style="width:1200px">${mine({ ...MINE[2]!, code: 'off' })}</div>`
+  const pg = (inner: string) =>
+    `<div class="pagebx"><div class="tabs2"><span class="on">Overview</span><span>Queues 3</span><span>Consumers 12</span></div><div class="strip2">${icon('plug', 13)}<span>This page is from your plugin <b>Queues</b> 0.1.0, from your own folder.</span><span class="end">What it may do →</span></div>${inner}</div>`
+  const offPage = pg(
+    `<div class="wait2"><span class="tl2">${icon('plug', 20)}</span><h3>Developer mode is off.</h3><p>Turn it on in Plugins to run Queues’ code.</p><span class="btn secondary">Open Plugins</span></div>`,
+  )
+  const lockedPage = pg(
+    `<div class="wait2"><span class="tl2">${icon('lock', 20)}</span><h3 style="margin-bottom:0">Your organization’s policy keeps Developer mode off.</h3></div>`,
+  )
+  const entry = (line: string, code: Code) =>
+    `<div class="ent">${mine({ ...MINE[2]!, code }).replace(SEE, '')}<div class="eb"><div class="eh">Run its code<span class="sw2${code === 'agreed' ? ' on' : ' dis'}"><i></i></span></div><div class="el">${line}</div></div></div>`
+  const entries = [
+    [
+      'Waiting: off and disabled, docs’ waiting line where the description was, and the way to agree',
+      entry(`Its code waits for you to agree to what it may do.${SEE}`, 'first'),
+    ],
+    ['Developer mode off', entry('Its pages don’t run: Developer mode is off.', 'off')],
+    [
+      'Locked by policy',
+      entry(`${icon('lock', 13)}Turned off by your organization’s policy.`, 'off'),
+    ],
+    [
+      'Agreed: the person’s own switch, and its description back',
+      entry(
+        'Draws its overview. It reads Pods as you, and proposes changes, each one you confirm.',
+        'agreed',
+      ),
+    ],
+  ]
+    .map(([c, h]) => `<p class="cap">${c}</p>${h}`)
+    .join('')
   const waiting = `<div class="pagebx"><div class="tabs2"><span class="on">Overview</span><span>Queues 3</span><span>Consumers 12</span></div><div class="strip2">${icon('plug', 13)}<span>This page is from your plugin <b>Queues</b> 0.1.0, from your own folder.</span><span class="end">What it may do →</span></div><div class="wait2"><span class="tl2">${icon('list', 20)}</span><h3>Queues’ code waits for you</h3><p>It runs once you’ve seen what it may do and agreed.</p><span class="btn primary">See what it may do…</span></div></div>`
   return `<section class="blk"><h2>The opening’s three endings<i>one clause follows Developer mode, the rest stays</i></h2><div class="blk">${openings}</div></section>
     <section class="blk"><h2>The switch<i>on the footer’s folder line, whatever filter is picked</i></h2><div class="blk">${footers}</div>
     <ul class="rules">
       <li><b>Where</b>: at the end of the footer’s line, beside “Yours go in ~/.lumovi/plugins”, the folder whose code it lets run; always in view, Yours 0 included, as someone is about to start. Lumovi has no settings page of its own to put it in. Docs’ line under it is always shown, never a tooltip: whoever turns it on has read it.</li>
       <li><b>Locked</b>: the switch off and at half strength, its line replaced by the lock and “Turned off by your organization’s policy.”, as the locked Run its code says it. The opening says none of yours run. On a server there’s no switch at all: a server’s plugins are its administrator’s (LMV-295).</li>
-      <li><b>Turned off</b>, every plugin of yours with code stops at once: its pages close where they’re open, and its row says “Its pages don’t run: Developer mode is off.” Its agreement is kept (turning it off is a switch, not taking an agreement back), so turning it on again runs what you agreed to without asking, unless its file’s asks or its code’s digest changed meanwhile: the agreement is bound to both and checked at every hand-over. The organization’s policy turning it off is someone else’s decision, so it clears every agreement: allowed again, each waits for the first dialog.</li>
+      <li><b>Turned off</b>, every plugin of yours with code stops at once: its open pages turn to the switched-off place below, and its row says “Its pages don’t run: Developer mode is off.” Its agreement is kept (turning it off is a switch, not taking an agreement back), so turning it on again runs what you agreed to without asking, unless its file’s asks or its code’s digest changed meanwhile: the agreement is bound to both and checked at every hand-over. The organization’s policy turning it off is someone else’s decision, so it clears every agreement: allowed again, each waits for the first dialog.</li>
     </ul></section>
     <section class="blk"><h2>A row of yours while Developer mode is off</h2>${offRow}</section>
+    <section class="blk"><h2>Run its code, in the opened entry<i>it shows whether the code can run, not only what the person chose</i></h2><div class="blk">${entries}</div>
+    <ul class="rules">
+      <li><b>When something else stops it</b> (it waits for you to agree, Developer mode is off, or the policy locks it), the switch is off and disabled at half strength, and the line under it says why, in place of the description, as the locked Run its code already does. Waiting, the line has See what it may do… beside it.</li>
+      <li><b>Once nothing stops it</b>, the switch shows the person’s own choice again and its description comes back. Their choice is kept underneath: turning Run its code off before agreeing still keeps it off after.</li>
+    </ul></section>
+    <section class="blk"><h2>Its page while Developer mode is off<i>a switched-off place, never a failure</i></h2><div class="row2" style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap"><div class="blk"><p class="cap">Off: what to do, and where</p>${offPage}</div><div class="blk"><p class="cap">Locked by policy: said, with nothing to press</p>${lockedPage}</div></div>
+    <ul class="rules">
+      <li><b>Off</b>: the tile with the plugin glyph, docs’ “Developer mode is off.” and “Turn it on in Plugins to run Queues’ code.”, and Open Plugins, secondary, since it goes somewhere rather than does something. No “the rest of Lumovi” line: nothing failed.</li>
+      <li><b>Locked</b>: the lock in the tile and docs’ one sentence, “Your organization’s policy keeps Developer mode off.”, with no button, as there’s nothing the person can do here.</li>
+      <li><b>Its lists stay</b> in both, as when its code waits: only what its code draws is held.</li>
+    </ul></section>
     <section class="blk"><h2>Its page while its code waits<i>in place of its pages, until you’ve agreed</i></h2>${waiting}
     <ul class="rules">
       <li><b>In place of what its code draws</b>: the page’s strip as any of yours, then the tile, “Queues’ code waits for you”, docs’ line, and See what it may do…, which opens the dialog. Filled, being the page’s one thing to do; it never runs the code itself.</li>
