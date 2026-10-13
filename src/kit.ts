@@ -15,19 +15,19 @@ import { icon } from './lucide.ts'
 import { CSS as SHELL, pill } from './proposals.ts'
 import { FONTS } from './scene.ts'
 
-type Level = 'critical' | 'warning' | 'progressing' | 'healthy' | 'neutral'
+export type Level = 'critical' | 'warning' | 'progressing' | 'healthy' | 'neutral'
 
 /** The lines of a shared stylesheet whose rule starts as `start` does: the app's own values. */
-const only = (css: string, start: RegExp) =>
+export const only = (css: string, start: RegExp) =>
   css
     .split('\n')
     .filter((line) => start.test(line))
     .join('\n')
 
-const escape = (text: string) =>
+export const escape = (text: string) =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-const CSS = `
+export const CSS = `
 body { margin: 0; background: var(--app-bg); font-family: 'Inter', sans-serif; font-size: 13px; line-height: 20px; color: var(--text-1); -webkit-font-smoothing: antialiased; }
 .sheet { display: flex; flex-direction: column; gap: 28px; padding: 32px; }
 .sheet > header h1 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; }
@@ -457,7 +457,7 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 
 `
 
-const LEVEL: Record<Level, string> = {
+export const LEVEL: Record<Level, string> = {
   critical: 'critical',
   warning: 'warn',
   progressing: 'neutral',
@@ -476,7 +476,7 @@ interface Lead {
 }
 
 /** The lead cell: what a row is called. A long name is cut in its middle, its last six kept. */
-function lead(l: Lead, o: { fit?: number; twist?: 'open' | 'closed' } = {}): string {
+export function lead(l: Lead, o: { fit?: number; twist?: 'open' | 'closed' } = {}): string {
   const name = o.fit && l.name.length > o.fit ? cut(l.name, o.fit) : escape(l.name)
   const dot = l.level
     ? `<span class="dot" style="--m:var(--${LEVEL[l.level]})"></span>`
@@ -488,7 +488,7 @@ function lead(l: Lead, o: { fit?: number; twist?: 'open' | 'closed' } = {}): str
 }
 
 /** A name cut in its middle to `fit` characters, its last six kept, as the phone layout cuts one. */
-function cut(name: string, fit: number): string {
+export function cut(name: string, fit: number): string {
   const head = Math.max(4, fit - 7)
   return `${escape(name.slice(0, head))}…${escape(name.slice(-6))}`
 }
@@ -509,7 +509,7 @@ interface Row {
   note?: string
 }
 
-function table(cols: string, heads: string[] | null, rows: (Row | string)[]): string {
+export function table(cols: string, heads: string[] | null, rows: (Row | string)[]): string {
   const th = heads
     ? `<div class="th" role="row">${heads.map((h) => (h.startsWith('<') ? h : `<span>${h}</span>`)).join('')}</div>`
     : ''
@@ -523,13 +523,16 @@ function table(cols: string, heads: string[] | null, rows: (Row | string)[]): st
   return `<div class="t" style="--cols:${cols}">${th}${tr}</div>`
 }
 
-const head = (text: string, o: { r?: boolean; sorted?: 'up' | 'down'; can?: boolean } = {}) =>
+export const head = (
+  text: string,
+  o: { r?: boolean; sorted?: 'up' | 'down'; can?: boolean } = {},
+) =>
   `<span class="${[o.r ? 'r' : '', o.sorted ? 'sorted' : '', o.can ? 'can' : ''].join(' ')}">${text}${o.sorted ? icon(o.sorted === 'up' ? 'arrow-up' : 'arrow-down', 12) : ''}</span>`
 
-const card = (title: string, note: string, body: string) =>
+export const card = (title: string, note: string, body: string) =>
   `<div class="kcard"><h3>${title}${note ? `<small>${note}</small>` : ''}</h3><div class="in">${body}</div></div>`
 
-const spec = (title: string, sub: string, body: string, rule: string) =>
+export const spec = (title: string, sub: string, body: string, rule: string) =>
   `<section class="spec"><h2>${title}<i>${sub}</i></h2>${body}<p>${rule}</p></section>`
 
 const LONG = 'checkout-payments-reconciliation-worker-eu-west-1-blue-canary-7d9f6c5b8-x2kqp'
@@ -789,9 +792,10 @@ function states(): string {
 
 // ─── Table, on a phone ─────────────────────────────────────────────────────────────────────
 
-const fact = (label: string, value: string) => `<div><dt>${label}</dt><dd>${value}</dd></div>`
+export const fact = (label: string, value: string) =>
+  `<div><dt>${label}</dt><dd>${value}</dd></div>`
 
-function phoneFrame(title: string, body: string, back = false): string {
+export function phoneFrame(title: string, body: string, back = false): string {
   return `<div class="ph"><div class="bar"><span class="tap">${icon(back ? 'arrow-left' : 'menu', 20)}</span><h1>${title}</h1></div>${body}</div>`
 }
 
@@ -887,7 +891,7 @@ interface TileOptions {
 }
 
 /** A tile, as the app's Overview has them and Karpenter's page uses. */
-function tile(
+export function tile(
   glyph: Parameters<typeof icon>[0],
   label: string,
   value: string,
@@ -898,7 +902,7 @@ function tile(
   return `<div class="ktile${o.hover ? ' hover' : ''}"><div class="l">${icon(glyph, 16)}<span>${label}</span>${o.opens ? `<span class="go">${icon('chevron-right', 16)}</span>` : ''}</div><div class="v${o.words ? ' words' : ''}">${value}</div><div class="s">${dot}<span>${sub}</span></div></div>`
 }
 
-const btn = (label: string, kind: 'primary' | 'secondary' | 'ghost') =>
+export const btn = (label: string, kind: 'primary' | 'secondary' | 'ghost') =>
   `<span class="btn ${kind} sm">${label}</span>`
 
 const MORE = `<span class="btn secondary sm" style="width:28px;padding:0">${icon('ellipsis', 14)}</span>`
@@ -1167,10 +1171,10 @@ const kfield = (
 ) =>
   `<span class="kfield${o.mono ? ' mono' : ''}${o.bad ? ' bad' : ''}${o.ph ? ' ph' : ''}"${o.width ? ` style="width:${o.width}px"` : ''}>${value}${o.end ? `<span class="end">${icon('chevrons-up-down', 14)}</span>` : ''}</span>`
 
-const diff = (lines: [string, string][]) =>
+export const diff = (lines: [string, string][]) =>
   `<div class="kdiff">${lines.map(([k, t]) => `<div class="${k}">${k === 'add' ? '+' : k === 'del' ? '−' : ' '} ${escape(t)}</div>`).join('')}</div>`
 
-const command = (text: string) =>
+export const command = (text: string) =>
   `<div class="kcmd"><div class="cl">Equivalent command${icon('copy', 14)}</div><code>${escape(text)}</code></div>`
 
 interface Ask {
@@ -1357,7 +1361,7 @@ interface GNode {
 
 type GEdge = [from: string, to: string, o?: { dash?: boolean; label?: string; cls?: string }]
 
-const TEXT: Record<Level, string> = {
+export const TEXT: Record<Level, string> = {
   critical: 'critical-text',
   warning: 'warn-text',
   progressing: 'text-2',
