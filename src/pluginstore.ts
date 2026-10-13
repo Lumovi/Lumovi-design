@@ -54,18 +54,17 @@ const CSS = `
 .sdlg .dh .g { display: grid; flex: none; width: 36px; height: 36px; place-items: center; border-radius: 12px; background: var(--surface-3); color: var(--text-2); }
 .sdlg .dh h3 { margin: 0; font-size: 15px; line-height: 21px; font-weight: 600; }
 .sdlg .dh small { display: block; margin-top: 2px; font-size: 12px; line-height: 16px; color: var(--text-3); }
+.sdlg .dh small .use { display: block; margin-top: 2px; }
 .sdlg .dh small b { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--text-2); }
 .sdlg .part { padding: 14px 20px; }
 .sdlg .part + .part { border-top: 1px solid var(--line); }
 .sdlg .cap2 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .sdlg .cap2 .n { padding: 0 6px; border-radius: 999px; background: var(--surface-3); font-size: 10.5px; letter-spacing: 0; text-transform: none; color: var(--text-1); }
-.ask { display: flex; gap: 10px; padding: 6px 0; font-size: 13px; line-height: 19px; color: var(--text-1); }
+.ask { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 13px; line-height: 19px; color: var(--text-1); }
 .ask svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
 .ask > span { min-width: 0; flex: 1; }
+.ask code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-1); }
 .ask small { display: block; font-size: 12px; line-height: 17px; color: var(--text-3); }
-.ask.heavy { color: var(--critical-text); }
-.ask.heavy svg.i { color: var(--critical-text); }
-.ask.heavy small { color: color-mix(in srgb, var(--critical-text) 75%, var(--text-3)); }
 .ask.gone { color: var(--text-3); text-decoration: line-through; text-decoration-color: var(--line-strong); }
 .ask.gone small { text-decoration: none; }
 .same { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-2); }
@@ -73,6 +72,8 @@ const CSS = `
 .codech { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 12.5px; line-height: 18px; color: var(--text-2); }
 .codech svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
 .codech b { font-weight: 600; color: var(--text-1); }
+.codech small { display: block; margin-top: 2px; font-size: 12px; line-height: 17px; color: var(--text-3); }
+.codech code { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text-2); }
 .ref { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; line-height: 19px; color: var(--text-2); }
 .ref svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
 .ref b { font-weight: 600; color: var(--text-1); }
@@ -257,7 +258,7 @@ const dlg = (o: {
   `<div class="sdlg"><div class="dh"><span class="g">${icon(o.glyph, 18)}</span><div><h3>${o.title}</h3><small>${o.sub}</small></div></div>${o.body}<div class="df">${o.note ? `<span class="note">${o.note}</span>` : ''}<span class="btn ghost sm">${o.off ? 'Close' : 'Cancel'}</span>${o.off ? '' : `<span class="btn primary sm">${o.button}</span>`}</div></div>`
 
 const SUB = (v: string) =>
-  `From Lumovi-plugins release <b>1.2.0</b>, signed by its release workflow. It runs in Lumovi’s sealed box, as you.${v ? ` In use: ${v}.` : ''}`
+  `From Lumovi-plugins release <b>1.4.0</b>, signed by its release workflow. What it reads and changes, it does as you.${v ? `<span class="use">In use: ${v}.</span>` : ''}`
 
 function dialogsFrame(): string {
   const install = dlg({
@@ -265,36 +266,36 @@ function dialogsFrame(): string {
     title: 'Install Tinker 1.0.0?',
     sub: SUB(''),
     body: `<div class="part"><p class="cap2">What it may do</p>
-      ${ask('pencil', 'Change Gadgets and Gizmos', 'Only the kinds it shows, with the patches it spells out, each shown before it’s sent')}
-      ${ask('eye', 'Read its own kinds, and Pods', 'As you, within your access')}
-      ${ask('key-round', 'Read Secrets’ values', 'Of the Secrets its Gadgets name, to say whether they’re set', 'heavy')}
-      ${ask('code', 'Draw its pages with its own code', 'In Lumovi’s sealed frame, through the door; you can turn its code off in Plugins')}</div>`,
+      ${ask('code', 'Draws its pages with its own code, which runs in Lumovi’s sealed box and is handed only what’s listed here.')}
+      ${ask('pencil', 'Its pages may propose to change Gadgets and Gizmos, each change one you confirm in Lumovi.')}
+      ${ask('eye', 'Of Pods, its code is handed only <code>metadata.name and status.phase</code>, as far as you may read them.')}
+      ${ask('key-round', 'Shows you <code>token</code> of the Secret that a Gadget’s <code>spec.secretRef.name</code> names. Lumovi reads it as you, only when you press Reveal or Copy; the plugin never sees it.')}</div>`,
     button: 'Install 1.0.0',
     note: 'Nothing is written until you press Install.',
   })
   const adds = dlg({
     glyph: 'boxes',
     title: 'Update Toys to 1.3.0?',
-    sub: SUB('1.2.0, installed from Lumovi-plugins'),
+    sub: SUB('1.2.0, installed from Lumovi-plugins release <b>1.1.0</b>'),
     body: `<div class="part"><p class="cap2">New in 1.3.0<span class="n">2</span></p>
-      ${ask('key-round', 'Read Secrets’ values', 'Of the key token in toys/toys-api, to say whether Widgets can reach their API', 'heavy')}
-      ${ask('scroll-text', 'Open Lumovi’s Logs tab for pods it shows', 'You read them there; it reads nothing of them')}</div>
-      <div class="part"><p class="cap2">No longer</p>${ask('pencil', 'Change Widgets’ spec.paused', '', 'gone')}</div>
-      <div class="part"><div class="codech">${icon('code', 15)}<span><b>Its code changed.</b> <a>See what changed on GitHub ↗</a> (1.2.0…1.3.0)</span></div><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (4)</div></div>`,
+      ${ask('key-round', 'Shows you <code>token</code> of the Secret that a Widget’s <code>spec.apiSecretRef.name</code> names. Lumovi reads it as you, only when you press Reveal or Copy; the plugin never sees it.')}
+      ${ask('link', 'It links to Pods by name. A link opens Lumovi’s page for the object; the plugin reads nothing of it.')}</div>
+      <div class="part"><p class="cap2">No longer</p>${ask('pencil', 'Its pages may propose to scale Widgets, each change one you confirm in Lumovi.', '', 'gone')}</div>
+      <div class="part"><div class="codech">${icon('code', 15)}<span><b>Its code changed.</b> <a>See what changed on GitHub ↗</a><small>Lumovi-plugins release <code>1.1.0</code> to <code>1.4.0</code>, every plugin’s changes. This one’s are under <code>plugins/toys</code> and <code>src/toys</code>.</small></span></div><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (4)</div></div>`,
     button: 'Update to 1.3.0',
     note: 'Without this, 1.2.0 stays in use.',
   })
   const same = dlg({
     glyph: 'boxes',
     title: 'Update Tinker to 1.0.1?',
-    sub: SUB('1.0.0, installed from Lumovi-plugins'),
-    body: `<div class="part"><div class="same">${icon('circle-check', 15, 2, 'color:var(--good-text)')}It asks for nothing it doesn’t already have.</div></div><div class="part"><div class="codech">${icon('code', 15)}<span><b>Its code changed.</b> <a>See what changed on GitHub ↗</a> (1.0.0…1.0.1)</span></div><div class="closed">${icon('chevron-right', 13)}What it may do (6)</div></div>`,
+    sub: SUB('1.0.0, installed from Lumovi-plugins release <b>1.1.0</b>'),
+    body: `<div class="part"><div class="same">${icon('circle-check', 15, 2, 'color:var(--good-text)')}It asks for nothing it doesn’t already have.</div></div><div class="part"><div class="codech">${icon('code', 15)}<span><b>Its code changed.</b> <a>See what changed on GitHub ↗</a><small>Lumovi-plugins release <code>1.1.0</code> to <code>1.4.0</code>, every plugin’s changes. This one’s are under <code>plugins/tinker</code> and <code>src/tinker</code>.</small></span></div><div class="closed">${icon('chevron-right', 13)}What it may do (6)</div></div>`,
     button: 'Update to 1.0.1',
   })
   const refused = dlg({
     glyph: 'boxes',
     title: 'Update Toys to 1.3.0?',
-    sub: SUB('1.2.0, installed from Lumovi-plugins'),
+    sub: SUB('1.2.0, installed from Lumovi-plugins release <b>1.1.0</b>'),
     body: `<div class="part"><div class="ref">${icon('lock', 15)}<span><b>Your organization’s policy doesn’t let plugins show what’s in Secrets, and this one would.</b> (<code>pluginSecrets: off</code>) 1.2.0 stays in use.</span></div></div>`,
     button: '',
     off: true,
@@ -312,9 +313,10 @@ function dialogsFrame(): string {
   return `<section class="blk"><h2>Installing and updating<i>one dialog, Lumovi’s words for what each asks</i></h2>
     <div class="dgrid"><div class="blk"><p class="cap">A first install, of one not in this Lumovi (Tinker and Toys are the tests’ stand-ins)</p>${install}</div><div class="blk"><p class="cap">An update that asks for more: what’s new first</p>${adds}</div><div class="blk"><p class="cap">An update that asks for the same</p>${same}</div><div class="blk"><p class="cap">Refused by policy</p>${refused}</div><div class="blk"><p class="cap">Removing one installed from Not here yet</p>${remove}</div></div>
     <ul class="rules">
-      <li><b>One dialog</b>, opened from a row’s Install… or Update…: the plugin, its version and the store’s release under its name (signed and checked, in the store’s words), then what it may do, then one button, “Install 1.0.0” or “Update to 1.2.0”. Nothing is written without it; Escape and Cancel leave everything as it was.</li>
-      <li><b>What it may do</b> is the Plugins page’s own lines (WhatItAsks), so a permission reads the same before and after. <b>Heavy ones are red</b>, words and icon: Secrets’ values, starting programs, who may do what (docs’ list). Nothing else is coloured.</li>
-      <li><b>An update says what’s new first</b>, with how many, then what it no longer asks (struck through, quiet), then “Its code changed” with the release’s diff on GitHub, never a summary of ours. What it asks as before is folded, with how many, and opens in place.</li>
+      <li><b>One dialog</b>, opened from a row’s Install… or Update…: the plugin and its version, and under them the store’s release (“From Lumovi-plugins release 1.4.0, signed by its release workflow. What it reads and changes, it does as you.”, true of every plugin, code or not); an update or a go-back adds what’s in use on a line of its own, “In use: 1.2.0, installed from Lumovi-plugins release 1.1.0.” or “In use: 1.1.0, which comes with Lumovi.”, each release named as the bar names it, so two 1.2.0s never read as one. Then what it may do, then one button, “Install 1.0.0” or “Update to 1.2.0”. Nothing is written without it; Escape and Cancel leave everything as it was.</li>
+      <li><b>What it may do</b> is the Plugins page’s own lines (WhatItAsks), one for each permission, so a permission reads the same before and after; New in and No longer are worked out from the plugin’s asks, never from their words. A plugin with code has one line more, first: “Draws its pages with its own code, which runs in Lumovi’s sealed box and is handed only what’s listed here.”</li>
+      <li><b>Nothing is red</b> (docs): “Shows you … of the Secret” is Lumovi showing it to you, as you, and the plugin never holds it. Red comes with LMV-290’s server reach. Nothing else is coloured.</li>
+      <li><b>An update says what’s new first</b>, with how many, then what it no longer asks (struck through, quiet), then “Its code changed” with the diff on GitHub between the release it came from and this one (compare/v1.1.0...v1.4.0: Lumovi-plugins’ tags are its releases, never a plugin’s version), and under it, quiet, docs’ line: “Lumovi-plugins release 1.1.0 to 1.4.0, every plugin’s changes. This one’s are under plugins/toys and src/toys.” No plugin versions beside it, no link where both are the same release, and never a summary of ours. What it asks as before is folded, with how many, and opens in place.</li>
       <li><b>The same asks</b>: one line, “It asks for nothing it doesn’t already have.”, with the good icon; the code line still shows, since code is new whatever it asks.</li>
       <li><b>Refused by policy</b>: the dialog says so and which key, in the policy’s own name, and that the version in use stays; it has Close and no button that can’t work. A row whose update policy refuses still offers Update…, so the person learns why.</li>
       <li><b>Going back</b> to a version that asks for anything the current one doesn’t opens this same dialog, titled “Go back to Toys 1.2.0?”, its new asks first; otherwise it goes back at once with a toast. <b>Remove</b> (only for one not in this Lumovi) asks first, its button in the danger colour; after, the row is back under Not here yet with Install…, and the toast “Removed Toys.” has no Undo, since putting it back is an install with its own questions.</li>
