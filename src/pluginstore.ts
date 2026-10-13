@@ -308,7 +308,7 @@ function dialogsFrame(): string {
       ${ask('eye', 'Of Pods, its code is handed only <code>metadata.name and status.phase</code>, as far as you may read them.')}
       ${ask('key-round', 'Shows you <code>token</code> of the Secret that a Gadget’s <code>spec.secretRef.name</code> names. Lumovi reads it as you, only when you press Reveal or Copy; the plugin never sees it.')}</div>`,
     button: 'Install 1.0.0',
-    note: 'Nothing is written until you press Install.',
+    note: 'Nothing changes until you press Install.',
   })
   const adds = dlg({
     glyph: 'boxes',
@@ -320,7 +320,7 @@ function dialogsFrame(): string {
       <div class="part"><p class="cap2">No longer</p>${ask('pencil', 'Its pages may propose to scale Widgets, each change one you confirm in Lumovi.', '', 'gone')}</div>
       <div class="part"><div class="codech">${icon('code', 15)}<span><b>Its code changed.</b> <a>See what changed on GitHub ↗</a><small>Lumovi-plugins release <code>1.1.0</code> to <code>1.4.0</code>, every plugin’s changes. This one’s are under <code>plugins/toys</code> and <code>src/toys</code>.</small></span></div><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (4)</div></div>`,
     button: 'Update to 1.3.0',
-    note: 'Without this, 1.2.0 stays in use.',
+    note: 'Nothing changes until you press Update.',
   })
   const same = dlg({
     glyph: 'boxes',
@@ -328,6 +328,7 @@ function dialogsFrame(): string {
     sub: SUB('1.0.0, installed from Lumovi-plugins release <b>1.1.0</b>'),
     body: `<div class="part"><div class="same">${icon('circle-check', 15, 2, 'color:var(--good-text)')}It asks for nothing it doesn’t already have.</div></div><div class="part"><div class="codech">${icon('code', 15)}<span><b>Its code changed.</b> <a>See what changed on GitHub ↗</a><small>Lumovi-plugins release <code>1.1.0</code> to <code>1.4.0</code>, every plugin’s changes. This one’s are under <code>plugins/tinker</code> and <code>src/tinker</code>.</small></span></div><div class="closed">${icon('chevron-right', 13)}What it may do (6)</div></div>`,
     button: 'Update to 1.0.1',
+    note: 'Nothing changes until you press Update.',
   })
   const refused = dlg({
     glyph: 'boxes',
@@ -350,7 +351,7 @@ function dialogsFrame(): string {
   return `<section class="blk"><h2>Installing and updating<i>one dialog, Lumovi’s words for what each asks</i></h2>
     <div class="dgrid"><div class="blk"><p class="cap">A first install, of one not in this Lumovi (Tinker and Toys are the tests’ stand-ins)</p>${install}</div><div class="blk"><p class="cap">An update that asks for more: what’s new first</p>${adds}</div><div class="blk"><p class="cap">An update that asks for the same</p>${same}</div><div class="blk"><p class="cap">Refused by policy</p>${refused}</div><div class="blk"><p class="cap">Removing one installed from Not here yet</p>${remove}</div></div>
     <ul class="rules">
-      <li><b>One dialog</b>, opened from a row’s Install… or Update…: the plugin and its version, and under them the store’s release (“From Lumovi-plugins release 1.4.0, signed by its release workflow. What it reads and changes, it does as you.”, true of every plugin, code or not); an update or a go-back adds what’s in use on a line of its own, “In use: 1.2.0, installed from Lumovi-plugins release 1.1.0.” or “In use: 1.1.0, which comes with Lumovi.”, each release named as the bar names it, so two 1.2.0s never read as one. Then what it may do, then one button, “Install 1.0.0” or “Update to 1.2.0”. Nothing is written without it; Escape and Cancel leave everything as it was.</li>
+      <li><b>One dialog</b>, opened from a row’s Install… or Update…: the plugin and its version, and under them the store’s release (“From Lumovi-plugins release 1.4.0, signed by its release workflow. What it reads and changes, it does as you.”, true of every plugin, code or not); an update or a go-back adds what’s in use on a line of its own, “In use: 1.2.0, installed from Lumovi-plugins release 1.1.0.” or “In use: 1.1.0, which comes with Lumovi.”, each release named as the bar names it, so two 1.2.0s never read as one. Then what it may do, then one button, “Install 1.0.0” or “Update to 1.2.0”. Nothing is written without it, and the footer says so in docs’ words, “Nothing changes until you press Install.” (or Update, or Go back); Escape and Cancel leave everything as it was. Which version stays in use is said only where something is refused: “… (pluginSecrets: off). 1.2.0 stays in use.”, or “Nothing is installed.” on a first install.</li>
       <li><b>What it may do</b> is the Plugins page’s own lines (WhatItAsks), one for each permission, so a permission reads the same before and after; New in and No longer are worked out from the plugin’s asks, never from their words. A plugin with code has one line more, first: “Draws its pages with its own code, which runs in Lumovi’s sealed box and is handed only what’s listed here.”</li>
       <li><b>Nothing is red</b> (docs): “Shows you … of the Secret” is Lumovi showing it to you, as you, and the plugin never holds it. Red comes with LMV-290’s server reach. Nothing else is coloured.</li>
       <li><b>An update says what’s new first</b>, with how many, then what it no longer asks (struck through, quiet), then “Its code changed” with the diff on GitHub between the release it came from and this one (compare/v1.1.0...v1.4.0: Lumovi-plugins’ tags are its releases, never a plugin’s version), and under it, quiet, docs’ line: “Lumovi-plugins release 1.1.0 to 1.4.0, every plugin’s changes. This one’s are under plugins/toys and src/toys.” No plugin versions beside it, no link where both are the same release, and never a summary of ours. What it asks as before is folded, with how many, and opens in place.</li>

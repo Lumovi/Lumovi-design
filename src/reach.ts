@@ -346,7 +346,7 @@ function serverFrame(): string {
       <div class="ask red">${icon('server', 15)}<span>${srv(PROM)}</span></div>
       <div class="ask">${icon('code', 15)}<span>Draws its pages with its own code, which runs in Lumovi’s sealed box and is handed only what’s listed here.</span></div></div>
     <div class="part"><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (3)</div></div>
-    <div class="df"><span class="note">Without this, 1.0.0 stays in use.</span><span class="btn ghost sm">Cancel</span><span class="btn primary sm">Update to 1.1.0</span></div></div>`
+    <div class="df"><span class="note">Nothing changes until you press Update.</span><span class="btn ghost sm">Cancel</span><span class="btn primary sm">Update to 1.1.0</span></div></div>`
   const lastLogs = 'It reads no Secret’s value, and sends nothing anywhere but to this cluster.'
   const two = `<div class="row2">
     <div class="blk"><p class="cap">Two red lines together: its code reads logs and asks its server (Toys, the tests’ stand-in)</p>${mayRead(logsRed() + srv(TOYS_SRV), lastLogs)}
@@ -362,7 +362,7 @@ function serverFrame(): string {
         <div class="ask red">${icon('scroll-text', 15)}<span>${logsRed()}</span></div>
         <div class="ask red">${icon('server', 15)}<span>${srv(TOYS_SRV)}</span></div></div>
       <div class="part"><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (4)</div></div>
-      <div class="df"><span class="note">Without this, 1.2.0 stays in use.</span><span class="btn ghost sm">Cancel</span><span class="btn primary sm">Update to 1.3.0</span></div></div></div>
+      <div class="df"><span class="note">Nothing changes until you press Update.</span><span class="btn ghost sm">Cancel</span><span class="btn primary sm">Update to 1.3.0</span></div></div></div>
   </div>`
   const refused = `<div class="srvd"><div class="dh"><span class="g">${icon('activity', 18)}</span><div><h3>Update Prometheus Operator to 1.1.0?</h3><small>${sub}</small></div></div>
     <div class="part"><div class="ask">${icon('lock', 15)}<span><b>Your organization’s policy doesn’t let plugins talk to servers in the cluster, and this one would.</b> (<code>pluginServers: off</code>) 1.0.0 stays in use.</span></div></div>
