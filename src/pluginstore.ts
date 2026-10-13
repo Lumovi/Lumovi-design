@@ -425,3 +425,6 @@ ${page ? `.win { height: ${f.size.height - 1}px; }` : ''}
 .pair > .win + .win { margin-top: 16px; }
 </style>${body}`
 }
+
+/** The parts LMV-291's frames draw the same Plugins page and dialog with. */
+export { CSS as STORE_FRAME_CSS, HERE, SECTION, STATE, ask, dlg }
