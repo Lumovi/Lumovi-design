@@ -61,6 +61,15 @@ body { margin: 0; background: var(--app-bg); font-family: 'Inter', sans-serif; f
 .t .tr + .tr, .t .th + .tr { margin-top: 2px; }
 .t .tr.opens.hover { background: color-mix(in srgb, var(--surface-3) 60%, transparent); }
 .t .tr.focus { box-shadow: 0 0 0 2px var(--accent); }
+.rel { position: relative; }
+.rtip { position: absolute; z-index: 3; width: max-content; max-width: 360px; padding: 8px 10px; border-radius: 8px; background: var(--text-1); font-size: 12px; line-height: 18px; color: var(--surface); box-shadow: var(--shadow-pop); }
+.rtip .go { display: block; font-weight: 500; }
+.rtip .ld { display: block; color: color-mix(in srgb, var(--surface) 68%, transparent); overflow-wrap: anywhere; }
+.rtip .ld b { font-weight: 500; color: var(--surface); }
+.rtip hr { height: 1px; margin: 6px 0; border: 0; background: color-mix(in srgb, var(--surface) 22%, transparent); }
+.rtip dl { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; margin: 0; }
+.rtip dt { color: color-mix(in srgb, var(--surface) 68%, transparent); }
+.rtip dd { margin: 0; font-variant-numeric: tabular-nums; }
 .t .tr > span { min-width: 0; }
 .t .r { text-align: right; font-variant-numeric: tabular-nums; }
 .t .q { font-size: 12px; color: var(--text-2); }
@@ -786,6 +795,78 @@ function hard(): string {
       ]),
     )}`,
     '<b>A name is never cut at its end.</b> Too long for its column, it loses its middle and keeps its last six characters, where a pod’s or a node’s name differs from its neighbours; the whole name is its title on hover and what a screen reader says. The words beside it take the room the name leaves and are cut only when the two don’t fit: then they give way first, down to about five characters, before the name gives a pixel (no share of the lead is kept back from them, so a short name never leaves them cut beside empty room). Cut, they’re whole where the name is: in the row’s tooltip under a pointer, and a tap away under a finger, as the line under is; then the name gives way; the line under is the one thing cut at its end. <b>A row’s last cell may take the rest of the row</b> (second node: no meters to show, so words in their place); no other spans. <b>A note</b> runs under the whole row from the name’s left edge, two lines at most, then “…”; with a note the dot sits on the name’s line.',
+  )
+}
+
+/** 4b. Narrow: the name keeps its floor, columns give way whole, and a row's one tooltip says the rest. */
+function fits(): string {
+  const tip = (o: { go?: string; lead?: string; cut?: [string, string][]; style: string }) =>
+    `<span class="rtip" style="${o.style}">${[
+      o.go ? `<span class="go">${o.go}</span>` : '',
+      o.lead ? `<span class="ld">${o.lead}</span>` : '',
+      o.cut?.length
+        ? `<dl>${o.cut.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('<hr>')}</span>`
+  const inst = (name: string, role: string, cls = '') =>
+    pgRow(
+      [
+        lead({ level: 'healthy', name }),
+        `<span>${role}</span>`,
+        `<span>${pill('healthy', 'Ready')}</span>`,
+        `<span class="q3">ip-10-0-2-44</span>`,
+      ],
+      cls,
+    )
+  const narrow = `<div class="rel" style="width:520px">${card(
+    'Instances',
+    '3',
+    table(
+      'minmax(160px,1fr) 88px 104px 104px',
+      [head('Name'), head('Role'), head('Status'), head('Node')],
+      [
+        inst('orders-db-1', 'Primary'),
+        inst('orders-db-2', 'Replica'),
+        inst('orders-db-3', 'Replica', 'opens hover'),
+      ],
+    ),
+  )}${tip({
+    go: 'Opens Pod shop/orders-db-3 at its Logs tab',
+    cut: [
+      ['Restarts', '2'],
+      ['Age', '3d3h'],
+    ],
+    style: 'left:44px;top:214px',
+  })}</div>`
+  const down = (w: number, name: string, beside: string, fit?: number) =>
+    `<div style="width:${w}px">${card(
+      'Down',
+      '1',
+      table('minmax(0,1fr) 40px', null, [
+        pgRow([
+          lead({ level: 'critical', name, beside }, fit ? { fit } : {}),
+          '<span class="q3 r">8h</span>',
+        ]),
+      ]),
+    )}</div>`
+  const BESIDE = 'storefront · ServiceMonitor · shop · Prometheus k8s'
+  const beside = `<div class="arr-stack">
+    <p class="cap">Room for both: the words beside are whole</p>${down(560, '10.0.3.7:8080', BESIDE)}
+    <p class="cap">Less room: they’re cut at their end, the name untouched</p>${down(340, '10.0.3.7:8080', BESIDE)}
+    <p class="cap">Not enough for the name either: they’re at their least, then the name loses its middle</p><div class="rel">${down(
+      328,
+      'storefront-metrics-exporter-7d9f6c5b8-x2kqp.shop.svc:8080',
+      BESIDE,
+      25,
+    )}${tip({ lead: `<b>storefront-metrics-exporter-7d9f6c5b8-x2kqp.shop.svc:8080</b> ${BESIDE}`, style: 'left:36px;top:84px;max-width:300px' })}</div>
+  </div>`
+  return spec(
+    'When it doesn’t all fit',
+    'the name keeps its floor, columns give way whole, and under a pointer nothing is lost',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start"><div class="arr-stack"><p class="cap">Beside a panel, 520 px: Restarts and Age gave way; the row links, and it’s under the pointer</p>${narrow}</div>${beside}</div>`,
+    `<b>The name keeps a floor</b>: the least of its own width and 160 px. The other columns have a least too (narrow 88, normal 120, wide 168, a Status 144, or their own width where that’s less), and where they don’t all fit at their least, <b>columns give way whole</b>, the last in the plugin’s order first and the first Status last of all; never every column squeezed until none can be read. <b>A row has one tooltip</b>, Lumovi’s own, under the pointer and on keyboard focus, and never the browser’s: first where the row goes, if it links (“Opens Pod shop/orders-db-3 at its Logs tab”, the words a header’s link has); then its lead whole, if the name or the words beside it are cut; then what its columns cut or what gave way, each with its heading, mono values whole. A row with none of the three has no tooltip. Over a cell that’s cut, only that cell’s own tooltip shows; a heading that’s cut has one too, and only while it’s cut. <b>The words beside a name</b> take the room the name leaves and are cut only when the two don’t fit: then they give way first, to about five characters, before the name gives a pixel, and no share of the lead is kept back from them. Under a finger nothing hovers: a row’s tap goes where it goes, and what’s cut is a tap away (LMV-298 draws that for a tablet).`,
   )
 }
 
@@ -2341,7 +2422,7 @@ function cardAbout(): string {
     'A Card’s line, and a button that only reads',
     'where a card’s data came from; and weight that follows what a press can do',
     `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start"><div class="arr-stack"><p class="cap">A Card with its quiet line: Prometheus Operator’s, where a namespace runs two</p>${withAbout(ABOUT)}<p class="cap">A longer one (Toys, the tests’ stand-in): two lines, then cut at its end, whole in its tooltip</p>${tip}</div>${headers}</div>`,
-    `<b>A Card’s line</b> (<code>about</code>, the plugin’s text, at most 240 characters) says where the card’s data came from, when the title and its note can’t: under the title, before what it holds, in the quiet ink at 12 px, as wide as the card, wrapping to two lines and then cut at its end, whole in its tooltip (and read whole to a screen reader, after the title, never as its name). Under a finger, where nothing hovers, it isn’t cut: it wraps whole, at most 240 characters, so it can always be read. <b>That’s the kit’s rule, not this line’s alone</b>: whatever is whole in a tooltip under a pointer is whole on the page, or a tap away, under a finger. A line of words wraps whole (a Card’s line, a Header’s status detail, the reason a button is off, which then stands under the buttons as a note does); a value in a row is a tap away, as a fact that stands for something longer is. No icon and no colour: it’s said, not warned. A card without one is as today. <b>A button that only reads</b> is never drawn filled: the filled one is the last button that declares <code>changes</code>, and a header whose buttons only read or go has none filled, as a link already isn’t. <b>The filled one always stands last</b>, at the row’s right end where a filled button stands on every Lumovi page, and so is never folded into “…”: where the plugin lists a read after it, Lumovi moves it there, and the others keep the plugin’s order. One that’s <code>off</code> for now still stands there and is still the filled one, drawn off at half strength with its reason, since it’s still where the change is. For that to be true, the door gives a press token only to a button that declares <code>changes</code>, so a press of any other button can propose nothing; on a phone, as today, those that change give way to Lumovi’s line, and those that only read stay.`,
+    `<b>A Card’s line</b> (<code>about</code>, the plugin’s text, at most 240 characters) says where the card’s data came from, when the title and its note can’t: under the title, before what it holds, in the quiet ink at 12 px, as wide as the card, wrapping to two lines and then cut at its end, whole in its tooltip (and read whole to a screen reader, after the title, never as its name). Under a finger, where nothing hovers, it isn’t cut: it wraps whole, at most 240 characters, so it can always be read. <b>That’s the kit’s rule, not this line’s alone</b>: whatever is whole in a tooltip under a pointer is whole on the page, or a tap away, under a finger. A line of words wraps whole (a Card’s line, a Header’s status detail, the reason a button is off, which then stands under the buttons, before that button’s note and in docs’ words, “Back up now is off: A backup is running.”); a value in a row is a tap away, as a fact that stands for something longer is. No icon and no colour: it’s said, not warned. A card without one is as today. <b>A button that only reads</b> is never drawn filled: the filled one is the last button that declares <code>changes</code>, and a header whose buttons only read or go has none filled, as a link already isn’t. <b>The filled one always stands last</b>, at the row’s right end where a filled button stands on every Lumovi page, and so is never folded into “…”: where the plugin lists a read after it, Lumovi moves it there, and the others keep the plugin’s order. One that’s <code>off</code> for now still stands there and is still the filled one, drawn off at half strength with its reason, since it’s still where the change is. For that to be true, the door gives a press token only to a button that declares <code>changes</code>, so a press of any other button can propose nothing; on a phone, as today, those that change give way to Lumovi’s line, and those that only read stay.`,
   )
 }
 
@@ -3019,6 +3100,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
     id === 'table'
       ? `<header><h1>Table</h1><p>What a plugin lists things with. It grows from the app’s plain-row table and Karpenter’s rows, which are one thing with and without headings. A plugin gives rows as data and names each column and its kind; Lumovi draws them. When the app’s own detail tables move onto it, their rows go from about 32 to 36 px and a long name takes the middle cut where today it wraps: both meant.</p></header>
         <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">${anatomy()}${sorting()}${structure()}${hard()}</div>
+        ${fits()}
         ${states()}${movedRules()}`
       : id === 'table-phone'
         ? phoneCards()
