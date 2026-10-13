@@ -58,6 +58,43 @@ const CSS = `
 .tbar2 { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 20px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--text-2); }
 .via { display: inline-flex; align-items: center; gap: 6px; }
 .via svg.i { color: var(--text-3); }
+.wia { width: 520px; padding: 20px 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); font-size: 13px; line-height: 20px; color: var(--text-2); }
+.wia h4 { margin: 0 0 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.wia p { margin: 0 0 8px; }
+.wia code, .srvd code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-1); }
+.srv { margin: 0 0 10px; }
+.srv .say { color: var(--critical-text); }
+.srv .svc { display: block; font-size: 12px; line-height: 18px; color: var(--text-3); }
+.srv ul { margin: 6px 0 0; padding: 0 0 0 12px; border-left: 2px solid color-mix(in srgb, var(--critical) 35%, transparent); list-style: none; }
+.srv li { padding-left: 2ch; text-indent: -2ch; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 20px; color: var(--text-1); overflow-wrap: anywhere; }
+.srv li i { font-style: normal; color: var(--text-3); }
+.srv .more { display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; font-size: 12px; font-weight: 500; color: var(--text-2); }
+.srv .more svg.i { color: var(--text-3); }
+.srv.off .say { color: var(--text-2); }
+.srv.off ul { border-left-color: var(--line-strong); }
+.srv.off li { color: var(--text-3); }
+.srv .lockl { display: flex; gap: 6px; margin-top: 8px; font-size: 12px; line-height: 18px; color: var(--text-2); }
+.srv .lockl svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
+.srvd { width: 560px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.srvd .dh { display: flex; gap: 12px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+.srvd .dh .g { display: grid; flex: none; width: 36px; height: 36px; place-items: center; border-radius: 12px; background: var(--surface-3); color: var(--text-2); }
+.srvd .dh h3 { margin: 0; font-size: 15px; line-height: 21px; font-weight: 600; }
+.srvd .dh small { display: block; margin-top: 2px; font-size: 12px; line-height: 16px; color: var(--text-3); }
+.srvd .dh small b { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--text-2); }
+.srvd .dh small .use { display: block; margin-top: 2px; }
+.srvd .part { padding: 14px 20px; font-size: 13px; line-height: 19px; }
+.srvd .part + .part { border-top: 1px solid var(--line); }
+.srvd .cap2 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.srvd .cap2 .n { padding: 0 6px; border-radius: 999px; background: var(--surface-3); font-size: 10.5px; letter-spacing: 0; text-transform: none; color: var(--text-1); }
+.srvd .ask { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; color: var(--text-1); }
+.srvd .ask > svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
+.srvd .ask > span { min-width: 0; flex: 1; }
+.srvd .ask.red > svg.i { color: var(--critical-text); }
+.srvd .ask .srv { margin: 0; }
+.srvd .df { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); }
+.srvd .df .note { margin-right: auto; font-size: 12px; color: var(--text-3); }
+.srvd .closed { display: flex; align-items: center; gap: 6px; padding-top: 8px; font-size: 12.5px; color: var(--text-2); }
+.srvd .closed svg.i { color: var(--text-3); }
 `
 
 const sheet = (
@@ -224,7 +261,100 @@ function whereFrame(): string {
   )
 }
 
-export type ReachFrame = 'reach-links' | 'reach-start' | 'reach-where'
+/** The red line: what a plugin's code may ask its tool's own server, through Lumovi. */
+const srv = (o: {
+  service: string
+  svc: string
+  paths: string[]
+  shown?: number
+  off?: boolean
+}) => {
+  const shown = o.shown ?? o.paths.length
+  const path = (p: string) => p.replace(/\{([a-z]+)\}/g, '<i>{$1}</i>')
+  return `<div class="srv${o.off ? ' off' : ''}"><span class="say">Asks the server ${o.service} in this cluster, through Lumovi, and its code reads what it answers:</span><span class="svc">${o.svc}</span><ul>${o.paths
+    .slice(0, shown)
+    .map((p) => `<li>${path(p)}</li>`)
+    .join(
+      '',
+    )}</ul>${shown < o.paths.length ? `<span class="more">${icon('chevron-down', 13)}${o.paths.length - shown} more paths</span>` : ''}${o.off ? `<span class="lockl">${icon('lock', 13)}<span>Turned off by your organization’s policy (<code>pluginServers: off</code>): Lumovi asks no server for it.</span></span>` : ''}</div>`
+}
+
+const PROM = {
+  service: 'prometheus-operated',
+  svc: 'The Service prometheus-operated, port web, in the namespace of the Prometheus its page shows',
+  // (Target health only: firing alerts are Lumovi's own Alerts page's, LMV-180.)
+  paths: ['/api/v1/targets'],
+}
+
+const TOYS_PATHS = [
+  '/api/v1/widgets',
+  '/api/v1/widgets/{widget}',
+  '/api/v1/widgets/{widget}/history',
+  '/api/v1/widgets/{widget}/history/rollouts/latest/steps',
+  '/api/v1/gadgets',
+  '/api/v1/gadgets/{gadget}/health',
+  '/api/v1/queues',
+  '/api/v1/queues/depth',
+  '/api/v1/workers',
+  '/api/v1/workers/busy',
+  '/api/v1/schedules',
+  '/api/v1/schedules/next',
+  '/api/v1/limits',
+  '/api/v1/quotas',
+  '/api/v1/version',
+  '/api/v1/health',
+  '/api/v1/metrics/summary',
+  '/api/v1/audit/recent',
+  '/api/v1/settings/public',
+  '/api/v1/build-info',
+]
+
+const mayRead = (red: string) => `<div class="wia"><h4>May read</h4>${red}
+  <p>Its own kinds’ objects: its columns, status and details are fields of the object shown.</p>
+  <p>It reads no logs and no Secret’s value, and sends nothing anywhere but to this cluster.</p></div>`
+
+function serverFrame(): string {
+  const page = `<div class="row2">
+    <div class="blk"><p class="cap">On the Plugins page: Prometheus Operator, opened (its first real user)</p>${mayRead(srv(PROM))}</div>
+    <div class="blk"><p class="cap">Twenty paths (the most a file may list): six, then the rest in place (Toys, the tests’ stand-in)</p>${mayRead(srv({ service: 'toys-api', svc: 'The Service toys-api, port http, in the namespace of the Widget its page shows', paths: TOYS_PATHS, shown: 6 }))}</div>
+    <div class="blk"><p class="cap">Turned off by policy: said, not red, since it can’t happen</p>${mayRead(srv({ ...PROM, off: true }))}</div>
+  </div>`
+  const sub = `From Lumovi-plugins release <b>1.4.0</b>, signed by its release workflow. What it reads and changes, it does as you.<span class="use">In use: 1.0.0, which comes with Lumovi.</span>`
+  const dialog = `<div class="srvd"><div class="dh"><span class="g">${icon('activity', 18)}</span><div><h3>Update Prometheus Operator to 1.1.0?</h3><small>${sub}</small></div></div>
+    <div class="part"><p class="cap2">New in 1.1.0<span class="n">2</span></p>
+      <div class="ask red">${icon('server', 15)}<span>${srv(PROM)}</span></div>
+      <div class="ask">${icon('code', 15)}<span>Draws its pages with its own code, which runs in Lumovi’s sealed box and is handed only what’s listed here.</span></div></div>
+    <div class="part"><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (3)</div></div>
+    <div class="df"><span class="note">Without this, 1.0.0 stays in use.</span><span class="btn ghost sm">Cancel</span><span class="btn primary sm">Update to 1.1.0</span></div></div>`
+  const refused = `<div class="srvd"><div class="dh"><span class="g">${icon('activity', 18)}</span><div><h3>Update Prometheus Operator to 1.1.0?</h3><small>${sub}</small></div></div>
+    <div class="part"><div class="ask">${icon('lock', 15)}<span><b>Your organization’s policy doesn’t let plugins talk to servers in the cluster, and this one would.</b> (<code>pluginServers: off</code>) 1.0.0 stays in use.</span></div></div>
+    <div class="df"><span class="btn ghost sm">Close</span></div></div>`
+  return block(
+    'Its tool’s own server',
+    'the one red line a plugin’s file can earn',
+    `${page}<div class="row2"><div class="blk"><p class="cap">The store’s dialog: an update that adds it puts it first under New in</p>${dialog}</div><div class="blk"><p class="cap">Refused by policy, as the dialog’s other refusals are</p>${refused}</div></div>`,
+    [
+      [
+        'One line, red, first',
+        'in May read on the Plugins page (it’s a read: GETs only), above the rest, since it’s the only thing a plugin can do that reaches past the Kubernetes API. Docs’ sentence, naming the Service (“Asks the server prometheus-operated in this cluster, through Lumovi, and its code reads what it answers:”, or “Asks a server in this cluster, …” where the file finds it by labels), since unlike logs and a Secret’s value, what it answers is handed to the plugin’s code, in the critical ink, then, quiet, which Service, port and namespace it means, then every path as the file lists it, mono, one a line, hung from a thin red rule so the list reads as the line’s. A long path wraps anywhere, hanging; none is ever cut.',
+      ],
+      [
+        'Paths as listed',
+        'a segment Lumovi fills, like <code>{widget}</code>, stays as written in the quiet ink, so the fixed part reads first. Past six, the rest fold behind “14 more paths”, which opens them in place; the most a file may list is twenty. Nothing else on the page or in the dialog is red: red means a plugin can do it, here and now.',
+      ],
+      [
+        'Turned off',
+        'with <code>pluginServers: off</code> the line stays, so the person knows what the plugin would do, but in the page’s own ink, its paths quiet, and a lock line saying the policy turns it off and Lumovi asks no server for it. The store refuses an install or update that would add it, saying which key, as for Secrets. No new part on a plugin’s page: its code gets Lumovi’s sentence for a failure and says what it will.',
+      ],
+      [
+        'In the dialog',
+        'the same line, with the server icon in red: under “New in” it comes first, before the code line; in a first install it follows the code line, which docs put first. Its paths are never folded behind “as before”: an update that changes the paths shows the new ones under New in and the gone ones under No longer, struck, as any permission.',
+      ],
+    ],
+  )
+}
+
+export type ReachFrame = 'reach-links' | 'reach-start' | 'reach-where' | 'reach-server'
 
 export const REACH_FRAMES: { id: ReachFrame; title: string; size: Size }[] = [
   { id: 'reach-links', title: 'Reach: where a link sits', size: { width: 1440, height: 1100 } },
@@ -234,6 +364,11 @@ export const REACH_FRAMES: { id: ReachFrame; title: string; size: Size }[] = [
     size: { width: 1440, height: 900 },
   },
   { id: 'reach-where', title: 'Reach: where each works', size: { width: 1440, height: 1000 } },
+  {
+    id: 'reach-server',
+    title: 'Reach: its tool’s own server',
+    size: { width: 1680, height: 1400 },
+  },
 ]
 
 /** One of the frames, in one theme. */
@@ -245,6 +380,7 @@ export function reachFrame(id: ReachFrame, scheme: Scheme): string {
     'reach-links': () => `${intro}${linksFrame()}`,
     'reach-start': startFrame,
     'reach-where': whereFrame,
+    'reach-server': serverFrame,
   }[id]()
   return sheet(scheme, f.size.width, body)
 }
