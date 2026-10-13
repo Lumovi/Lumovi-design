@@ -222,6 +222,8 @@ function storePage(o: {
   menu?: string
   foot: string
   counts?: string[]
+  /** The bar's count, each row once by where it came from (docs' words). */
+  n?: string
 }): string {
   const counts =
     o.counts ??
@@ -232,7 +234,7 @@ function storePage(o: {
     'Plugins',
     'plug',
     { after: '', label: 'All plugins', icon: 'plug', tag: '', section: 'Plugins', items: SECTION },
-    `<div class="bar"><span class="n">32 from Lumovi</span>${seg(counts, o.filter)}${STATE[o.state]}</div>
+    `<div class="bar"><span class="n">${o.n ?? '31 come with Lumovi, 1 installed'}</span>${seg(counts, o.filter)}${STATE[o.state]}</div>
     ${head}<div style="position:relative">${o.rows.map(row).join('')}${o.menu ?? ''}</div>
     <div class="foot">${icon('info', 14)}${o.foot}</div>`,
     'All namespaces',
@@ -263,12 +265,14 @@ function notHereFrame(): string {
     rows: NOT_HERE,
     state: 'checked',
     counts,
+    n: '32 come with Lumovi, 1 installed',
     foot: 'Names are examples (the tests’ stand-ins): today every plugin in Lumovi-plugins comes with Lumovi, so this filter is empty and not shown.',
   })}${storePage({
     filter: 'All 33',
     rows: ALL_T,
     state: 'checked',
     counts,
+    n: '32 come with Lumovi, 1 installed',
     menu: MENU_NOT_HERE,
     foot: 'Toys, installed from Not here yet, in the list by its name; Toys’ menu open.',
   })}</div>`
@@ -358,7 +362,7 @@ function dialogsFrame(): string {
 
 function statesFrame(): string {
   const bar = (s: StoreState) =>
-    `<div class="bar" style="border:1px solid var(--line);border-radius:10px;background:var(--surface)"><span class="n">32 from Lumovi</span>${seg(s === 'policy' ? ['All 32', 'On this cluster 6'] : ['All 32', 'On this cluster 6', 'Updates 1', 'Not here yet 2'], 'All 32')}${STATE[s]}</div>`
+    `<div class="bar" style="border:1px solid var(--line);border-radius:10px;background:var(--surface)"><span class="n">31 come with Lumovi, 1 installed</span>${seg(s === 'policy' ? ['All 32', 'On this cluster 6'] : ['All 32', 'On this cluster 6', 'Updates 1', 'Not here yet 2'], 'All 32')}${STATE[s]}</div>`
   return `<section class="blk"><h2>The toolbar’s states<i>the page goes on with what’s installed in every one</i></h2>
     <div class="blk" style="max-width:1200px">${(['checked', 'checking', 'offline', 'unsigned', 'expired', 'older', 'policy'] as StoreState[]).map((s) => bar(s)).join('')}</div>
     <ul class="rules">
@@ -374,7 +378,7 @@ const RULES_PAGE = `<ul class="rules" style="margin:20px 32px 32px">
   <li><b>One this Lumovi is too old for</b> says “1.3.0 needs Lumovi 1.23.0”, quiet, at its end, and nothing to press: Lumovi’s own update is how to get it.</li>
   <li><b>Installed from the store</b>, From says “Installed from Lumovi-plugins release 1.1.0” (docs’ line, on every store plugin’s row and in its dialog) and which version is kept; Lumovi’s own say “Comes with Lumovi”; its “…” menu has Back to 1.1.0 (the one kept), Back to the one that came with Lumovi (deletes the store’s copies) and its release on GitHub. One not in this Lumovi has “Remove Toys” instead, in the danger colour, since there’s nothing of Lumovi’s to go back to.</li>
   <li><b>Updates</b> and <b>Not here yet</b> are filters with their counts, beside the page’s own; the counts are the last good check’s. Not here yet lists each with Install… (and isn’t shown at all while the store has nothing Lumovi doesn’t carry, as today; a filter that empties while it’s on falls back to All, without a word); once installed, one is here, so it leaves Not here yet for the page’s own list, and Remove puts it back. The list is one order, by name, whatever each came from, so an update or an install never moves a row, and, before it’s installed, “Its kinds are on this cluster” where they are, so the person sees which would show something.</li>
-  <li><b>The store’s line</b> is at the bar’s right: “Lumovi-plugins release 1.2.0 · checked 2m ago” and Check now; or what’s happening, or why it couldn’t check (wrapping under the filters when it’s long). Docs write the filters “Updates: 1” and “Not here yet: 2”; here they take the page’s own segmented form with the count.</li>
+  <li><b>The store’s line</b> is at the bar’s right: “Lumovi-plugins release 1.2.0 · checked 2m ago” and Check now; or what’s happening, or why it couldn’t check (wrapping under the filters when it’s long). Docs write the filters “Updates: 1” and “Not here yet: 2”; here they take the page’s own segmented form with the count. The bar’s count names each row once, as its From does (docs’ words): “31 come with Lumovi, 1 installed”, and “, 1 of yours” where there are files of yours, each part after the first only where it’s more than 0, so the parts add up to All.</li>
   <li><b>Every change here is audited</b> (installed, updated, went back), with the versions and what was agreed.</li>
 </ul>`
 
