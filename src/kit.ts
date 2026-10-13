@@ -85,7 +85,7 @@ body { margin: 0; background: var(--app-bg); font-family: 'Inter', sans-serif; f
 .lead > .w { min-width: 0; flex: 1; }
 .lead .nm { display: flex; min-width: 0; align-items: baseline; gap: 8px; }
 .lead .nm b { min-width: 0; overflow: hidden; font-weight: 500; white-space: nowrap; text-overflow: clip; }
-.lead .nm i { flex: none; max-width: 40%; overflow: hidden; font-style: normal; font-size: 12px; color: var(--text-3); white-space: nowrap; text-overflow: ellipsis; }
+.lead .nm i { flex: 0 99 auto; min-width: 5ch; overflow: hidden; font-style: normal; font-size: 12px; color: var(--text-3); white-space: nowrap; text-overflow: ellipsis; }
 .lead small { display: block; overflow: hidden; font-size: 12px; line-height: 16px; color: var(--text-3); white-space: nowrap; text-overflow: ellipsis; }
 
 /* A meter in a cell, as the app's. */
@@ -785,7 +785,7 @@ function hard(): string {
         },
       ]),
     )}`,
-    '<b>A name is never cut at its end.</b> Too long for its column, it loses its middle and keeps its last six characters, where a pod’s or a node’s name differs from its neighbours; the whole name is its title on hover and what a screen reader says. The word beside it gives way first (to 40% of the lead at most), then the name; the line under is the one thing cut at its end. <b>A row’s last cell may take the rest of the row</b> (second node: no meters to show, so words in their place); no other spans. <b>A note</b> runs under the whole row from the name’s left edge, two lines at most, then “…”; with a note the dot sits on the name’s line.',
+    '<b>A name is never cut at its end.</b> Too long for its column, it loses its middle and keeps its last six characters, where a pod’s or a node’s name differs from its neighbours; the whole name is its title on hover and what a screen reader says. The words beside it take the room the name leaves and are cut only when the two don’t fit: then they give way first, down to about five characters, before the name gives a pixel (no share of the lead is kept back from them, so a short name never leaves them cut beside empty room). Cut, they’re whole where the name is: in the row’s tooltip under a pointer, and a tap away under a finger, as the line under is; then the name gives way; the line under is the one thing cut at its end. <b>A row’s last cell may take the rest of the row</b> (second node: no meters to show, so words in their place); no other spans. <b>A note</b> runs under the whole row from the name’s left edge, two lines at most, then “…”; with a note the dot sits on the name’s line.',
   )
 }
 
