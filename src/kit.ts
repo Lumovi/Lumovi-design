@@ -288,6 +288,14 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .kcmd { margin-top: 8px; padding: 8px 12px; border-radius: 8px; background: color-mix(in srgb, var(--surface-3) 70%, transparent); }
 .kcmd .cl { display: flex; align-items: center; justify-content: space-between; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .kcmd code { display: block; margin-top: 2px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.cutbox { position: relative; }
+.cutbox::after { content: ''; position: absolute; right: 1px; bottom: 1px; left: 1px; height: 22px; border-radius: 0 0 8px 8px; background: linear-gradient(transparent, var(--surface)); }
+.cutbox .kdiff > div { padding-left: calc(12px + 6ch); text-indent: -6ch; white-space: pre-wrap; overflow: visible; overflow-wrap: anywhere; }
+.cutbox.cut { max-height: calc(var(--rows) * 20px + 9px); overflow: hidden; border-radius: 8px; }
+.cutbox:not(.cut)::after { content: none; }
+.cutsay { margin: 6px 0 0; font-size: 12px; line-height: 17px; color: var(--text-2); }
+.kcmd.fold .cl > span { display: inline-flex; align-items: center; gap: 4px; }
+.kcmd.two code { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: pre-wrap; }
 .notyet { padding: 14px 12px; border: 1px dashed var(--line-strong); border-radius: 8px; font-size: 13px; color: var(--text-3); }
 .verdict { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; font-size: 12px; line-height: 18px; color: var(--text-2); }
 .verdict > svg.i { flex: none; margin-top: 2px; }
@@ -1270,9 +1278,131 @@ function formHard(): string {
     'the change never leaves the screen',
     `<div style="display:grid;grid-template-columns:560px minmax(0,1fr);gap:32px;align-items:start">
       ${ask({ fields: five, send: SYNC_SEND('main', OK), cut: true, maxHeight: 640 })}
-      <div class="spec" style="gap:10px"><p style="max-width:none"><b>The options scroll; the change stays in view.</b> When the fields are taller than the dialog allows, they scroll in their own box, fading at its edge, and “What Lumovi will send” stays above the buttons with its verdict. A person can’t confirm having read only the plugin’s words.</p><p style="max-width:none"><b>Who gets the height</b> (the dialog is at most the window less 48 px above and below; its caption, verdict and buttons are always in view): the options first, up to their whole height, since they’re what the person fills in; then the change’s box, from a floor of three lines up to its own length, scrolling inside itself past that. At its floor the box starts at the first line that changes (the fold of unchanged lines above it doesn’t count toward the three) and shows it’s cut, by the fade and “N more lines”, so what’s in view is always some of the change itself; then the command’s box, from a floor of two lines. Where the options would still have less than two fields’ height (about 190 px), the command folds to its heading’s row, with its copy button and a chevron that opens it in place. Only then do the options scroll, the focused field always brought into view. So a long change never squeezes the options to a strip, and a long form never pushes the change out of sight.</p><p style="max-width:none"><b>The limits are the format’s:</b> five fields at most; a label of 40 characters and a hint of about two lines (160 characters is design’s number, for app to settle as the format’s), each wrapping whole and never cut. Four kinds of field: text, a whole number, a choice (two to four as a segmented control, more as a select) and a switch. <b>No kind hides what’s typed</b>, and none is labelled or drawn as a password: a plugin’s form is for options, and a field that looks like a sign-in can’t be made.</p><p style="max-width:none"><b>Keys:</b> the focus starts in the first field, Tab goes through the fields to Cancel and the action’s button, Enter in a field doesn’t confirm, Escape cancels.</p></div>
+      <div class="spec" style="gap:10px"><p style="max-width:none"><b>The options scroll; the change stays in view.</b> When the fields are taller than the dialog allows, they scroll in their own box, fading at its edge, and “What Lumovi will send” stays above the buttons with its verdict. A person can’t confirm having read only the plugin’s words.</p><p style="max-width:none"><b>Who gets the height</b> when it doesn’t all fit, and what the change’s box must always show, is the next section.</p><p style="max-width:none"><b>The limits are the format’s:</b> five fields at most; a label of 40 characters and a hint of about two lines (160 characters is design’s number, for app to settle as the format’s), each wrapping whole and never cut. Four kinds of field: text, a whole number, a choice (two to four as a segmented control, more as a select) and a switch. <b>No kind hides what’s typed</b>, and none is labelled or drawn as a password: a plugin’s form is for options, and a field that looks like a sign-in can’t be made.</p><p style="max-width:none"><b>Keys:</b> the focus starts in the first field, Tab goes through the fields to Cancel and the action’s button, Enter in a field doesn’t confirm, Escape cancels.</p></div>
     </div>`,
     'Drawn at the dialog’s greatest height, 640 px here: the first two fields show, the rest are a scroll away, and the patch, the command and the verdict are all in view.',
+  )
+}
+
+/** 2a. Who gets the height: the options first, and the change's box never loses the change. */
+function formHeights(): string {
+  /** The change's box: `rows` rows in view where it's cut, and Lumovi's line under it. */
+  const box = (lines: [string, string][], say: string, rows?: number) =>
+    `<div class="cutbox${rows ? ' cut' : ''}"${rows ? ` style="--rows:${rows}"` : ''}>${diff(lines)}</div>${say ? `<p class="cutsay">${say}</p>` : ''}`
+  const cmd = (text: string, folded = false) =>
+    folded
+      ? `<div class="kcmd fold"><div class="cl"><span>${icon('chevron-right', 12)}Equivalent command</span>${icon('copy', 14)}</div></div>`
+      : `<div class="kcmd two"><div class="cl">Equivalent command${icon('copy', 14)}</div><code>${escape(text)}</code></div>`
+  const dlg2 = (o: {
+    glyph: Parameters<typeof icon>[0]
+    from: string
+    title: string
+    sub: string
+    fields: string
+    cut: boolean
+    send: string
+    verb: string
+    height: number
+  }) =>
+    `<div class="kdlg" style="--mh:${o.height}px;height:${o.height}px"><div class="dh"><span class="g">${icon(o.glyph, 18)}</span><div><div class="eb">${icon('plug', 12)}From ${o.from}</div><h3>${o.title}</h3><div class="sub"><span>${o.sub}</span></div></div></div>
+    <div class="db"><div class="part opts${o.cut ? ' cut' : ''}"><div class="kcap">Options, in ${o.from.replace(/ [0-9.]+$/, '')}’s words</div>${o.fields}</div>
+    <div class="part send"><div class="kcap">What Lumovi will send</div>${o.send}${OK}</div></div>
+    <div class="df"><span class="btn ghost sm">Cancel</span><span class="btn primary sm">${o.verb}</span></div></div>`
+  const size = fld(
+    'Size',
+    kfield('5', { mono: true, width: 96 }),
+    'How many copies of the widget to keep, from 1 to 10. More copies answer faster and cost more.',
+  )
+  const colour = fld(
+    'Colour',
+    kseg(['Red', 'Blue', 'Green'], 'Blue'),
+    'The label its pods carry, which the dashboards group by.',
+  )
+  const five = `${size}${colour}${fld('Weight', kfield('20', { mono: true, width: 96 }), 'The share of traffic it takes while it’s tuned, in percent of the whole.')}${fld('Speed', kseg(['Slow', 'Steady', 'Fast'], 'Steady'), 'How quickly the change rolls out across its copies.')}${fld('Reach', kfield('eu-central-1', { mono: true, width: 260 }), 'The regions it’s tuned in, separated by commas. Empty means every region.')}`
+  const URL =
+    'https://dashboards.example.com/d/widgets/blue-widget?orgId=1&var-namespace=default&var-widget=blue-widget&var-colour=blue&var-region=eu-central-1&from=now-6h&to=now&refresh=30s&viewPanel=12'
+  const patch: [string, string][] = [
+    ['', '  tier: toys'],
+    ['add', 'annotations:'],
+    ['add', `  example.com/dashboard: ${URL}`],
+    ['add', '  example.com/note-1: a note that says something of the widget, number 1'],
+    ['add', '  example.com/note-2: a note that says something of the widget, number 2'],
+    ['add', '  example.com/note-3: a note that says something of the widget, number 3'],
+  ]
+  const patchCmd =
+    'kubectl patch widget.example.com/blue-widget --type merge -p \'{"metadata":{"annotations":{"example.com/dashboard":"https://dashboards.example.com/d/widgets/blue-widget?orgId=1&var-namespace=default…'
+  const tinker = (o: {
+    height: number
+    fields: string
+    cut: boolean
+    send: string
+    verb?: string
+  }) =>
+    dlg2({
+      glyph: 'boxes',
+      from: 'Tinker 1.0.0',
+      title: 'Tinker asks to change the Widget default/blue-widget',
+      sub: 'Widget · default · <b>demo</b>',
+      verb: 'Tune',
+      ...o,
+    })
+  const room = tinker({
+    height: 804,
+    fields: `${size}${colour}`,
+    cut: false,
+    send: `${box(patch, 'Shows 3 of 25 changed lines. Scroll to see the rest.', 10)}${cmd(patchCmd)}`,
+  })
+  const floor = tinker({
+    height: 804,
+    fields: five,
+    cut: true,
+    send: `${box(patch, 'Shows 1 of 25 changed lines. Scroll to see the rest.', 5)}${cmd(patchCmd)}`,
+  })
+  const part = tinker({
+    height: 544,
+    fields: five,
+    cut: true,
+    send: `${box(
+      [
+        ['', 'spec:'],
+        ['del', `  dashboard: ${URL.replace('blue-widget?', 'blue-widget-old?')}`],
+        ['add', `  dashboard: ${URL}`],
+      ],
+      'Shows part of the first of 2 changed lines. Scroll to see the rest.',
+      5,
+    )}${cmd('', true)}`,
+  })
+  const backup = dlg2({
+    glyph: 'database',
+    from: 'CloudNativePG 1.1.0',
+    title: 'CloudNativePG asks to create a new Backup in shop',
+    sub: 'Backup · shop · <b>databases</b>',
+    fields: fld('Method', kseg(['Volume snapshot', 'Barman object store'], 'Volume snapshot')),
+    cut: false,
+    send: `${box(
+      [
+        ['add', 'apiVersion: postgresql.cnpg.io/v1'],
+        ['add', 'kind: Backup'],
+        ['add', 'metadata:'],
+        ['add', '  generateName: orders-db-'],
+        ['add', '  namespace: shop'],
+      ],
+      'Shows 4 of 9 changed lines. Scroll to see the rest.',
+      5,
+    )}${cmd(`kubectl create -f - -n shop --context databases <<'LUMOVI_EOF'\nthe object above, 9 lines`)}`,
+    verb: 'Back up now',
+    height: 544,
+  })
+  return spec(
+    'Who gets the height',
+    'a long change never squeezes the options; a long form never hides the change',
+    `<div style="display:grid;grid-template-columns:repeat(2,560px);gap:28px 32px;align-items:start">
+      <div class="arr-stack"><span class="cap">A window of 1440 × 900 (the dialog at most 804 px), two options: they’re whole, so the change’s box takes the rest. A long value wraps, its rows set in</span>${room}</div>
+      <div class="arr-stack"><span class="cap">The same window, five options: they get the height first and scroll; the box is at its floor, three rows of the change</span>${floor}</div>
+      <div class="arr-stack"><span class="cap">The smallest window, 1024 × 640 (at most 544 px): the command folds; the first changed line alone is taller than the floor</span>${part}</div>
+      <div class="arr-stack"><span class="cap">A create at 1024 × 640: the whole object is the change, so it starts at its top</span>${backup}</div>
+    </div>`,
+    `The dialog is at most the window less 48 px above and below, and its caption, verdict and buttons are always in view. <b>The options get the height first</b>, up to their whole height, since they’re what the person fills in; then the change’s box, up to its own length; then the command’s box, from a floor of two lines. Where the options would still have less than two fields’ height (about 190 px), the command folds to its heading’s row, with its copy button and a chevron that opens it in place. Only then do the options scroll, fading at their edge, the focused field always brought into view. <b>The change’s box opens on the change</b> (docs’ must): its first line is the first line that changes, with at most one line before it for place, never a fold of unchanged lines and never the object’s top when the change is further down. <b>Its floor is three rows of the change</b>: a plugin’s long form may take the box down to them and no further (three rows a person can read: the fade that shows there’s more lies over a further row, never over these), a change shorter than the box shows whole, and unchanged folds come after it or between its parts, never counted. <b>A line wraps whole inside the box</b>: it’s never cut at the right edge and the box never scrolls sideways; it breaks as the equivalent command does, between its words but for one wider than the box, its further rows set in under its text, the − or + on its first row only, and lines of context wrap the same way. So one scroll, downwards, shows everything. <b>A cut box says so, in Lumovi’s words</b>, on a line of its own under it and outside the plugin’s part: “Shows 1 of 25 changed lines. Scroll to see the rest.” It counts whole lines: one counts as shown only when all its rows are in view, and where the first changed line alone is taller than the floor it reads “Shows part of the first of 2 changed lines. Scroll to see the rest.” <b>A create</b> is all change, so it starts at its top and says the same when cut; every line of it is a changed line, so its count is the object’s lines as Lumovi will send it. None of this adds a wait.`,
   )
 }
 
@@ -2901,7 +3031,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
               : id === 'reference-phone'
                 ? refPhone()
                 : id === 'form'
-                  ? `<header><h1>A form inside Lumovi’s confirmation</h1><p>For a plugin’s change that asks for options first. The plugin describes the fields; Lumovi shows them in its own dialog with the change it will make.</p></header>${formStates()}${formMore()}${formOver()}${formHard()}`
+                  ? `<header><h1>A form inside Lumovi’s confirmation</h1><p>For a plugin’s change that asks for options first. The plugin describes the fields; Lumovi shows them in its own dialog with the change it will make.</p></header>${formStates()}${formMore()}${formOver()}${formHard()}${formHeights()}`
                   : id === 'form-phone'
                     ? formPhone()
                     : id === 'graph'
