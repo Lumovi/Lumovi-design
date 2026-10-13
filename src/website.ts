@@ -69,6 +69,7 @@ const CSS = `
 .stage { position: relative; max-width: 1240px; margin: 56px auto 0; padding: 0 var(--gut); perspective: 1600px; }
 .phone .stage { margin-top: 36px; }
 .still { width: 100%; border-radius: 16px; background-repeat: no-repeat; background-color: var(--surface); }
+.stage .still.tilt { max-height: 560px; }
 .still.tilt { transform: rotateX(14deg); transform-origin: 50% 100%; border-radius: 18px; box-shadow: 0 0 0 1px var(--line-strong), 0 60px 120px -40px rgb(0 0 0 / 0.55); -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
 .still.shadowed { box-shadow: 0 0 0 1px var(--line), 0 30px 80px -40px rgb(0 0 0 / 0.45); }
 .playc { position: absolute; left: 50%; bottom: 18%; display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px 10px 12px; border-radius: 999px; background: rgb(0 0 0 / 0.6); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; font-size: 14px; transform: translateX(-50%); }
@@ -80,13 +81,16 @@ const CSS = `
 .site .media2 { padding-top: 32px; }
 .hb2.band { margin-top: 120px; padding: 96px 0; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 7%, transparent) 40%, transparent); }
 .site.phone .hb2.band { margin-top: 64px; padding: 56px 0; }
-.toolgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 36px; }
-.phone .toolgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.tool { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 22px 22px 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-panel); }
-.tool b { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
-.phone .tool b { font-size: 16px; }
-.tool small { font-size: 13px; color: var(--text-3); }
-.tool .tic { position: absolute; top: 18px; right: 18px; color: var(--text-3); }
+.toolgrid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+.phone .toolgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tool { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 56px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-panel); }
+.tool b { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.phone .tool b { font-size: 13px; }
+.phone .tool { padding: 8px 10px; }
+.phone .tool small { display: none; }
+.phone .tool .tic { display: none; }
+.tool small { font-size: 12px; color: var(--text-3); }
+.tool .tic { position: absolute; top: 10px; right: 10px; color: var(--text-3); }
 .tool .tdot { position: absolute; top: 18px; right: 18px; width: 8px; height: 8px; border-radius: 999px; background: var(--good); box-shadow: 0 0 0 4px color-mix(in srgb, var(--good) 18%, transparent); }
 .tool.lit { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 20px 50px -20px color-mix(in srgb, var(--accent) 45%, transparent); }
 .story2 { display: flex; gap: 36px; align-items: center; }
@@ -412,10 +416,10 @@ const MAP: [string, string, MapBlock[]][] = [
     'The app',
     [
       ['Headline + the 2 a.m. video', 1.1, 'hero'],
-      ['Every cluster checked first: Clusters scene', 1, 'thing'],
-      ['Problems first: the window, 5 tabs', 1.1, 'thing'],
-      ['What routes to what: Map scene', 1, 'thing'],
-      ['Every change shows its kubectl: Rollback, Helm', 1, 'thing'],
+      ['Every cluster checked first: the clusters window', 1, 'thing'],
+      ['Problems first: Needs attention, a loop', 1.1, 'thing'],
+      ['What routes to what: the map, a loop', 1, 'thing'],
+      ['Every change shows its kubectl: rollback, a loop', 1, 'thing'],
       ['Where capacity goes, and why a pod can’t start', 1, 'thing'],
       ['Docs', 0.3, 'quiet'],
       ['Download foot', 0.7, 'foot'],
@@ -426,7 +430,7 @@ const MAP: [string, string, MapBlock[]][] = [
     'For teams',
     [
       ['Headline + Monday video', 1.1, 'hero'],
-      ['One chart, sign-in, as each person: team scene', 1, 'thing'],
+      ['One chart, sign-in, as each person: sign-in', 1, 'thing'],
       ['Every cluster, private ones too: Fleet', 0.9, 'thing'],
       ['#access: who may do what', 1, 'thing'],
       ['#record: who did', 1, 'thing'],
@@ -501,7 +505,7 @@ function siteMap(): string {
   }
   return `<section class="spec"><h2>The sitemap, as layout<i>each page’s blocks in order, drawn to the phone screens they take</i></h2><div class="map">${MAP.map(col).join('')}</div>
     <div class="legend"><span class="mb m-hero">headline and media</span><span class="mb m-thing">a thing: words and the app’s screen</span><span class="mb m-new">new on the site</span><span class="mb m-quiet">quiet: text, facts, story, sponsors</span><span class="mb m-foot">the download foot</span></div>
-    <p><b>Every page stays within about eight phone screens</b> (today’s home page is 35). <b>The home page</b> is website’s draft 3 with Péter’s sponsors answer: its eleven blocks hold to about one phone screen each, the facts line and the film in the hero, so about 7.5. <b>/app keeps five things, not six</b>: today’s four demos (palette, problems, logs, Helm) don’t come as a sixth; the palette and logs join Problems first as two of its tabs, Helm joins Rollback (“Every change shows its kubectl.”, with “Many can be taken back with one click, and a Helm release rolls back to any revision.”, marketing’s words), so nothing is lost and the page stays within the shape’s five. The 17-tab window keeps five tabs: Overview, Problems, Map, Logs, Rollback. Each scene stays as one interactive scene on the desktop and its poster with a play on a phone. <b>/teams has six</b>, one past the shape’s five, by the PM’s ruling that access and the record share it; #everyone is short and closes it. <b>/about</b> is read, not scanned: the story in full and the five tiers. Sizes are design’s estimates; the frames measure them.</p>
+    <p><b>Every page stays within about eight phone screens</b> (today’s home page is 35). <b>The home page</b> is website’s draft 3 with Péter’s sponsors answer: its eleven blocks hold to about one phone screen each, the facts line and the film in the hero, so about 7.5. <b>/app keeps five things, not six</b>: today’s four demos (palette, problems, logs, Helm) don’t come as a sixth; Problems first names the palette and logs in its words, and Rollback says Helm (“Every change shows its kubectl.”, with “Many can be taken back with one click, and a Helm release rolls back to any revision.”, marketing’s words), so the page stays within the shape’s five. Péter’s “a” (2026-10-13): today’s live scenes, demos and the 17-tab window are retired; each thing is the app’s screenshot or one of six loops, the same on the desktop and a phone. <b>/teams has six</b>, one past the shape’s five, by the PM’s ruling that access and the record share it; #everyone is short and closes it. <b>/about</b> is read, not scanned: the story in full and the five tiers. Sizes are design’s estimates; the frames measure them.</p>
   </section>`
 }
 
@@ -628,8 +632,6 @@ const CROPS = {
   mondayPhone: region(0.025, 0.36, 0.0, 0.5),
   /** The same, for a card: the rows and what everyone may do. */
   accessLeftPhone: region(0.025, 0.32, 0.0, 0.5),
-  /** The same, for a card: what the platform team and developers may do. */
-  accessRightPhone: region(0.33, 0.62, 0.0, 0.5),
   /** The approval on a phone, as the page's picture: why, and the change. */
   approvalNear: region(0.282, 0.58, 0.15, 0.62),
   /** The approval's foot on a phone: its kubectl command and the time it waits. */
@@ -675,7 +677,7 @@ function homePage(scheme: Scheme, phone = false): string {
     `${icon('users', 14)}For teams`,
     'Give it to your whole team.',
     'Install one Helm chart in your cluster. Everyone signs in as themselves, and what’s done is on the record.',
-    `<div class="cards2"><div class="c2"><b>Everyone, as themselves</b><p>Single sign-on, and each person sees and changes only what their own Kubernetes access allows.</p>${still(P('monday-v2'), phone ? CROPS.accessLeftPhone : CROPS.accessLeft)}</div><div class="c2"><b>Who may do what, and who did</b><p>Decide more on top of RBAC, team by team, and keep a record of what’s done. <span class="inl">How it’s kept secure${icon('arrow-right', 12)}</span></p>${still(P('monday-v2'), phone ? CROPS.accessRightPhone : CROPS.accessRight)}</div></div><div class="vid">${icon('play', 16)}Watch “Monday”, 1 min</div>`,
+    `<div class="cards2"><div class="c2"><b>Everyone, as themselves</b><p>Single sign-on, and each person sees and changes only what their own Kubernetes access allows.</p>${still(P('monday-v2'), phone ? CROPS.accessLeftPhone : CROPS.accessLeft)}</div><div class="c2"><b>Who may do what, and who did</b><p>Decide more on top of RBAC, team by team, and keep a record of what’s done. <span class="inl">How it’s kept secure${icon('arrow-right', 12)}</span></p>${phone ? '' : still(P('monday-v2'), CROPS.accessRight)}</div></div><div class="vid">${icon('play', 16)}Watch “Monday”, 1 min</div>`,
     'For teams',
   )
   const tools = ['Karpenter', 'Argo CD', 'Flux', 'CloudNativePG', 'cert-manager', 'Istio']
@@ -684,13 +686,13 @@ function homePage(scheme: Scheme, phone = false): string {
     `${icon('sparkles', 14)}AI assistants`,
     'Your assistant, with you in charge.',
     'Any AI agent or assistant that speaks MCP works through Lumovi, as you. Where your permissions say so, its changes wait for you with the diff, the reason and the kubectl command.',
-    looped(
+    `<div class="fit" style="max-width:${phone ? 358 : 880}px">${looped(
       still(P('asked-first-v2'), {
         ...(phone ? CROPS.approvalPhone : CROPS.approval),
         cls: 'shadowed',
       }),
       APPROVAL_STEPS,
-    ),
+    )}</div>`,
     'AI assistants',
   )
   const story = `<section class="hb2"><div class="wrap story2"><div class="photo" style="background-image:url(${peter()})"></div><div><blockquote class="ph-q">Péter’s pull quote, in his own words</blockquote><p class="lead2">Why Lumovi exists, who builds it, and how it stays free.</p>${more('Why I built it')}</div></div></section>`
@@ -1272,13 +1274,13 @@ function securityPage(scheme: Scheme, phone = false): string {
       3,
       'Less than RBAC, never more.',
       'Access rules',
-      `<p>Lumovi’s admins can let people do less through Lumovi than their RBAC allows: changes, shells, node shells, logs, Secrets, Helm and AI assistants. The server decides before it acts, and a refusal says which grant or limit decided.</p>${shot('access-rules', CROPS.accessRules, CROPS.accessRulesPhone)}`,
+      `<p>Lumovi’s admins can let people do less through Lumovi than their RBAC allows: changes, shells, node shells, logs, Secrets, Helm and AI assistants. The server decides before it acts, and a refusal says which grant or limit decided.</p>${phone ? '' : shot('access-rules', CROPS.accessRules, CROPS.accessRulesPhone)}`,
     ),
     sec(
       4,
       'On the record, and checkable.',
       'The audit log',
-      `<p>By default, changes, shells, Secrets read, sign-ins and AI assistants’ calls, kept on a volume in Lumovi’s namespace and sent on to its output, and to a webhook if you give one. Never values, tokens or manifests. Each event follows from the one before: compare the newest with a copy kept elsewhere.</p>${shot('audit-checked', CROPS.auditHold, CROPS.auditPhone)}`,
+      `<p>By default, changes, shells, Secrets read, sign-ins and AI assistants’ calls, kept on a volume in Lumovi’s namespace and sent on to its output, and to a webhook if you give one. Never values, tokens or manifests. Each event follows from the one before: compare the newest with a copy kept elsewhere.</p>${phone ? '' : shot('audit-checked', CROPS.auditHold, CROPS.auditPhone)}`,
     ),
     sec(
       5,
@@ -1408,7 +1410,7 @@ function aboutPage(scheme: Scheme, phone = false): string {
 
 /** Where a page's loops sit, and how every loop behaves (Péter, 2026-10-13: "1a"). */
 const loopNote = (list: [block: string, loop: string][]) =>
-  `<p><b>Loops</b> (the pause button marks each): ${list.map(([b, l]) => `${b} → <i>${l}</i>`).join('; ')}. Website’s scenes, re-rendered; each loop’s poster is its own frame at rest, drawn here with the app’s screenshot until marketing’s sheet. Muted, a few seconds, loaded near view and played only while in view; one pause button under the picture, never over it, 44 px to touch, named Pause and then Play (aria-pressed), with a visible focus ring; under reduced motion or Save-Data, the poster alone. On a phone each loop is its own render at the phone crop drawn here, never the desktop one shrunk. Every other block is a still, and the films stay click-to-play. Under the approval and audit loops, a static strip of their three steps in mono, nothing lit.</p>`
+  `<p><b>Loops</b> (the pause button marks each): ${list.map(([b, l]) => `${b} → <i>${l}</i>`).join('; ')}. The app’s moments, rendered by marketing at the block’s own crop; each loop’s poster is its own frame at rest, drawn here with the app’s screenshot until marketing’s sheet. Muted, a few seconds, loaded near view and played only while in view; one pause button under the picture, never over it, 44 px to touch, named Pause and then Play (aria-pressed), with a visible focus ring; under reduced motion or Save-Data, the poster alone. On a phone each loop is its own render at the phone crop drawn here, never the desktop one shrunk. Every other block is a still, and the films stay click-to-play. Under the approval and audit loops, a static strip of their three steps in mono, nothing lit.</p>`
 
 const partLoops = (part: Part): [string, string][] =>
   part.things.flatMap((t) =>
@@ -1481,7 +1483,7 @@ export function siteFrame(id: SiteFrame, scheme: Scheme): string {
     : PARTS[id]
       ? `<header><h1>lumovi.dev${PARTS[id]![1]}</h1><p>The part’s page in the shared shape, in brief §2a’s look, with the app’s own screenshots. Words: marketing’s where given, else drafts for marketing.</p>${partLoops(PARTS[id]![0]).length ? loopNote(partLoops(PARTS[id]![0])) : '<p><b>Loops</b>: none on this page; its blocks are stills, its film click-to-play.</p>'}</header><div class="row" style="flex-wrap:nowrap;align-items:flex-start">${partPage(PARTS[id]![0], scheme)}${partPage(PARTS[id]![0], scheme, true)}</div>`
       : id === 'site-app'
-        ? `<header><h1>lumovi.dev/app</h1><p>The part’s page in the shared shape, in brief §2a’s look. Words: marketing’s where given (audience.md §8), else drafts for marketing. Pictures are the app’s own screenshots (docs/screenshots) and, in six blocks, loops; today’s live scenes and demos are retired (design’s recommendation (a), with the PM for Péter).</p>${loopNote(partLoops(APP))}</header><div class="row" style="flex-wrap:nowrap;align-items:flex-start">${partPage(APP, scheme)}${partPage(APP, scheme, true)}</div>`
+        ? `<header><h1>lumovi.dev/app</h1><p>The part’s page in the shared shape, in brief §2a’s look. Words: marketing’s where given (audience.md §8), else drafts for marketing. Pictures are the app’s own screenshots (docs/screenshots) and, in six blocks, loops; today’s live scenes and demos are retired (Péter, 2026-10-13: “a”).</p>${loopNote(partLoops(APP))}</header><div class="row" style="flex-wrap:nowrap;align-items:flex-start">${partPage(APP, scheme)}${partPage(APP, scheme, true)}</div>`
         : id === 'site-home'
           ? `<header><h1>lumovi.dev: home</h1><p>Short: a block a phone screen, each pointing to its page. The words are marketing’s (audience.md, sitemap draft 3); screens are labelled until the launch capture.</p>${loopNote(
               [
