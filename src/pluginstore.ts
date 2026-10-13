@@ -162,14 +162,36 @@ const NOT_HERE: Row[] = [
     from: ['Lumovi-plugins', 'From Lumovi-plugins release 1.2.0'],
     act: `<span class="btn secondary sm">Install…</span>`,
   },
+]
+
+/** The page's own list by name, where one installed from Not here yet now sits. */
+const ALL_T: Row[] = [
+  {
+    name: 'Tekton',
+    glyph: 'workflow',
+    version: '1.0.0',
+    kinds: 'PipelineRuns, TaskRuns, Pipelines and 1 more kind',
+    here: 'no',
+    from: ['Lumovi', CAME],
+    act: '',
+  },
   {
     name: 'Toys',
     glyph: 'boxes',
     version: '1.2.0',
     kinds: 'Widgets',
     here: 'sidebar',
-    from: ['Lumovi-plugins', 'Installed from Lumovi-plugins release 1.2.0'],
+    from: ['Lumovi-plugins', 'Installed from Lumovi-plugins release 1.1.0'],
     act: MORE(true),
+  },
+  {
+    name: 'Traefik',
+    glyph: 'signpost',
+    version: '1.0.0',
+    kinds: 'IngressRoutes, Middlewares, IngressRouteTCPs and 5 more kinds',
+    here: 'no',
+    from: ['Lumovi', CAME],
+    act: '',
   },
 ]
 
@@ -199,11 +221,13 @@ function storePage(o: {
   state: StoreState
   menu?: string
   foot: string
+  counts?: string[]
 }): string {
   const counts =
-    o.state === 'policy'
+    o.counts ??
+    (o.state === 'policy'
       ? ['All 32', 'On this cluster 6', 'Yours 0']
-      : ['All 32', 'On this cluster 6', 'Updates 1', 'Not here yet 2']
+      : ['All 32', 'On this cluster 6', 'Updates 1', 'Not here yet 2'])
   return shell(
     'Plugins',
     'plug',
@@ -232,13 +256,22 @@ function pageFrame(): string {
 }
 
 function notHereFrame(): string {
-  return storePage({
-    filter: 'Not here yet 2',
+  // Toys, installed from Not here yet, is here now: in the page's own list, by name.
+  const counts = ['All 33', 'On this cluster 7', 'Updates 1', 'Not here yet 1']
+  return `<div class="pair">${storePage({
+    filter: 'Not here yet 1',
     rows: NOT_HERE,
     state: 'checked',
+    counts,
+    foot: 'Names are examples (the tests’ stand-ins): today every plugin in Lumovi-plugins comes with Lumovi, so this filter is empty and not shown.',
+  })}${storePage({
+    filter: 'All 33',
+    rows: ALL_T,
+    state: 'checked',
+    counts,
     menu: MENU_NOT_HERE,
-    foot: 'Names are examples (the tests’ stand-ins): today every plugin in Lumovi-plugins comes with Lumovi, so this filter is empty and not shown. Toys’ menu open.',
-  })
+    foot: 'Toys, installed from Not here yet, in the list by its name; Toys’ menu open.',
+  })}</div>`
 }
 
 // ─── The dialog ────────────────────────────────────────────────────────────────────────────
@@ -340,7 +373,7 @@ const RULES_PAGE = `<ul class="rules" style="margin:20px 32px 32px">
   <li><b>A row with an update</b> says “Update: 1.2.0” under its kinds, in the ink, and has Update… at its end, a secondary button, never filled: updates are a choice, and there can be several. Its version stays the one in use until it’s done.</li>
   <li><b>One this Lumovi is too old for</b> says “1.3.0 needs Lumovi 1.23.0”, quiet, at its end, and nothing to press: Lumovi’s own update is how to get it.</li>
   <li><b>Installed from the store</b>, From says “Installed from Lumovi-plugins release 1.1.0” (docs’ line, on every store plugin’s row and in its dialog) and which version is kept; Lumovi’s own say “Comes with Lumovi”; its “…” menu has Back to 1.1.0 (the one kept), Back to the one that came with Lumovi (deletes the store’s copies) and its release on GitHub. One not in this Lumovi has “Remove Toys” instead, in the danger colour, since there’s nothing of Lumovi’s to go back to.</li>
-  <li><b>Updates</b> and <b>Not here yet</b> are filters with their counts, beside the page’s own; the counts are the last good check’s. Not here yet lists each with Install… (and isn’t shown at all while the store has nothing Lumovi doesn’t carry, as today; a filter that empties while it’s on falls back to All, without a word), and, before it’s installed, “Its kinds are on this cluster” where they are, so the person sees which would show something.</li>
+  <li><b>Updates</b> and <b>Not here yet</b> are filters with their counts, beside the page’s own; the counts are the last good check’s. Not here yet lists each with Install… (and isn’t shown at all while the store has nothing Lumovi doesn’t carry, as today; a filter that empties while it’s on falls back to All, without a word); once installed, one is here, so it leaves Not here yet for the page’s own list, and Remove puts it back. The list is one order, by name, whatever each came from, so an update or an install never moves a row, and, before it’s installed, “Its kinds are on this cluster” where they are, so the person sees which would show something.</li>
   <li><b>The store’s line</b> is at the bar’s right: “Lumovi-plugins release 1.2.0 · checked 2m ago” and Check now; or what’s happening, or why it couldn’t check (wrapping under the filters when it’s long). Docs write the filters “Updates: 1” and “Not here yet: 2”; here they take the page’s own segmented form with the count.</li>
   <li><b>Every change here is audited</b> (installed, updated, went back), with the versions and what was agreed.</li>
 </ul>`
@@ -353,7 +386,7 @@ export const STORE_FRAMES: { id: StoreFrame; title: string; size: Size }[] = [
     title: 'The store: the Plugins page, an update and a menu',
     size: { width: W, height: 760 },
   },
-  { id: 'store-not-here', title: 'The store: not here yet', size: { width: W, height: 640 } },
+  { id: 'store-not-here', title: 'The store: not here yet', size: { width: W, height: 1136 } },
   {
     id: 'store-dialogs',
     title: 'The store: installing and updating',
@@ -383,5 +416,7 @@ ${PLUGIN}
 ${STORE}
 ${CSS}
 ${page ? `.win { height: ${f.size.height - 1}px; }` : ''}
+.pair > .win { height: 560px; }
+.pair > .win + .win { margin-top: 16px; }
 </style>${body}`
 }
