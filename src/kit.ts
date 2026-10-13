@@ -1012,7 +1012,7 @@ function pagePhone(): string {
 const PLUGIN = 'Argo CD'
 
 const refCard = (title: string, them: 'it' | 'them', note: string, body: string) =>
-  `<div class="kcard"><h3>${title}<span class="by">Shown by Lumovi. ${PLUGIN} can’t see ${them}.</span>${note ? `<small>${note}</small>` : ''}</h3><div class="in">${body}</div></div>`
+  `<div class="kcard"><h3>${title}<span class="by">${them === 'them' ? `Shown by Lumovi: ${PLUGIN}’s code never sees them.` : `Shown by Lumovi. ${PLUGIN} can’t see it.`}</span>${note ? `<small>${note}</small>` : ''}</h3><div class="in">${body}</div></div>`
 
 const ib = (glyph: Parameters<typeof icon>[0], off = false) =>
   `<span class="ib${off ? ' off' : ''}">${icon(glyph, 16)}</span>`
@@ -1151,7 +1151,7 @@ function refPhone(): string {
   const a = phoneFrame(
     'storefront',
     `<div class="sec"><h3>Repository credentials<span class="btn ghost sm" style="height:44px;margin:-12px -10px -12px auto">${icon('eye', 16)}Reveal all</span></h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi. ${PLUGIN} can’t see it.</p>${secretName(true)}<div class="secret">${secretKey('username', { value: 'deploy-bot', size: '10 B' })}${secretKey('password')}${secretKey('token', { quiet: 'Secret repo-credentials in argocd has no key named token.' })}</div></div>
-    <div class="sec"><h3>Logs</h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi. ${PLUGIN} can’t see them.</p><div class="klog">${LOGS.slice(
+    <div class="sec"><h3>Logs</h3><p class="larger" style="padding:0 0 8px">Shown by Lumovi: ${PLUGIN}’s code never sees them.</p><div class="klog">${LOGS.slice(
       1,
       3,
     )
