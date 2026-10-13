@@ -915,7 +915,7 @@ export const FRAMES: { id: Frame; title: string; today: string; fresh: string; r
       'Most of what a page needs is already a part of the app: 11 of these 16 are shared parts (9 in the components folder, 2 beside the pages that use them), and 3 are drawn inside one page and would be lifted out.',
     fresh:
       'The same parts, given to plugin authors as a kit with names and properties that stay stable. Two are missing: a table whose rows nest, and a graph.',
-    risk: 'The kit is the largest piece of the work and a promise kept for years: every part on a phone, in both themes, named for screen readers. Design checks each one.',
+    risk: 'The kit is the largest piece of the work and a promise kept for years: every part on a phone, in both themes, named for screen readers. Design checks each one. As built for 1.22.0 (LMV-262, 2026-10-13): a page names ten parts (Table, Graph, Tiles, Header, Split, Card, Pair, Counts, Stack, Logs), and the rest of this first set are what a cell or a part holds; each is drawn with its hard cases in the kit’s own frames (src/kit.ts), which are the sheet now.',
   },
   {
     id: 'cnpg',
