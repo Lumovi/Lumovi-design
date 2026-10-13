@@ -45,6 +45,8 @@ body { margin: 0; background: var(--app-bg); font-family: 'Inter', sans-serif; f
 .kcard > h3 { display: flex; align-items: center; margin: 0; padding: 14px 16px 6px; font-size: 13px; font-weight: 600; }
 .kcard > h3 small { margin-left: auto; font-size: 12px; font-weight: 400; color: var(--text-3); }
 .kcard > .in { padding: 0 16px 12px; }
+.kcard > .about { max-width: none; margin: 0; padding: 0 16px 8px; font-size: 12px; line-height: 18px; color: var(--text-3); }
+.kcard > .about.cut { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 
 /* Table. One grid for its heading row and every row: a lead, then columns from one scale. */
 .t { display: flex; flex-direction: column; margin: 0 -8px; }
@@ -2157,6 +2159,62 @@ const crow = (value: string, n: number, total: number, mono = false) =>
 const cgroup = (title: string, rows: [string, number][], total: number, mono = false, more = 0) =>
   `<div class="cg"><h4>${title}</h4>${rows.map(([v, n]) => crow(v, n, total, mono)).join('')}${more ? `<div class="cmore">${icon('chevron-down', 14)}${more} more</div>` : ''}</div>`
 
+/** A Card's quiet line about where its data came from, and a header button that only reads. */
+function cardAbout(): string {
+  const ABOUT =
+    'These are the targets of whichever of them answered: the prometheus-operated Service sends each ask to one of their pods. Asking again may show the other’s.'
+  const lead2 = (level: Level, name: string, beside: string, under = '') =>
+    `<span class="lead"><span class="dot" style="--m:var(--${LEVEL[level]})"></span><span class="w"><span class="nm"><b>${name}</b><i>${beside}</i></span>${under ? `<small>${under}</small>` : ''}</span></span>`
+  const rows = table(
+    'minmax(0,1fr) 64px 64px',
+    [head('Pool'), head('Up', { r: true }), head('Down', { r: true })],
+    [
+      pgRow([
+        lead2('warning', 'storefront', 'ServiceMonitor · shop'),
+        '<span class="r">1</span>',
+        '<span class="r">1</span>',
+      ]),
+      pgRow([
+        lead2('neutral', 'cart', 'PodMonitor · shop', '1 target not scraped yet'),
+        '<span class="r">0</span>',
+        '<span class="r">0</span>',
+      ]),
+      pgRow([
+        lead2('healthy', 'node-exporter', 'ServiceMonitor · monitoring'),
+        '<span class="r">2</span>',
+        '<span class="r">0</span>',
+      ]),
+    ],
+  )
+  const withAbout = (
+    about: string,
+    cut = false,
+    title = 'Prometheus k8s and user',
+    note = 'in monitoring',
+    inner = rows,
+  ) =>
+    `<div class="kcard"><h3>${title}<small>${note}</small></h3><p class="about${cut ? ' cut' : ''}">${about}</p><div class="in">${inner}</div></div>`
+  const widgets = table(
+    'minmax(0,1fr) 120px',
+    [head('Widget'), head('Status')],
+    [
+      pgRow([lead2('healthy', 'blue-7', 'shop'), `<span>${pill('healthy', 'Ready')}</span>`]),
+      pgRow([lead2('warning', 'green-2', 'shop'), `<span>${pill('warning', 'Paused')}</span>`]),
+    ],
+  )
+  const tip = `<div style="position:relative">${withAbout('Counted from toys-api’s own list of widgets, which it refreshes every five minutes and keeps for a day, so a widget made in the last five minutes, or one removed since, may not show here yet. Lumovi’s own list of Widgets is always current.', true, 'Widgets', '2', widgets)}<span class="tt" style="top:58px;left:16px;max-width:520px;white-space:normal">Counted from toys-api’s own list of widgets, which it refreshes every five minutes and keeps for a day, so a widget made in the last five minutes, or one removed since, may not show here yet. Lumovi’s own list of Widgets is always current.</span></div>`
+  const headers = `<div class="arr-stack">
+    <p class="cap">One button, and it only reads: none filled</p><div class="h2nd"><b>Target health</b><span class="acts">${btn('Ask again', 'secondary')}</span></div>
+    <p class="cap">One that changes beside it: only that one is filled, wherever it sits</p>${header2('orders-db', ['healthy', 'Healthy'], `${btn('Ask again', 'secondary')}${btn('Back up now…', 'primary')}`)}
+  </div>`
+  return spec(
+    'A Card’s line, and a button that only reads',
+    'where a card’s data came from; and weight that follows what a press can do',
+    `<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start"><div class="arr-stack"><p class="cap">A Card with its quiet line: Prometheus Operator’s, where a namespace runs two</p>${withAbout(ABOUT)}<p class="cap">A longer one (Toys, the tests’ stand-in): two lines, then cut at its end, whole in its tooltip</p>${tip}</div>${headers}</div>`,
+    `<b>A Card’s line</b> (<code>about</code>, the plugin’s text, at most 240 characters) says where the card’s data came from, when the title and its note can’t: under the title, before what it holds, in the quiet ink at 12 px, as wide as the card, wrapping to two lines and then cut at its end, whole in its tooltip (and read whole to a screen reader, after the title, never as its name). No icon and no colour: it’s said, not warned. A card without one is as today. <b>A button that only reads</b> is never drawn filled: the filled one is the last button that declares <code>changes</code>, and a header whose buttons only read or go has none filled, as a link already isn’t. For that to be true, the door gives a press token only to a button that declares <code>changes</code>, so a press of any other button can propose nothing; on a phone, as today, those that change give way to Lumovi’s line, and those that only read stay.`,
+  )
+}
+
 function countsWhole(): string {
   const long = `eu-central-1-wl1-ber…${mk('U+202E')}wlz-1`
   const mix = card(
@@ -2859,7 +2917,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                               : id === 'places-phone'
                                 ? placesPhone()
                                 : id === 'counts'
-                                  ? `<header><h1>Counts, Card and Pair</h1><p>Three parts Karpenter’s overview needs to be drawn from the kit: a share of a whole, the card a part stands in, and two parts side by side.</p></header>${countsWhole()}`
+                                  ? `<header><h1>Counts, Card and Pair</h1><p>Three parts Karpenter’s overview needs to be drawn from the kit: a share of a whole, the card a part stands in, and two parts side by side.</p></header>${countsWhole()}${cardAbout()}`
                                   : id === 'counts-phone'
                                     ? countsPhone()
                                     : id === 'cnpg'
