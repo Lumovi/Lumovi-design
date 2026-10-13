@@ -907,7 +907,12 @@ export const btn = (label: string, kind: 'primary' | 'secondary' | 'ghost') =>
 
 const MORE = `<span class="btn secondary sm" style="width:28px;padding:0">${icon('ellipsis', 14)}</span>`
 
-function header2(name: string, status: [Level, string], buttons: string, fit?: number): string {
+export function header2(
+  name: string,
+  status: [Level, string],
+  buttons: string,
+  fit?: number,
+): string {
   const shown = fit && name.length > fit ? cut(name, fit) : escape(name)
   return `<div class="h2nd"><b>${shown}</b><span class="st">${pill(status[0], status[1])}</span><span class="acts">${buttons}</span></div>`
 }
@@ -1818,7 +1823,7 @@ function graphPhone(): string {
 
 // ─── A plugin's page: whose it is, and stopped ─────────────────────────────────────────────
 
-const whoseStrip = (name: string, version: string, short = false) =>
+export const whoseStrip = (name: string, version: string, short = false) =>
   `<div class="whose">${icon('plug', 14)}<span>${short ? `From the plugin <b>${name}</b> ${version}` : `This page is from the plugin <b>${name}</b> ${version}. Lumovi draws it from its own parts; what it shows and says is the plugin’s.`}</span><span class="btn ghost sm">What it may do${icon('arrow-right', 14)}</span></div>`
 
 interface Stop {
@@ -1838,7 +1843,7 @@ function stopped(name: string, s: Stop): string {
   return `<div class="stopped"><span class="tile">${icon('plug', 20)}</span><h3>${s.title}</h3>${s.why ? `<p>${s.why}</p>` : ''}${s.said ? `<div class="saidbox"><i>${name} said</i><code>${escape(s.said)}</code></div>` : ''}<p class="q">${s.again === false ? 'The rest of Lumovi is as it was.' : STILL}</p>${s.advice ? `<p class="q">${ADVICE}</p>` : ''}${s.again === false ? '' : '<span class="btn secondary sm">Open it again</span>'}</div>`
 }
 
-const pgframe = (name: string, version: string, body: string, short = false) =>
+export const pgframe = (name: string, version: string, body: string, short = false) =>
   `<div class="pgframe">${whoseStrip(name, version, short)}${body}</div>`
 
 const LONG_PLUGIN = 'Platform Team’s Reconciliation and Settlement Workflows'
@@ -1928,7 +1933,7 @@ function stoppedPhone(): string {
 // ─── Where a plugin adds things: its pages, a tab on its kinds' objects, palette commands ──
 
 /** A tab of the app's strip. A tab whose body is a plugin's frame carries Lumovi's plug before its name. */
-const ltab = (
+export const ltab = (
   label: string,
   o: { on?: boolean; plug?: boolean; count?: string; hover?: boolean } = {},
 ) =>
@@ -1990,7 +1995,7 @@ function placesTabs(): string {
   )
 }
 
-const detailHead = (name: string, kind: string) =>
+export const detailHead = (name: string, kind: string) =>
   `<div class="dhd"><div><b>${name}</b><small>${kind}</small></div>${pill('healthy', 'Ready')}</div>`
 
 /** 3. A tab on an object of the plugin's kinds. */
