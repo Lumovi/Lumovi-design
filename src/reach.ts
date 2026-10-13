@@ -75,6 +75,14 @@ const CSS = `
 .srv.off li { color: var(--text-3); }
 .srv .lockl { display: flex; gap: 6px; margin-top: 8px; font-size: 12px; line-height: 18px; color: var(--text-2); }
 .srv .lockl svg.i { flex: none; margin-top: 2px; color: var(--text-3); }
+.ph-wia { padding: 12px 16px 16px; font-size: 13px; line-height: 20px; color: var(--text-2); }
+.ph-wia h4 { margin: 16px 0 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.ph-wia p { margin: 0 0 8px; }
+.ph-wia code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-3); }
+.ph-card { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.ph-card .g { display: grid; flex: none; width: 36px; height: 36px; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text-2); }
+.ph-card b { font-weight: 500; color: var(--text-1); }
+.ph-card small { display: block; font-size: 12px; color: var(--text-3); }
 .srvd { width: 560px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
 .srvd .dh { display: flex; gap: 12px; padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
 .srvd .dh .g { display: grid; flex: none; width: 36px; height: 36px; place-items: center; border-radius: 12px; background: var(--surface-3); color: var(--text-2); }
@@ -309,9 +317,22 @@ const TOYS_PATHS = [
   '/api/v1/build-info',
 ]
 
-const mayRead = (red: string) => `<div class="wia"><h4>May read</h4>${red}
+/** The logs red line: a plugin whose code is handed what containers print (docs' words). */
+const logsRed = (off = false) =>
+  `<div class="srv${off ? ' off' : ''}"><span class="say">Its code reads containers’ logs: what they print, which can hold tokens and personal data, reaches its code.</span><span class="svc">Of pods its page shows, one container at a time: at most its last 500 lines or hour, as you, within your access.</span>${off ? `<span class="lockl">${icon('lock', 13)}<span>Turned off by your organization’s policy (<code>pluginLogs: off</code>): Lumovi reads no logs for it.</span></span>` : ''}</div>`
+
+const mayRead = (
+  red: string,
+  last = 'It reads no logs and no Secret’s value, and sends nothing anywhere but to this cluster.',
+) => `<div class="wia"><h4>May read</h4>${red}
   <p>Its own kinds’ objects: its columns, status and details are fields of the object shown.</p>
-  <p>It reads no logs and no Secret’s value, and sends nothing anywhere but to this cluster.</p></div>`
+  <p>${last}</p></div>`
+
+const TOYS_SRV = {
+  service: 'toys-api',
+  svc: 'The Service toys-api, port http, in the namespace of the Widget its page shows',
+  paths: ['/api/v1/widgets/{widget}/history'],
+}
 
 function serverFrame(): string {
   const page = `<div class="row2">
@@ -326,21 +347,42 @@ function serverFrame(): string {
       <div class="ask">${icon('code', 15)}<span>Draws its pages with its own code, which runs in Lumovi’s sealed box and is handed only what’s listed here.</span></div></div>
     <div class="part"><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (3)</div></div>
     <div class="df"><span class="note">Without this, 1.0.0 stays in use.</span><span class="btn ghost sm">Cancel</span><span class="btn primary sm">Update to 1.1.0</span></div></div>`
+  const lastLogs = 'It reads no Secret’s value, and sends nothing anywhere but to this cluster.'
+  const two = `<div class="row2">
+    <div class="blk"><p class="cap">Two red lines together: its code reads logs and asks its server (Toys, the tests’ stand-in)</p>${mayRead(logsRed() + srv(TOYS_SRV), lastLogs)}
+      <p class="cap" style="margin-top:12px">Shown, not read: stays quiet, as today</p><div class="wia"><h4>May read</h4><p>Its own kinds’ objects: its columns, status and details are fields of the object shown.</p><p>Shows containers’ logs. Lumovi reads and draws them: its code never sees them.</p><p>It reads no Secret’s value, and sends nothing anywhere but to this cluster.</p></div>
+      <p class="cap" style="margin-top:12px">Logs turned off by policy (<code>pluginLogs: off</code>): said, not red</p>${mayRead(logsRed(true), lastLogs)}</div>
+    <div class="blk"><p class="cap">On a phone: the plugin opened as its own page</p>${phoneFrame(
+      'Toys',
+      `<div class="ph-wia"><div class="ph-card"><span class="g">${icon('boxes', 18)}</span><span><b>Toys</b> <code>1.3.0</code><small>Widgets</small></span></div><h4>May read</h4>${logsRed()}${srv(TOYS_SRV)}<p>Its own kinds’ objects: its columns, status and details are fields of the object shown.</p><p>${lastLogs}</p></div>`,
+      true,
+    )}</div>
+    <div class="blk"><p class="cap">The store’s dialog with both, each new under New in, red, logs first</p><div class="srvd"><div class="dh"><span class="g">${icon('boxes', 18)}</span><div><h3>Update Toys to 1.3.0?</h3><small>From Lumovi-plugins release <b>1.4.0</b>, signed by its release workflow. What it reads and changes, it does as you.<span class="use">In use: 1.2.0, installed from Lumovi-plugins release <b>1.1.0</b>.</span></small></div></div>
+      <div class="part"><p class="cap2">New in 1.3.0<span class="n">2</span></p>
+        <div class="ask red">${icon('scroll-text', 15)}<span>${logsRed()}</span></div>
+        <div class="ask red">${icon('server', 15)}<span>${srv(TOYS_SRV)}</span></div></div>
+      <div class="part"><div class="closed">${icon('chevron-right', 13)}Everything else it may do, as before (4)</div></div>
+      <div class="df"><span class="note">Without this, 1.2.0 stays in use.</span><span class="btn ghost sm">Cancel</span><span class="btn primary sm">Update to 1.3.0</span></div></div></div>
+  </div>`
   const refused = `<div class="srvd"><div class="dh"><span class="g">${icon('activity', 18)}</span><div><h3>Update Prometheus Operator to 1.1.0?</h3><small>${sub}</small></div></div>
     <div class="part"><div class="ask">${icon('lock', 15)}<span><b>Your organization’s policy doesn’t let plugins talk to servers in the cluster, and this one would.</b> (<code>pluginServers: off</code>) 1.0.0 stays in use.</span></div></div>
     <div class="df"><span class="btn ghost sm">Close</span></div></div>`
   return block(
-    'Its tool’s own server',
-    'the one red line a plugin’s file can earn',
-    `${page}<div class="row2"><div class="blk"><p class="cap">The store’s dialog: an update that adds it puts it first under New in</p>${dialog}</div><div class="blk"><p class="cap">Refused by policy, as the dialog’s other refusals are</p>${refused}</div></div>`,
+    'What reaches its code',
+    'the two red lines a plugin’s file can earn: its tool’s own server, and containers’ logs',
+    `${page}${two}<div class="row2"><div class="blk"><p class="cap">The store’s dialog: an update that adds it puts it first under New in</p>${dialog}</div><div class="blk"><p class="cap">Refused by policy, as the dialog’s other refusals are</p>${refused}</div></div>`,
     [
       [
-        'One line, red, first',
-        'in May read on the Plugins page (it’s a read: GETs only), above the rest, since it’s the only thing a plugin can do that reaches past the Kubernetes API. Docs’ sentence, naming the Service (“Asks the server prometheus-operated in this cluster, through Lumovi, and its code reads what it answers:”, or “Asks a server in this cluster, …” where the file finds it by labels), since unlike logs and a Secret’s value, what it answers is handed to the plugin’s code, in the critical ink, then, quiet, which Service, port and namespace it means, then every path as the file lists it, mono, one a line, hung from a thin red rule so the list reads as the line’s. A long path wraps anywhere, hanging; none is ever cut.',
+        'The server’s line, red, first',
+        'in May read on the Plugins page (it’s a read: GETs only), above the rest, since what it answers reaches the plugin’s code from past the Kubernetes API. Docs’ sentence, naming the Service (“Asks the server prometheus-operated in this cluster, through Lumovi, and its code reads what it answers:”, or “Asks a server in this cluster, …” where the file finds it by labels), since, unlike a Secret’s value or logs it only shows, what it answers is handed to the plugin’s code, in the critical ink, then, quiet, which Service, port and namespace it means, then every path as the file lists it, mono, one a line, hung from a thin red rule so the list reads as the line’s. A long path wraps anywhere, hanging; none is ever cut.',
       ],
       [
         'Paths as listed',
         'a segment Lumovi fills, like <code>{widget}</code>, stays as written in the quiet ink, so the fixed part reads first. Past six, the rest fold behind “14 more paths”, which opens them in place; the most a file may list is twenty. Nothing else on the page or in the dialog is red: red means a plugin can do it, here and now.',
+      ],
+      [
+        'Logs, read or shown',
+        'a plugin whose code reads containers’ logs earns the second red line, drawn as the server’s is: docs’ sentence in the critical ink (what they print can hold tokens and personal data, and it reaches the code), then, quiet, how much (one container at a time, the last 500 lines or hour, as you). No list under it. One that only shows logs keeps its quiet line, “Shows containers’ logs. Lumovi reads and draws them: its code never sees them.”, since nothing reaches its code. Where both red lines are there, logs come first, then the server, each whole. With <code>pluginLogs: off</code> it goes quiet as the server’s does, with docs’ lock line, the same for showing and reading since the key turns off both: “Turned off by your organization’s policy (pluginLogs: off): Lumovi reads no logs for it.” The store refuses an install or update of a plugin that shows or reads logs, Close only: “Your organization’s policy doesn’t let plugins show or read containers’ logs, and this one would. (pluginLogs: off)”, then that the version in use stays, or that nothing is installed. No agree dialog is drawn for a phone or a server: the store is the desktop’s, and a server’s plugins with code are LMV-295’s.',
       ],
       [
         'Turned off',
@@ -348,7 +390,7 @@ function serverFrame(): string {
       ],
       [
         'In the dialog',
-        'the same line, with the server icon in red: under “New in” it comes first, before the code line; in a first install it follows the code line, which docs put first. Its paths are never folded behind “as before”: an update that changes the paths shows the new ones under New in and the gone ones under No longer, struck, as any permission.',
+        'the same lines, each with its icon in red (the scroll for logs, the server for its server): under “New in” they come first, before the code line, and on a phone the plugin’s own page has them first in May read too (the store and its dialogs are the desktop’s); in a first install it follows the code line, which docs put first. Its paths are never folded behind “as before”: an update that changes the paths shows the new ones under New in and the gone ones under No longer, struck, as any permission.',
       ],
     ],
   )
