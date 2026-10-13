@@ -177,6 +177,8 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .pcount { padding: 12px 16px 8px; font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
 .arr-stack { display: flex; min-width: 0; flex-direction: column; gap: 16px; }
 .arr-tiles { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 16px; }
+.bk2 { display: flex; height: 36px; align-items: center; gap: 8px; margin: -8px -8px -8px; padding: 0 8px; border-radius: 8px; font-size: 13px; color: var(--text-2); }
+.bk2 svg.i { color: var(--text-3); }
 .arr-split { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 16px; align-items: start; }
 .pagebox { padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
 .tag { position: relative; }
@@ -2357,6 +2359,32 @@ function pgClusters(): string {
   )
 }
 
+/** The Split in a narrow pane (beside a row's panel): the phone's two pages, by its own width. */
+function pgNarrow(): string {
+  const back = `<div class="bk2">${icon('arrow-left', 16)}Clusters</div>`
+  const panel = `<div class="dpanel" style="width:380px">${detailHead('orders-db-1', 'Pod · shop')}${frameStub('Lumovi’s Overview of the Pod')}</div>`
+  const kept = pgframe(
+    'CloudNativePG',
+    '1.24.1',
+    `<div class="arr-stack" style="padding:16px">${back}${header2('orders-db', ['healthy', 'Healthy'], '')}<div class="arr-tiles" style="--n:1">${tile('server', 'Instances ready', '3/3', 'All ready', { level: 'healthy', opens: true })}</div><p class="cap">… its other tiles, Instances (orders-db-1 the row just pressed), Backups</p></div>`,
+    true,
+  )
+  const list = pgframe(
+    'CloudNativePG',
+    '1.24.1',
+    `<div class="arr-stack" style="padding:16px">${card('Clusters', '4', pickList(PG_CLUSTERS, 2, { fit: 18 }))}</div>`,
+    true,
+  )
+  const pane = (body: string) =>
+    `<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:300px;flex:none">${body}</div>${panel}</div>`
+  return spec(
+    'Beside a panel',
+    'under 640 px of its own width, the Split is the phone’s two pages',
+    `<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap"><div class="arr-stack"><p class="cap">1024, a row of orders-db pressed: what was in view stays, with Back</p>${pane(kept)}</div><div class="arr-stack"><p class="cap">After Back: the list, its rows whole, orders-db still the picked one</p>${pane(list)}</div></div>`,
+    `The Split goes by <b>its own width</b>, not the window’s: side by side from 640 px (the list’s 300, the gap, and enough for the rest’s tiles to stand two across); under that, the phone’s two pages, in place. So at 1440 or 1024 beside a row’s panel it’s two pages, and at 1024 with no panel it stays side by side. <b>Narrowing never takes away what’s in view</b>: a picked one’s page that was showing when the panel opened keeps showing, so the row just pressed is still there beside its panel, with a Back row first: the arrow and the list’s own title (“Clusters”), 36 px, the whole row pressable, focusable as any row. No title in the top bar (that’s the phone’s app bar), since the picked one’s header names it. <b>Arriving narrow</b> (a reload, a link) starts at the list, as on a phone. On the list page the rows are whole, the picked one marked, nothing beside them. <b>Widening</b> (the panel closed) goes back side by side, the same one picked. Tiles under 320 px of row stand one across.`,
+  )
+}
+
 function pgBackupsPage(): string {
   const tiles = `${tile('database', 'Backups in the last day', '23', 'across 3 clusters')}${tile('circle-x', 'Failed in the last day', '1', 'orders-db at 06:00', { level: 'critical', opens: true })}${tile('clock', 'No backup in a day', '1', 'reports-db', { level: 'warning', opens: true })}${tile('timer', 'Next scheduled', 'in 4m', 'orders-db', { words: true })}`
   const groups = `${table(
@@ -2832,7 +2860,7 @@ export function kitFrame(id: KitFrame, scheme: Scheme): string {
                                   : id === 'counts-phone'
                                     ? countsPhone()
                                     : id === 'cnpg'
-                                      ? `<header><h1>CloudNativePG, as a plugin</h1><p>Its code draws two pages in Lumovi’s box from the kit’s parts, read-only for now: Clusters, and every cluster’s Backups. It reads its own kinds, and of Kubernetes’ own only the Pods labelled cnpg.io/cluster.</p></header>${pgClusters()}${pgBackupsPage()}`
+                                      ? `<header><h1>CloudNativePG, as a plugin</h1><p>Its code draws two pages in Lumovi’s box from the kit’s parts: Clusters, and every cluster’s Backups. Back up now, on a cluster’s header, proposes a Backup through Lumovi’s dialog. It reads its own kinds, and of Kubernetes’ own only the Pods labelled cnpg.io/cluster.</p></header>${pgClusters()}${pgNarrow()}${pgBackupsPage()}`
                                       : id === 'cnpg-phone'
                                         ? pgPhone()
                                         : id === 'argo'
