@@ -51,7 +51,7 @@ const CSS = `
 .sstart dt { color: var(--text-3); }
 .sstart dd { margin: 0; min-width: 0; color: var(--text-1); }
 .sstart dd.m { font-family: 'JetBrains Mono', monospace; }
-.sel2 { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.sel2 { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 12px; }
 .sel2 svg.i { color: var(--text-3); }
 .sstart .btn.primary { margin-top: 20px; }
 .sstart .q { max-width: 380px; margin-top: 12px; font-size: 12px; line-height: 18px; color: var(--text-3); }
@@ -119,8 +119,8 @@ const INSTANCES = (hover = -1) =>
 function linksFrame(): string {
   const page = (tip: string, hover = -1, forward = false) =>
     `<div class="rel" style="width:900px">${pgframe('CloudNativePG', '1.1.0', `<div class="arr-stack" style="padding:16px">${header2('orders-db', ['healthy', 'Healthy'], ACTS({ forward }))}${card('Instances', '3', INSTANCES(hover))}</div>`)}${tip}</div>`
-  const btnTip = `<span class="tip3" style="right:150px;top:104px">Opens <b>Pod shop/orders-db-1</b> at its Shell tab</span>`
-  const rowTip = `<span class="tip3" style="left:40px;top:258px">Opens <b>Pod shop/orders-db-1</b> at its Logs tab</span>`
+  const btnTip = `<span class="tip3" style="right:150px;top:104px">Opens Pod shop/orders-db-1 at its Shell tab</span>`
+  const rowTip = `<span class="tip3" style="left:40px;top:258px">Opens Pod shop/orders-db-1 at its Logs tab</span>`
   return block(
     'Where a link sits',
     'a Header button with goes, and a Table row whose opens names a tab',
@@ -165,7 +165,7 @@ function startFrame(): string {
     ltab('Audit'),
     ltab('YAML'),
   ].join('')
-  const panel = `<div class="dpanel" style="max-width:600px;width:600px"><div class="dhd"><div><b>orders-db-1</b><small>Pod · shop · 12d old</small></div>${pill('healthy', 'Running')}</div><nav class="lts">${tabs}</nav><div class="tbar2"><span class="via">${icon('plug', 13)}Opened from CloudNativePG’s page</span></div><div class="sstart"><span class="tl2">${icon('square-terminal', 20)}</span><h3>A shell in orders-db-1</h3><p>CloudNativePG’s page opened this tab. A shell starts only when you press Start: as you, within your access.</p><dl><dt>Container</dt><dd><span class="sel2">postgres${icon('chevron-down', 13)}</span></dd><dt>As</dt><dd>jane@example.com, with your RBAC</dd><dt>Runs</dt><dd>bash, or sh where there’s no bash</dd></dl><span class="btn primary">${icon('play', 14)}Start shell</span><p class="q">A plugin’s page can bring you here, never start a shell. Opening the Shell tab yourself starts one at once, as always.</p></div></div>`
+  const panel = `<div class="dpanel" style="max-width:600px;width:600px"><div class="dhd"><div><b>orders-db-1</b><small>Pod · shop · 12d old</small></div>${pill('healthy', 'Running')}</div><nav class="lts">${tabs}</nav><div class="tbar2"><span class="via">${icon('plug', 13)}Opened from CloudNativePG’s page</span></div><div class="sstart"><span class="tl2">${icon('square-terminal', 20)}</span><h3>A shell in orders-db-1</h3><p>CloudNativePG’s page opened this tab. A shell starts only when you press Start: as you, within your access.</p><dl><dt>Container</dt><dd><span class="sel2">postgres${icon('chevron-down', 13)}</span></dd><dt>As</dt><dd>Your kubeconfig’s user for production, with its RBAC</dd><dt>Runs</dt><dd>bash, or sh where there’s no bash</dd></dl><span class="btn primary">${icon('play', 14)}Start shell</span><p class="q">A plugin’s page can bring you here, never start a shell. Opening the Shell tab yourself starts one at once, as always.</p></div></div>`
   const readOnly = `<div class="dpanel" style="max-width:600px;width:600px"><div class="dhd"><div><b>orders-db-1</b><small>Pod · shop · 12d old</small></div>${pill('healthy', 'Running')}</div><nav class="lts">${tabs}</nav><div class="sstart"><span class="tl2" style="background:var(--surface-3);color:var(--text-2)">${icon('square-terminal', 20)}</span><h3>Shells are off</h3><p>production is read-only in Lumovi, and a shell can change a container.</p></div></div>`
   return block(
     'The Shell tab, opened from a link',
@@ -196,7 +196,7 @@ function whereFrame(): string {
   const serverHeader = `<div style="width:900px">${pgframe('CloudNativePG', '1.1.0', `<div class="arr-stack" style="padding:16px">${header2('orders-db', ['healthy', 'Healthy'], ACTS())}</div>`)}</div>`
   const phone = phoneFrame(
     'orders-db',
-    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.1.0', true)}</div><div class="under">${pill('healthy', 'Healthy')}</div><div class="ph-acts" style="display:flex;gap:8px;padding:12px 16px 0"><span class="btn secondary go2" style="height:44px;padding:0 14px">${icon('scroll-text', 14)}Primary’s logs</span></div><p class="larger">Open Lumovi on a larger screen to use <b style="font-weight:500;color:var(--text-2)">Shell into primary</b> and <b style="font-weight:500;color:var(--text-2)">Back up now</b>.</p><div class="sec"><h3>Instances<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-1' })}<span class="twist">${icon('chevron-right', 16)}</span></div><dl>${fact('Role', 'Primary')}${fact('Status', 'Ready')}${fact('Age', '12d')}</dl></li></ul></div>`,
+    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.1.0', true)}</div><div class="under">${pill('healthy', 'Healthy')}</div><p class="larger">Open Lumovi on a larger screen to use <b style="font-weight:500;color:var(--text-2)">Shell into primary</b> and <b style="font-weight:500;color:var(--text-2)">Back up now</b>.</p><div class="ph-acts" style="display:flex;gap:8px;padding:12px 16px 0"><span class="btn secondary go2" style="height:44px;padding:0 14px">${icon('scroll-text', 14)}Primary’s logs</span></div><div class="sec"><h3>Instances<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-1' })}<span class="twist">${icon('chevron-right', 16)}</span></div><dl>${fact('Role', 'Primary')}${fact('Status', 'Ready')}${fact('Age', '12d')}</dl></li></ul></div>`,
     true,
   )
   return block(
