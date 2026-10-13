@@ -32,7 +32,9 @@ const CSS = `
 .thing .still { width: 100%; }
 .fit { width: 100%; margin: 0 auto; }
 .loopwrap { position: relative; width: 100%; }
-.loopbar { display: flex; justify-content: flex-end; margin-top: 10px; }
+.loopbar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 10px; }
+.steps { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 auto 0 0; padding: 0; list-style: none; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
+.steps .to { color: var(--text-3); }
 .loopc { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--text-2); }
 .phone .loopc { width: 36px; height: 36px; }
 .loops { margin: 8px 0 0; padding: 0 0 0 18px; max-width: 900px; font-size: 12px; line-height: 18px; color: #333; }
@@ -217,6 +219,12 @@ body { margin: 0; background: #dcdcdc; font-family: 'Inter', sans-serif; color: 
 .docs .dlinks { display: flex; flex-wrap: wrap; gap: 10px; }
 .docs .dlinks span { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 14px; color: var(--text-1); }
 .docs .dlinks svg.i { color: var(--text-3); }
+.dcards { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 14px; }
+.phone .dcards { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.dcard { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.dcard b { display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; color: var(--text-1); }
+.dcard b svg.i { color: var(--text-3); }
+.dcard p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--text-2); }
 .foot-dl { padding: 64px 0; border-top: 1px solid var(--line); background: var(--glow); text-align: center; }
 .foot-dl h2 { margin: 0; font-size: 40px; line-height: 1.1; font-weight: 650; letter-spacing: -0.03em; }
 .foot-dl p { margin: 12px auto 0; max-width: 560px; font-size: 16px; line-height: 1.6; color: var(--text-2); }
@@ -262,6 +270,50 @@ body { margin: 0; background: #dcdcdc; font-family: 'Inter', sans-serif; color: 
 .og .scr .bar { position: absolute; top: 0; left: 0; right: 0; height: 34px; border-bottom: 1px solid var(--line); background: var(--surface-2); border-radius: 14px 14px 0 0; }
 `
 
+/** The docs pages the site points to, by their own title, each with its own description (Lumovi-docs, docs/next). */
+const DOCS = {
+  'A quick tour':
+    'Five minutes through the ideas Lumovi is built on: problems first, details next to the list, and every change shown before it’s made.',
+  Overview:
+    'A cluster’s health and capacity on one page: what’s running, what needs attention, and where CPU and memory go.',
+  Map: 'How an object is connected: what leads to it, from the gateway and the service in front of it, and what it uses and runs on, down to the nodes.',
+  'Undo and activity':
+    'Take a change back from its notification, and see every change you made this session, with its kubectl command.',
+  'Install Lumovi in your cluster':
+    'Install Lumovi with its Helm chart, open it, and sign in with a token, in a few minutes.',
+  'Signing in to your team’s Lumovi':
+    'Open your team’s Lumovi, sign in, and see and change what your own account may, with nothing to install.',
+  'Access for your team':
+    'Say who may do what through Lumovi, team by team: what everyone gets, profiles your groups get where you say, and limits that hold anyone back. Always within Kubernetes RBAC.',
+  'The audit log':
+    'What was done through Lumovi, by whom, from where, and how it went: search it, follow it as it happens, see each object’s, and export it.',
+  Plugins:
+    'A tool your cluster runs that Lumovi has a plugin for gets an entry in the sidebar, leading to everything of its kinds in one list, what’s failing first, with a tab for each kind.',
+  'Included plugins':
+    'The plugins Lumovi comes with, for 32 popular tools: each tool’s entry in the sidebar, and the columns, status, links, related tabs and actions its custom resources get.',
+  'Write a plugin':
+    'Give your own custom resources useful columns, a real status, related objects and one-click actions, in a short YAML file.',
+  'Custom resources':
+    'Every kind the cluster serves, custom resources included, found through discovery and shown with the columns, status and actions that matter.',
+  'AI assistants':
+    'Lumovi is an MCP server: any AI agent that speaks MCP can read your clusters through it, on your desktop or your team’s server, and ask you before it changes anything.',
+  'Approving changes':
+    'A change an AI assistant asks for is checked by the cluster, then waits in Lumovi with its diff, its reason and its kubectl command, for you to approve or reject.',
+  'What assistants may do':
+    'Say what AI assistants may see, change and read: defaults for everywhere, and rules for some clusters and namespaces, by name, pattern or label.',
+  'Security in your cluster':
+    'What Lumovi can do when it runs in your cluster, what it never does, and how to keep it contained.',
+  'Privacy and security':
+    'What Lumovi connects to, where your credentials stay, and how the desktop app is built to keep them contained.',
+  'Harden it for production':
+    'What to set for a production installation of Lumovi: sign-in, the network, the service account, who may do what, the audit log, and an image you’ve checked.',
+}
+type DocTitle = keyof typeof DOCS
+
+/** "In the docs": two to four of a page's docs pages as cards, each its title and its one line. */
+const docCards = (titles: DocTitle[]) =>
+  `<div class="wrap docs"><h4>In the docs</h4><div class="dcards" style="--n:${titles.length}">${titles.map((t) => `<div class="dcard"><b>${t}${icon('arrow-right', 15)}</b><p>${DOCS[t]}</p></div>`).join('')}</div></div>`
+
 const PAGES: [string, string][] = [
   ['The app', '/app'],
   ['For teams', '/teams'],
@@ -303,7 +355,7 @@ function pageShape(scheme: Scheme, phone = false): string {
     `<div class="thing${r ? ' r' : ''}"><div class="tx"><h3>${title}</h3><p>${body}</p><span class="doc">${icon('file-text', 14)}Docs: how it works${icon('arrow-right', 14)}</span></div><div class="shot">the app’s own screen</div></div>`
   const inner = `${bar(phone ? 'phone' : 'wide')}<div class="hero"><div class="wrap"><span class="eyebrow">${icon('users', 14)}For teams</span><h1 class="h1">The same app, for your whole team.</h1><p class="lead">Install it in your cluster with one chart. Everyone signs in as themselves and sees only what their own access allows.</p><div class="acts"><span class="dl big">${icon('download', 18)}Install in your cluster</span><span class="btn2">Try it on your computer</span></div><div class="media"><div class="bar"><i></i><i></i><i></i></div><div class="ph">the page’s video, poster first</div><span class="play">${icon('play', 26)}</span></div></div></div>
     <div class="wrap things">${t('One chart, one sign-in', 'Install with Helm. People sign in with your identity provider, or through the proxy you already run.')}${t('As each person, never more', 'Lumovi acts as whoever is signed in, within their Kubernetes access. It never holds more than they have.', true)}${t('Who may do what, and who did', 'Profiles, grants and limits on top of RBAC, and a record of every change, shell and Secret read.')}</div>
-    <div class="wrap docs"><h4>In the docs</h4><div class="dlinks"><span>${icon('file-text', 14)}Install in a cluster</span><span>${icon('file-text', 14)}Single sign-on</span><span>${icon('file-text', 14)}Access rules</span><span>${icon('file-text', 14)}The record</span></div></div>
+    ${docCards(['Install Lumovi in your cluster', 'Signing in to your team’s Lumovi', 'Access for your team', 'The audit log'])}
     ${downloadFoot(phone)}`
   return `<div class="site${phone ? ' phone' : ''}" style="width:${phone ? 390 : 1376}px;${TOKENS[scheme]}--gut:${phone ? 16 : 40}px">${inner}</div>`
 }
@@ -637,6 +689,7 @@ function homePage(scheme: Scheme, phone = false): string {
         ...(phone ? CROPS.approvalPhone : CROPS.approval),
         cls: 'shadowed',
       }),
+      APPROVAL_STEPS,
     ),
     'AI assistants',
   )
@@ -647,13 +700,16 @@ function homePage(scheme: Scheme, phone = false): string {
   return `<div class="site${phone ? ' phone' : ''}" style="width:${phone ? 390 : 1376}px;${TOKENS[scheme]}--gut:${phone ? 16 : 40}px">${inner}</div>`
 }
 
+/** What the approval loop goes through, under it in a line of its own; static, nothing lit. */
+const APPROVAL_STEPS = ['Dry-run', 'Waits', 'Approved']
+
 /**
  * A block's loop: muted, a few seconds, played while in view, its poster the still drawn here. Its
  * pause button is the one control it has, under the picture so it never covers what the loop
  * shows; under reduced motion it stays its poster.
  */
-const looped = (still: string) =>
-  `<div class="loopwrap">${still}<div class="loopbar"><span class="loopc" title="Pause">${icon('pause', 13)}</span></div></div>`
+const looped = (still: string, steps?: string[]) =>
+  `<div class="loopwrap">${still}<div class="loopbar">${steps ? `<ol class="steps">${steps.map((x) => `<li>${x}</li>`).join('<li class="to" aria-hidden="true">→</li>')}</ol>` : ''}<span class="loopc" title="Pause">${icon('pause', 13)}</span></div></div>`
 
 /** What a part's page shows in one of its things: a film's still or the app's screenshot, cropped, or a screen the launch capture is to take. */
 type Pic =
@@ -665,6 +721,7 @@ type Pic =
       fit?: number
       phone?: Pic
       loop?: string
+      steps?: string[]
     }
   | {
       shot: string
@@ -674,6 +731,7 @@ type Pic =
       fit?: number
       phone?: Pic
       loop?: string
+      steps?: string[]
     }
   | { capture: string }
   | { file: string; code: string }
@@ -687,7 +745,7 @@ interface Part {
   hero: Pic
   film?: string
   things: { title: string; body: string; doc: string; pic: Pic; id?: string }[]
-  docs: string[]
+  docs: DocTitle[]
   foot?: 'cluster'
 }
 
@@ -701,6 +759,7 @@ const yaml = (code: string) =>
 const pic = (q: Pic, scheme: Scheme, cls = '', phone = false): string => {
   const p = phone && 'phone' in q && q.phone ? q.phone : q
   const loop = 'loop' in q && q.loop
+  const steps = 'steps' in q ? q.steps : undefined
   if ('capture' in p)
     return `<div class="scene ${cls}"><span class="sc-dot"></span><span>${p.capture}</span><small>from the launch capture: not in the app’s screenshots yet</small></div>`
   if ('file' in p)
@@ -713,7 +772,7 @@ const pic = (q: Pic, scheme: Scheme, cls = '', phone = false): string => {
   })
   // A close crop of a small part is shown at about its size in the app, not blown up.
   const fitted = p.fit ? `<div class="fit" style="max-width:${p.fit}px">${s}</div>` : s
-  return loop ? looped(fitted) : fitted
+  return loop ? looped(fitted, steps) : fitted
 }
 
 /** One part's page, from the shared shape: headline and media, its things, the docs, the foot. */
@@ -725,7 +784,7 @@ function partPage(part: Part, scheme: Scheme, phone = false): string {
         `<div class="thing${k % 2 ? ' r' : ''}"${t.id ? ` id="${t.id}"` : ''}><div class="tx"><h3>${t.title}</h3><p>${t.body}</p><span class="doc">${icon('file-text', 14)}${t.doc}${icon('arrow-right', 14)}</span></div>${pic(t.pic, scheme, '', phone)}</div>`,
     )
     .join('')
-  const docs = `<div class="wrap docs"><h4>In the docs</h4><div class="dlinks">${part.docs.map((d) => `<span>${icon('file-text', 14)}${d}</span>`).join('')}</div></div>`
+  const docs = docCards(part.docs)
   const inner = `${bar(phone ? 'phone' : 'wide', PAGES.find(([, path]) => path === part.path)?.[0] ?? '')}${hero}<div class="wrap things">${things}</div>${docs}${downloadFoot(phone, part.foot)}${footerInner(phone, true)}`
   return `<div class="site${phone ? ' phone' : ''}" style="width:${phone ? 390 : 1376}px;${TOKENS[scheme]}--gut:${phone ? 16 : 40}px">${inner}</div>`
 }
@@ -798,7 +857,7 @@ const APP: Part = {
       },
     },
   ],
-  docs: ['Get started', 'Clusters', 'Problems', 'The map', 'Logs', 'Undo and activity', 'Helm'],
+  docs: ['A quick tour', 'Overview', 'Map', 'Undo and activity'],
 }
 
 const TEAMS: Part = {
@@ -849,6 +908,7 @@ const TEAMS: Part = {
       doc: 'The audit log',
       pic: {
         loop: 'audit',
+        steps: ['Recorded', 'Chained', 'Checked'],
         shot: 'audit-checked',
         ...CROPS.auditHold,
         phone: { shot: 'audit-checked', ...CROPS.auditPhone },
@@ -867,12 +927,10 @@ const TEAMS: Part = {
     },
   ],
   docs: [
-    'Install in a cluster',
-    'Single sign-on',
-    'Fleet',
-    'Access rules',
+    'Install Lumovi in your cluster',
+    'Signing in to your team’s Lumovi',
+    'Access for your team',
     'The audit log',
-    'Your access',
   ],
 }
 
@@ -951,6 +1009,7 @@ const AI: Part = {
       doc: 'Approvals',
       pic: {
         loop: 'approval',
+        steps: APPROVAL_STEPS,
         poster: 'asked-first-v2',
         ...CROPS.approvalFoot,
         phone: { poster: 'asked-first-v2', ...CROPS.approvalFootNear },
@@ -978,7 +1037,7 @@ const AI: Part = {
       },
     },
   ],
-  docs: ['Connect an assistant', 'Approvals', 'Assistant permissions', 'The audit log'],
+  docs: ['AI assistants', 'Approving changes', 'What assistants may do', 'The audit log'],
 }
 
 /** /security, /download and /about: their own parts, beside the shared shape. */
@@ -1162,8 +1221,7 @@ const CSS3 = `
 const siteBox = (phone: boolean, scheme: Scheme, inner: string) =>
   `<div class="site${phone ? ' phone' : ''}" style="width:${phone ? 390 : 1376}px;${TOKENS[scheme]}--gut:${phone ? 16 : 40}px">${inner}</div>`
 
-const docsRow = (docs: string[]) =>
-  `<div class="wrap docs"><h4>In the docs</h4><div class="dlinks">${docs.map((d) => `<span>${icon('file-text', 14)}${d}</span>`).join('')}</div></div>`
+const docsRow = docCards
 
 /** The security page: the eight facts as anchors first, then each with its docs link. Words: marketing's where quoted, else docs' own, for docs to check. */
 function securityPage(scheme: Scheme, phone = false): string {
@@ -1248,7 +1306,7 @@ function securityPage(scheme: Scheme, phone = false): string {
     ),
   ].join('')
   const notyet = `<div class="notyet"><h3>What it doesn’t do yet.</h3><p>Said as plainly as the rest, from the docs on the day.</p><ul class="sx-list">${li('One replica.', ' With AI assistants on, or the audit history on its volume, the chart runs one Lumovi and refuses more.')}${li('The audit chain has no key.', ' Whoever can write its volume could rewrite it unseen: keep a copy elsewhere, and compare.')}</ul></div>`
-  const inner = `${bar(phone ? 'phone' : 'wide', 'Security')}${hero}<div class="wrap">${sections}${notyet}</div>${docsRow(['Security in your cluster', 'Privacy and security', 'Access rules', 'The audit log', 'Check a release'])}${downloadFoot(phone, 'cluster')}${footerInner(phone, true)}`
+  const inner = `${bar(phone ? 'phone' : 'wide', 'Security')}${hero}<div class="wrap">${sections}${notyet}</div>${docsRow(['Security in your cluster', 'Privacy and security', 'Harden it for production', 'The audit log'])}${downloadFoot(phone, 'cluster')}${footerInner(phone, true)}`
   return siteBox(phone, scheme, inner)
 }
 
@@ -1350,7 +1408,7 @@ function aboutPage(scheme: Scheme, phone = false): string {
 
 /** Where a page's loops sit, and how every loop behaves (Péter, 2026-10-13: "1a"). */
 const loopNote = (list: [block: string, loop: string][]) =>
-  `<p><b>Loops</b> (the pause button marks each): ${list.map(([b, l]) => `${b} → <i>${l}</i>`).join('; ')}. Website’s scenes, re-rendered; each loop’s poster is its own frame at rest, drawn here with the app’s screenshot until marketing’s sheet. Muted, a few seconds, loaded near view and played only while in view; one pause button under the picture, never over it, 44 px to touch, named Pause and then Play (aria-pressed), with a visible focus ring; under reduced motion or Save-Data, the poster alone. On a phone each loop is its own render at the phone crop drawn here, never the desktop one shrunk. Every other block is a still, and the films stay click-to-play.</p>`
+  `<p><b>Loops</b> (the pause button marks each): ${list.map(([b, l]) => `${b} → <i>${l}</i>`).join('; ')}. Website’s scenes, re-rendered; each loop’s poster is its own frame at rest, drawn here with the app’s screenshot until marketing’s sheet. Muted, a few seconds, loaded near view and played only while in view; one pause button under the picture, never over it, 44 px to touch, named Pause and then Play (aria-pressed), with a visible focus ring; under reduced motion or Save-Data, the poster alone. On a phone each loop is its own render at the phone crop drawn here, never the desktop one shrunk. Every other block is a still, and the films stay click-to-play. Under the approval and audit loops, a static strip of their three steps in mono, nothing lit.</p>`
 
 const partLoops = (part: Part): [string, string][] =>
   part.things.flatMap((t) =>
@@ -1423,7 +1481,7 @@ export function siteFrame(id: SiteFrame, scheme: Scheme): string {
     : PARTS[id]
       ? `<header><h1>lumovi.dev${PARTS[id]![1]}</h1><p>The part’s page in the shared shape, in brief §2a’s look, with the app’s own screenshots. Words: marketing’s where given, else drafts for marketing.</p>${partLoops(PARTS[id]![0]).length ? loopNote(partLoops(PARTS[id]![0])) : '<p><b>Loops</b>: none on this page; its blocks are stills, its film click-to-play.</p>'}</header><div class="row" style="flex-wrap:nowrap;align-items:flex-start">${partPage(PARTS[id]![0], scheme)}${partPage(PARTS[id]![0], scheme, true)}</div>`
       : id === 'site-app'
-        ? `<header><h1>lumovi.dev/app</h1><p>The part’s page in the shared shape, in brief §2a’s look. Words: marketing’s where given (audience.md §8), else drafts for marketing. Pictures are the app’s own screenshots (docs/screenshots); where the site has a live scene, it stands in their place on the desktop.</p>${loopNote(partLoops(APP))}</header><div class="row" style="flex-wrap:nowrap;align-items:flex-start">${partPage(APP, scheme)}${partPage(APP, scheme, true)}</div>`
+        ? `<header><h1>lumovi.dev/app</h1><p>The part’s page in the shared shape, in brief §2a’s look. Words: marketing’s where given (audience.md §8), else drafts for marketing. Pictures are the app’s own screenshots (docs/screenshots) and, in six blocks, loops; today’s live scenes and demos are retired (design’s recommendation (a), with the PM for Péter).</p>${loopNote(partLoops(APP))}</header><div class="row" style="flex-wrap:nowrap;align-items:flex-start">${partPage(APP, scheme)}${partPage(APP, scheme, true)}</div>`
         : id === 'site-home'
           ? `<header><h1>lumovi.dev: home</h1><p>Short: a block a phone screen, each pointing to its page. The words are marketing’s (audience.md, sitemap draft 3); screens are labelled until the launch capture.</p>${loopNote(
               [
