@@ -8,8 +8,13 @@ import { type Scheme } from './colors.ts'
 import {
   CSS as KIT,
   card,
+  graph,
+  legend,
+  type GNode,
+  type GEdge,
   cgroup,
   command,
+  diff,
   escape,
   fact,
   head,
@@ -170,6 +175,47 @@ const CSS = `
 .objs .o.out { color: var(--text-3); }
 .left { display: flex; gap: 6px; margin: 10px 0 0; font-size: 12px; line-height: 17px; color: var(--text-2); }
 .left svg.i { flex: none; margin-top: 1px; color: var(--text-3); }
+
+/* An application's page: the panel opened wide, its Now card, the graph. */
+.wide { width: 1180px; }
+.wide .ap { width: 1180px; }
+.gcard.oos { border-color: var(--warn); box-shadow: 0 0 0 1px var(--warn), var(--shadow-panel); }
+.oosk { display: inline-block; width: 16px; height: 10px; border: 2px solid var(--warn); border-radius: 3px; }
+.steps { display: flex; align-items: flex-start; margin: 2px 0 14px; }
+.step { position: relative; display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 6px; }
+.step::before { content: ''; position: absolute; top: 9px; right: 0; left: 0; height: 2px; background: var(--line-strong); }
+.step:first-child::before { left: 50%; }
+.step:last-child::before { right: 50%; }
+.step.done::before, .step.cur::before { background: color-mix(in srgb, var(--good) 55%, var(--line-strong)); }
+.step.cur::before { background: linear-gradient(90deg, color-mix(in srgb, var(--good) 55%, var(--line-strong)) 50%, var(--line-strong) 50%); }
+.step .sd { position: relative; z-index: 1; display: grid; width: 20px; height: 20px; margin: 0 auto; place-items: center; border: 2px solid var(--line-strong); border-radius: 50%; background: var(--surface); color: var(--text-3); }
+.step.done .sd { border-color: var(--good); background: var(--good); color: #fff; }
+.step.cur .sd { border-color: var(--text-2); color: var(--text-2); }
+.step.bad .sd { border-color: var(--critical); background: var(--critical); color: #fff; }
+.step b { font-size: 12.5px; font-weight: 600; text-align: center; }
+.step small { font-size: 12px; line-height: 16px; text-align: center; color: var(--text-3); }
+.step.cur b { color: var(--text-1); }
+.wait { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 13px; line-height: 19px; }
+.wait .lead { flex: none; width: 220px; }
+.wait p { margin: 0; min-width: 0; color: var(--text-2); }
+.rbtn { height: 26px !important; padding: 0 8px !important; font-size: 12px !important; }
+.cur-l { font-size: 12px; color: var(--text-3); }
+
+/* The sync dialog: sections of options, plain words where a choice does harm. */
+.sdlg { width: 640px; }
+.sdlg .opt { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
+.sdlg .opt + .opt { border-top: 1px solid var(--line); }
+.sdlg .opt .w { min-width: 0; flex: 1; }
+.sdlg .opt .w b { display: block; font-size: 13px; font-weight: 500; }
+.sdlg .opt .w p { margin: 2px 0 0; font-size: 12px; line-height: 17px; color: var(--text-3); }
+.sdlg .opt .w p.harm { color: var(--warn-text); }
+.sdlg .opt .w p.harm.red { color: var(--critical-text); }
+.sdlg .opt .w ul { margin: 6px 0 0; padding: 6px 10px; border-radius: 8px; background: color-mix(in srgb, var(--critical) 8%, transparent); list-style: none; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 19px; color: var(--text-1); }
+.sdlg .grp { margin: 14px 0 2px; font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.sdlg .grp:first-child { margin-top: 0; }
+.sdlg .res { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; margin-top: 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; }
+.sdlg .res small { font-size: 11.5px; color: var(--text-3); }
+.sdlg .btn.danger { border-color: var(--critical); background: var(--critical); color: #fff; }
 
 /* On a phone. */
 .ph .tbp { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
@@ -781,7 +827,7 @@ const APPS: AppRow[] = [
     ['healthy', 'Synced'],
     opPill('progressing', 'Syncing', '1m 05s'),
     'main · 9b2e771',
-    'prod-us · shop',
+    'in-cluster · shop',
     'On',
     '5h',
   ],
@@ -793,7 +839,7 @@ const APPS: AppRow[] = [
     ['healthy', 'Synced'],
     pill('neutral', 'Terminated'),
     'main · 91ac0f3',
-    'in-cluster · shop',
+    'prod-us · shop',
     'Off',
     '41m',
   ],
@@ -1012,6 +1058,482 @@ function listPhone(): string {
   return `<section class="blk"><h2>On a phone<i>read, not changed: filters as a sheet, rows as cards</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${page}</div></section>`
 }
 
+// ─── 4. One application's page ──────────────────────────────────────────────────────────────
+
+/** Where the sync is: its hooks and waves in order, each done, running or to come. */
+const STEPS = `<div class="steps">${[
+  ['done', 'PreSync', 'db-migrate, done'],
+  ['done', 'Wave 0', '2 resources, done'],
+  ['cur', 'Wave 1', '1 of 3 Pods ready'],
+  ['', 'Wave 2', '1 resource'],
+  ['', 'PostSync', 'smoke-test'],
+]
+  .map(
+    ([st, label, sub]) =>
+      `<div class="step ${st}"><span class="sd">${st === 'done' ? icon('check', 12, 3) : st === 'cur' ? icon('loader-circle', 12, 2.5) : ''}</span><b>${label}</b><small>${sub}</small></div>`,
+  )
+  .join('')}</div>`
+
+const NOW = `<div class="kcard"><h3>Now<small>step 3 of 5</small></h3><div class="in">${STEPS}<div class="wait">${lead({ level: 'progressing', name: 'storefront', under: 'Deployment · shop' })}<p>Waiting for rollout to finish: 1 of 3 updated replicas are available…</p></div></div></div>`
+
+const APP_TILES = () =>
+  `${tile('git-branch', 'Sync', 'Out of sync', parts('3 of 12 resources differ'), { words: true, level: 'warning' })}${tile('package', 'Revision', '9b2e771 → 4f1c9aa', parts('main · syncing to its newest'), { words: true })}${tile('clock', 'Last synced', 'Syncing now', parts('for 1m 05s · by peter'), { words: true, level: 'progressing' })}${tile('rotate-cw', 'Auto-sync', 'Off', parts('prune off · self-heal off'), { words: true })}`
+
+const G_NODES: GNode[] = [
+  {
+    id: 'app',
+    glyph: 'git-branch',
+    kind: 'Application',
+    name: 'storefront',
+    status: ['progressing', 'Progressing'],
+    col: 2,
+    row: 0,
+  },
+  {
+    id: 'job',
+    glyph: 'play',
+    kind: 'Job',
+    meta: 'PreSync',
+    name: 'db-migrate',
+    status: ['healthy', 'Complete'],
+    col: 0,
+    row: 1,
+  },
+  { id: 'cm', glyph: 'file-code-2', kind: 'ConfigMap', name: 'storefront-config', col: 1, row: 1 },
+  {
+    id: 'dep',
+    glyph: 'layers',
+    kind: 'Deployment',
+    name: 'storefront',
+    status: ['progressing', 'Progressing'],
+    col: 2,
+    row: 1,
+    cls: 'oos',
+  },
+  {
+    id: 'svc',
+    glyph: 'network',
+    kind: 'Service',
+    name: 'storefront',
+    status: ['healthy', 'Healthy'],
+    col: 3,
+    row: 1,
+  },
+  {
+    id: 'rs1',
+    glyph: 'layers',
+    kind: 'ReplicaSet',
+    meta: '4f1c9aa',
+    name: 'storefront-7d9f6c5b8',
+    status: ['progressing', '1 of 3'],
+    col: 2,
+    row: 2,
+  },
+  {
+    id: 'rs0',
+    glyph: 'layers',
+    kind: 'ReplicaSet',
+    meta: '9b2e771',
+    name: 'storefront-5c8b9d7f4',
+    status: ['healthy', '2 of 2'],
+    col: 3,
+    row: 2,
+  },
+  {
+    id: 'p1',
+    glyph: 'box',
+    kind: '3 Pods',
+    name: 'storefront-7d9f6c5b8-…',
+    status: ['warning', '1 ready'],
+    col: 2,
+    row: 3,
+  },
+  {
+    id: 'p0',
+    glyph: 'box',
+    kind: '2 Pods',
+    name: 'storefront-5c8b9d7f4-…',
+    status: ['healthy', '2 ready'],
+    col: 3,
+    row: 3,
+  },
+]
+const G_EDGES: GEdge[] = [
+  ['app', 'job'],
+  ['app', 'cm'],
+  ['app', 'dep'],
+  ['app', 'svc'],
+  ['dep', 'rs1'],
+  ['dep', 'rs0'],
+  ['rs1', 'p1'],
+  ['rs0', 'p0'],
+]
+
+const RESULT = card(
+  'This sync',
+  '7 resources, 3 hooks',
+  table(
+    '52px minmax(0,1fr) 112px 120px 92px minmax(0,1.6fr)',
+    [head('Wave'), head('Resource'), head('Result'), head('Health'), head('Hook'), head('Message')],
+    [
+      row([
+        `<span class="q3">−</span>`,
+        lead({ name: 'db-migrate', under: 'Job · shop' }),
+        `<span>${pill('healthy', 'Synced')}</span>`,
+        `<span>${pill('healthy', 'Complete')}</span>`,
+        '<span class="q">PreSync</span>',
+        '<span class="q">job.batch/db-migrate created</span>',
+      ]),
+      row([
+        '<span class="r">0</span>',
+        lead({ name: 'storefront-config', under: 'ConfigMap · shop' }),
+        `<span>${pill('healthy', 'Synced')}</span>`,
+        '<span class="q3">—</span>',
+        '<span class="q3">—</span>',
+        '<span class="q">configmap/storefront-config configured</span>',
+      ]),
+      row([
+        '<span class="r">0</span>',
+        lead({ name: 'storefront', under: 'Service · shop' }),
+        `<span>${pill('healthy', 'Synced')}</span>`,
+        `<span>${pill('healthy', 'Healthy')}</span>`,
+        '<span class="q3">—</span>',
+        '<span class="q">service/storefront unchanged</span>',
+      ]),
+      row([
+        '<span class="r">1</span>',
+        lead({ name: 'storefront', under: 'Deployment · shop' }),
+        `<span>${pill('healthy', 'Synced')}</span>`,
+        `<span>${pill('progressing', 'Progressing')}</span>`,
+        '<span class="q3">—</span>',
+        '<span class="q">deployment.apps/storefront configured</span>',
+      ]),
+      row([
+        '<span class="r">2</span>',
+        lead({ name: 'storefront', under: 'Ingress · shop' }),
+        `<span>${pill('neutral', 'Waiting')}</span>`,
+        '<span class="q3">—</span>',
+        '<span class="q3">—</span>',
+        '<span class="q3">—</span>',
+      ]),
+      row([
+        `<span class="q3">−</span>`,
+        lead({ name: 'smoke-test', under: 'Job · shop' }),
+        `<span>${pill('neutral', 'Waiting')}</span>`,
+        '<span class="q3">—</span>',
+        '<span class="q">PostSync</span>',
+        '<span class="q3">—</span>',
+      ]),
+      row([
+        '<span class="r">0</span>',
+        lead({ name: 'storefront-legacy', under: 'ConfigMap · shop' }),
+        `<span>${pill('neutral', 'PruneSkipped')}</span>`,
+        '<span class="q3">—</span>',
+        '<span class="q3">—</span>',
+        '<span class="q">ignored (requires pruning)</span>',
+      ]),
+    ],
+  ),
+)
+
+const PROBLEMS = card(
+  'Problems',
+  '3',
+  table(
+    '128px minmax(0,1fr) minmax(0,2fr) 56px',
+    [head('What'), head('Where'), head('What it says'), head('When', { r: true })],
+    [
+      row([
+        `<span>${pill('warning', 'Warning event')}</span>`,
+        lead({ name: 'storefront-7d9f6c5b8-x2kqp', under: 'Pod · shop' }),
+        '<span class="q">Readiness probe failed: HTTP probe failed with statuscode: 503</span>',
+        ago('40s'),
+      ]),
+      row([
+        `<span>${pill('warning', 'Condition')}</span>`,
+        lead({ name: 'SharedResourceWarning', under: 'storefront' }),
+        '<span class="q">ConfigMap shop/storefront-config is part of applications argocd/storefront and checkout</span>',
+        ago('2d'),
+      ]),
+      row([
+        `<span>${pill('warning', 'Out of sync')}</span>`,
+        lead({ name: 'storefront-legacy', under: 'ConfigMap · shop' }),
+        '<span class="q">Not in the repository any more; prune is off, so it stays</span>',
+        ago('6h'),
+      ]),
+    ],
+  ),
+)
+
+const HISTORY = (auto = false) =>
+  card(
+    'History',
+    '5',
+    table(
+      '44px minmax(0,1.2fr) 72px minmax(0,1fr) 64px 112px',
+      [
+        head('ID'),
+        head('Revision'),
+        head('Took', { r: true }),
+        head('By'),
+        head('When', { r: true, sorted: 'down' }),
+        '<span></span>',
+      ],
+      [
+        row(
+          [
+            '<span>14</span>',
+            '<span class="q"><span class="mono">9b2e771</span> <span class="q3">main · Raise the cart timeout</span></span>',
+            '<span class="r q3">48s</span>',
+            '<span class="q">peter</span>',
+            ago('5h'),
+            '<span class="cur-l">Current</span>',
+          ],
+          false,
+        ),
+        row(
+          [
+            '<span>13</span>',
+            '<span class="q"><span class="mono">e91f0c2</span> <span class="q3">main · Move images to the new registry</span></span>',
+            '<span class="r q3">1m 12s</span>',
+            '<span class="q q3">Auto-sync</span>',
+            ago('2d'),
+            `<span class="btn secondary sm rbtn${auto ? ' off' : ''}">Roll back…</span>`,
+          ],
+          false,
+        ),
+        row(
+          [
+            '<span>12</span>',
+            '<span class="q"><span class="mono">4c7a1d9</span> <span class="q3">main · Two replicas in staging</span></span>',
+            '<span class="r q3">39s</span>',
+            '<span class="q q3">Auto-sync</span>',
+            ago('4d'),
+            `<span class="btn secondary sm rbtn${auto ? ' off' : ''}">Roll back…</span>`,
+          ],
+          false,
+        ),
+        '<div class="kmore">Show all 5</div>',
+      ],
+    ),
+  )
+
+/** 4. One application's page: its Argo CD tab, with the panel opened wide, while a sync runs. */
+function appPageFrame(): string {
+  const graphCard = card(
+    'Resources',
+    '12',
+    `${legend('Graph').replace('<span class="end', '<span class="leg"><i class="oosk"></i>Out of sync</span><span class="end')}${graph(G_NODES, G_EDGES, 4, 4)}`,
+  )
+  const body = `<div class="arr-stack" style="padding:16px"><div>${header(
+    `${pill('progressing', 'Progressing')}${opPill('progressing', 'Syncing', '1m 05s')}`,
+    busy('Syncing'),
+    `Sync running: ${WAITING}`,
+  )}</div>${NOW}<div class="arr-tiles" style="--n:4">${APP_TILES()}</div>${graphCard}${RESULT}${PROBLEMS}${HISTORY()}<div class="kcard"><h3>Events<small>Shown by Lumovi</small></h3><div class="in"><div class="stub">the Application’s events, as Lumovi shows any object’s</div></div></div></div>`
+  const page = `<div class="ap" style="width:1180px"><div class="hd"><span class="kt">${icon('git-branch', 18)}</span><div class="who"><small>Application · argocd · 12d old</small><b>storefront${icon('copy', 14)}</b><div class="st2">${pill('progressing', 'Progressing')}<span class="abar">${TERMINATE}${busy('Syncing', '1m 05s')}${PIN}${MORE}</span></div></div><span class="wins"><span>${icon('maximize-2', 16)}</span><span>${icon('x', 16)}</span></span></div><nav class="lts">${TABS}</nav><div class="pgframe flat">${whoseStrip('Argo CD', '1.3.0')}${body}</div></div>`
+  return `<section class="blk"><h2>One application’s page<i>Argo CD’s tab, the panel opened wide, while a sync runs</i></h2>${page}</section>`
+}
+
+const R_NODES: GNode[] = [
+  {
+    id: 'app',
+    glyph: 'git-branch',
+    kind: 'Application',
+    name: 'orders',
+    status: ['progressing', 'Progressing'],
+    col: 1,
+    row: 0,
+  },
+  {
+    id: 'job',
+    glyph: 'play',
+    kind: 'Job',
+    meta: 'PreSync',
+    name: 'orders-migrate',
+    status: ['healthy', 'Complete'],
+    col: 0,
+    row: 1,
+    cls: 'ctx',
+  },
+  {
+    id: 'dep',
+    glyph: 'layers',
+    kind: 'Deployment',
+    name: 'orders',
+    status: ['progressing', 'Progressing'],
+    col: 1,
+    row: 1,
+    cls: 'oos ctx',
+  },
+  {
+    id: 'svc',
+    glyph: 'network',
+    kind: 'Service',
+    name: 'orders',
+    status: ['healthy', 'Healthy'],
+    col: 2,
+    row: 1,
+    cls: 'ctx',
+  },
+]
+const R_EDGES: GEdge[] = [
+  ['app', 'job'],
+  ['app', 'dep'],
+  ['app', 'svc'],
+]
+
+/** An Application that deploys to another cluster: only what Argo CD reports, and nothing opens here. */
+function remoteCase(): string {
+  return `<section class="blk"><h2>When it deploys to another cluster<i>only what Argo CD reports of it, as Lumovi reads only the cluster it’s connected to</i></h2><div style="width:1180px">${card('Resources', '3', `<p class="left" style="margin:0 0 12px">${icon('info', 14)}<span>orders deploys to prod-us, so what’s shown is what Argo CD reports of it.</span></p>${legend('Graph').replace('<span class="end', '<span class="leg"><i class="oosk"></i>Out of sync</span><span class="end')}${graph(R_NODES, R_EDGES, 3, 2)}`)}</div><p class="cap" style="max-width:1180px">Its resources come from <code>status.resources</code> alone: their health and sync, and no ReplicaSets, Pods or events, which are on the other cluster. Its cards open nothing, so as not to open a same-named object on this one; they’re drawn as context (dashed). Problems has no events of its resources, and Now’s waiting line has Argo CD’s health message only.</p></section>`
+}
+
+/** The header when nothing runs, and History while auto-sync is on. */
+function appCases(): string {
+  const idle = `<div class="case" style="width:1180px"><p class="cap"><b>Nothing running</b>: four buttons, so the last two show, Sync… filled, and “…” holds Delete… and Turn auto-sync on….</p>${header(
+    `${pill('healthy', 'Healthy')}${pill('warning', 'Out of sync')}`,
+    `<span class="sq" style="height:28px">${icon('ellipsis', 14)}</span>${btn('Refresh…', 'secondary')}${btn('Sync…', 'primary')}`,
+  )}</div>`
+  const refreshing = `<div class="case" style="width:1180px"><p class="cap"><b>Refreshing</b>: Refresh… busy until Argo CD has compared it again, as Sync is while it syncs.</p>${header(
+    `${pill('healthy', 'Healthy')}${pill('warning', 'Out of sync')}`,
+    `<span class="sq" style="height:28px">${icon('ellipsis', 14)}</span>${busy('Refreshing')}${btn('Sync…', 'primary')}`,
+  )}</div>`
+  const auto = `<div class="case" style="width:1180px"><p class="cap"><b>Auto-sync on</b>: Roll back… is off, and says why in its tooltip and on a finger’s tap.</p><div style="position:relative">${HISTORY(true)}<span class="tip3" style="top:150px;right:12px">Auto-sync is on, so Argo CD would sync it straight back. Turn auto-sync off to roll back.</span></div></div>`
+  return `<section class="blk"><h2>Its other states<i>the header at rest and refreshing, and History under auto-sync</i></h2><div style="display:flex;flex-direction:column;gap:12px">${idle}${refreshing}${auto}</div></section>`
+}
+
+/** Roll back… and Turn auto-sync off…: the page's own changes, in Lumovi's confirmation. */
+const proposal = (
+  title: string,
+  lines: [string, string][],
+  patch: string,
+  verb: string,
+  options = '',
+) =>
+  `<div class="kdlg"><div class="dh"><span class="g">${icon('git-branch', 18)}</span><div><div class="eb">${icon('plug', 12)}From Argo CD 1.3.0</div><h3>${title}</h3><div class="sub"><span>Application · argocd · <b>production-eu</b></span><span class="prodm">Production</span></div></div></div><div class=\"db\">${options}<div class=\"part send\"><div class="kcap">What Lumovi will send</div>${diff(lines)}${command(`kubectl patch application storefront -n argocd --type merge -p '${patch}' --context production-eu`)}<div class="verdict ok">${icon('circle-check', 14)}<span>The cluster accepts it.</span></div></div></div><div class="df"><span class="btn ghost sm">Cancel</span><span class="btn primary sm">${verb}</span></div></div>`
+
+function appDialogs(): string {
+  const back = proposal(
+    'Argo CD asks to change the Application argocd/storefront',
+    [
+      ['', 'operation:'],
+      ['add', '  initiatedBy: { username: lumovi }'],
+      ['add', '  sync:'],
+      ['add', '    revision: e91f0c2'],
+      ['add', '    source: { repoURL: github.com/acme/deploy, path: apps/storefront }'],
+      ['add', '    prune: false'],
+      ['add', '    syncStrategy: { apply: {} }'],
+    ],
+    '{"operation":{"initiatedBy":{"username":"lumovi"},"sync":{"revision":"e91f0c2","source":{"repoURL":"https://github.com/acme/deploy","path":"apps/storefront"},"prune":false,"syncStrategy":{"apply":{}}}}}',
+    'Roll back',
+    `<div class="part opts"><div class="kcap">Options, in Argo CD’s words</div><div class="fld"><label>Prune</label><span class="ksw"><i></i></span><p>Delete what this revision doesn’t have. Off unless you turn it on.</p></div></div>`,
+  )
+  const auto = proposal(
+    'Argo CD asks to change the Application argocd/storefront',
+    [
+      ['', 'spec:'],
+      ['', '  syncPolicy:'],
+      ['add', '    automated:'],
+      ['add', '      prune: false'],
+      ['add', '      selfHeal: true'],
+    ],
+    '{"spec":{"syncPolicy":{"automated":{"prune":false,"selfHeal":true}}}}',
+    'Turn on',
+    `<div class="part opts"><div class="kcap">Options, in Argo CD’s words</div><div class="fld"><label>Prune</label><span class="ksw"><i></i></span><p>Delete what’s no longer in the repository when it syncs.</p></div><div class="fld"><label>Self-heal</label><span class="ksw on"><i></i></span><p>Sync again when something in the cluster drifts from the repository.</p></div></div>`,
+  )
+  return `<section class="blk"><h2>Roll back, and auto-sync<i>the page’s own changes, each in Lumovi’s confirmation</i></h2><div class="dlgs"><div class="col"><p class="cap"><b>Roll back…</b> on History’s ID 13: a sync to that entry’s revision and source.</p>${back}</div><div class="col"><p class="cap"><b>Turn auto-sync on…</b>, with prune and self-heal asked first (self-heal on here).</p>${auto}</div></div></section>`
+}
+
+const APP_RULES = [
+  '<b>The tab, top to bottom:</b> the header (group 1); Now, while a sync runs; four tiles; Resources, as a graph; This sync; Problems; History; and the Application’s events, as Lumovi shows any object’s. With nothing running, Now isn’t there and This sync is the last one’s result.',
+  '<b>Now</b> shows where the sync is: its hooks and waves in order (PreSync, each wave, PostSync), each done, running or to come, red where one failed. Under them, what it waits on, with that resource’s own health message, which opens it on this cluster. The phase and time are the header’s; Terminate sync… is Lumovi’s bar’s (group 1).',
+  '<b>Four tiles:</b> Sync, with how many resources differ (Unknown is never counted as out of sync); Revision, from the one it’s at to the one it’s syncing to; Last synced, which says “Syncing now” while one runs (never “Never”); and Auto-sync, Off where <code>automated.enabled</code> is false.',
+  '<b>Resources</b> is the kit’s Graph. Where the Application deploys to the cluster Lumovi is connected to (its destination’s server is <code>https://kubernetes.default.svc</code>, or its name <code>in-cluster</code>): the Application, what it manages, their ReplicaSets and their Pods, which the plugin now reads. Anywhere else, only what Argo CD reports (<code>status.resources</code>): no ReplicaSets, Pods or events, no card that opens, and a line saying where it deploys. Each card has its health; one out of sync has an amber edge (the legend says so); a hook says which, beside its kind. A ReplicaSet’s Pods are one card, “3 Pods”, with how many are ready; past 200 resources, each kind’s past the first few are one card too. Every card opens its object, on this cluster. The Graph’s own Table is a click away, and on a phone.',
+  '<b>This sync</b> is the operation’s own result, one row a resource and hook, in wave order: its wave, the result (Synced, SyncFailed, Pruned, PruneSkipped, or Waiting while it runs), its health, its hook, and Argo CD’s message.',
+  '<b>Problems</b> are in one place, worst first: the Application’s conditions, the failed sync’s message, resources that failed, are degraded or out of sync, and, on this cluster only, the warning events of what it manages. Each opens what it’s about. None: “No problems.”',
+  '<b>History</b>, newest first: its ID, the revision with its branch and commit message, how long it took, who started it, and when. <b>Roll back…</b> is on each row but the current one, a button on a row, and only while no sync is set (as the file’s Sync is, and sent with the version Lumovi judged, so one that started meanwhile refuses it): as Argo CD’s own Rollback does, a sync to that entry’s revision and source (each source’s, for several), with the Application’s sync options, applied without hooks, and Prune asked first, off. It’s off, and says why, while auto-sync is on (on Argo CD 3, only where it’s enabled), while the Application is being deleted, and while another sync runs. A sync of only some resources leaves no entry, and the dialog says so before one runs.',
+  '<b>The header’s buttons</b>, at rest: Delete…, Turn auto-sync on… (or off…), Refresh… and Sync…; four, so “…” holds the first two. <b>Delete…</b> offers no choice of what happens to what it deployed, as a page can’t change the Application’s finalizer; it says what will happen, from the one it has: Argo CD’s own or its foreground one removes what it deployed and waits for it; its background one removes it without waiting; none leaves it running. Refresh… asks Normal or Hard and is busy (“Refreshing”) until Argo CD has compared it again. Turning auto-sync on asks for prune and self-heal first.',
+  '<b>New in the kit:</b> Now’s steps, beyond LMV-305 §5 (for Péter); buttons on a row (§5). The rest is the kit as built: Header, Tiles, Graph and its Table, Card, Table, events shown by reference. <b>New reads in Argo CD’s file</b>, on this cluster, each only the fields it picks: ReplicaSets and Pods (Péter’s “2 yes”): owner references, labels, and readiness (<code>status.phase</code>, conditions, containers’ ready and restart count), never <code>spec</code>; and Events: the object they’re about, type, reason, message and times. <b>initiatedBy</b> is Lumovi’s, as on the file’s Sync (<code>lumovi</code>): the page’s code never writes a name into Argo CD’s history.',
+]
+
+/** On a phone: the tab read, Now in one line, the graph as its table. */
+function appPhone(): string {
+  const page = phoneFrame(
+    'storefront',
+    `<nav class="lts">${TABS}</nav><div class="pgframe flat" style="border-top:0">${whoseStrip('Argo CD', '1.3.0', true)}</div><div class="tbp"><b>storefront</b><div class="pills">${pill('progressing', 'Progressing')}${opPill('progressing', 'Syncing', '1m 05s')}</div><p class="why" style="-webkit-line-clamp:unset">Sync running: ${WAITING}</p></div><div class="sec" style="padding-top:0"><h3>Now<small>step 3 of 5</small></h3><p class="why" style="margin:0 0 10px;-webkit-line-clamp:unset"><b style="font-weight:600;color:var(--text-1)">Wave 1</b>, after PreSync and Wave 0, before Wave 2 and PostSync: 1 of 3 Pods ready.</p><ul class="cards"><li><div class="top">${lead({ level: 'progressing', name: 'storefront', under: 'Deployment · shop' })}</div><dl class="one">${fact('Its health says', 'Waiting for rollout to finish: 1 of 3 updated replicas are available…')}</dl></li></ul></div><div class="ptiles">${APP_TILES()}</div>`,
+    true,
+  )
+  return `<section class="blk"><h2>On a phone<i>read: Now in words, the tiles two across, the graph as its table</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${page}</div><p class="cap" style="max-width:820px">Now’s steps become one sentence, which step it is between which; what it waits on is a card. Resources is the Graph’s own Table, as the kit has it on a phone; This sync, Problems and History are cards. No Roll back, auto-sync or Delete: a phone changes nothing here.</p></section>`
+}
+
+// ─── 5. The sync dialog ─────────────────────────────────────────────────────────────────────
+
+const sw = (on: boolean) => `<span class="ksw${on ? ' on' : ''}"><i></i></span>`
+const opt = (on: boolean, name: string, hint: string, harm = '', red = false, list = '') =>
+  `<div class="opt">${sw(on)}<div class="w"><b>${name}</b><p>${hint}</p>${harm ? `<p class="harm${red ? ' red' : ''}">${harm}</p>` : ''}${list}</div></div>`
+const chk = (on: boolean, name: string, hint: string) =>
+  `<div class="opt">${CHECK(on)}<div class="w"><b>${name}</b><p>${hint}</p></div></div>`
+
+/** The tab's Sync…: Lumovi's confirmation with every option Argo CD's own sync has. */
+function syncDialog(kind: 'plain' | 'harm'): string {
+  const harm = kind === 'harm'
+  const resources = harm
+    ? `<div class="res">${CHECK(true)}<span>storefront <small>Deployment · out of sync</small></span><small>wave 1</small>${CHECK(true)}<span>storefront <small>Ingress · out of sync</small></span><small>wave 2</small>${CHECK(false)}<span>storefront-config <small>ConfigMap · synced</small></span><small>wave 0</small><span></span><span class="q3" style="font-size:12px">and 9 more, synced</span><span></span></div><p class="harm" style="margin:6px 0 0;font-size:12px;line-height:17px;color:var(--warn-text)">Only 2 of 12: hooks don’t run, and this sync leaves no entry in History.</p>`
+    : ''
+  const options = `<div class="part opts">
+    <p class="grp">Revision</p><span class="kfield mono" style="width:280px">main</span><p style="margin:5px 0 0;font-size:12px;color:var(--text-3)">A branch, a tag or a commit. Empty syncs to what it tracks: main.</p>
+    <p class="grp">How</p>
+    ${opt(harm, 'Prune', 'Delete what is no longer in the repository.', harm ? 'Deletes what’s no longer in the repository. <span style="font-weight:400;color:var(--text-3)">In Argo CD’s words, these 2:</span>' : '', true, harm ? '<ul><li>ConfigMap shop/storefront-legacy</li><li>Ingress shop/storefront-old</li></ul>' : '')}
+    ${opt(false, 'Dry run', 'Change nothing: Argo CD says what it would do.')}
+    ${opt(false, 'Apply only', 'Skip hooks: PreSync db-migrate and PostSync smoke-test don’t run.')}
+    ${opt(harm, 'Force', 'Delete and recreate what can’t be changed in place.', harm ? 'Its Pods restart, and what isn’t in the repository is lost with what’s recreated.' : '', true)}
+    <p class="grp">Sync options</p>
+    ${chk(false, 'Server-side apply', 'The cluster merges the change, as kubectl apply --server-side does.')}
+    ${chk(false, 'Prune last', 'Delete only after everything else is synced and healthy.')}
+    ${chk(false, 'Only what’s out of sync', 'Leave what already matches alone.')}
+    ${chk(false, 'Create the namespace', 'Make shop if it isn’t there.')}
+    <p class="grp">If it fails</p>
+    ${opt(false, 'Retry', 'Try again up to 2 times, 5s apart, then twice as long each time, at most 3m.')}
+    <p class="grp">Resources</p>
+    <span class="kseg"><span class="${harm ? '' : 'on'}">All 12</span><span>Out of sync, 3</span><span class="${harm ? 'on' : ''}">Choose…</span></span>${resources}
+  </div>`
+  const send = `<div class="part send"><div class="kcap">What Lumovi will send</div>${diff([
+    ['', 'operation:'],
+    ['add', '  initiatedBy: { username: lumovi }'],
+    ['add', '  sync:'],
+    ['add', '    revision: main'],
+    ...(harm
+      ? ([
+          ['add', '    prune: true'],
+          ['add', '    syncStrategy: { hook: { force: true } }'],
+          ['add', '    resources:'],
+          ['add', '      - { group: apps, kind: Deployment, namespace: shop, name: storefront }'],
+          [
+            'add',
+            '      - { group: networking.k8s.io, kind: Ingress, namespace: shop, name: storefront }',
+          ],
+        ] as [string, string][])
+      : ([['add', '    syncStrategy: { hook: {} }']] as [string, string][])),
+  ])}<div class="verdict ok">${icon('circle-check', 14)}<span>The cluster accepts it, as the options stand.</span></div></div>`
+  const head = `<div class="dh"><span class="g">${icon('refresh-cw', 18)}</span><div><div class="eb">${icon('plug', 12)}From Argo CD 1.3.0</div><h3>Argo CD asks to change the Application argocd/storefront</h3><div class="sub"><span>Application · argocd · <b>production-eu</b></span><span class="prodm">Production</span></div></div></div>`
+  const foot = `<div class="df"><span class="btn ghost sm">Cancel</span><span class="btn ${harm ? 'danger' : 'primary'} sm">${harm ? 'Sync, prune and force' : 'Sync'}</span></div>`
+  return `<div class="kdlg sdlg">${head}<div class="db">${options}${send}</div>${foot}</div>`
+}
+
+function syncFrame(): string {
+  return `<section class="blk"><h2>The sync dialog<i>the tab’s Sync…, with every option Argo CD’s own has, in plain words where one does harm</i></h2><div class="dlgs" style="gap:32px"><div class="col" style="width:640px"><p class="cap"><b>As it opens</b>: nothing that does harm is on.</p>${syncDialog('plain')}</div><div class="col" style="width:640px"><p class="cap"><b>Prune and Force on, and two resources chosen</b>: each says what it will do, prune lists what it deletes, and the button names the harm, in red.</p>${syncDialog('harm')}</div></div></section>`
+}
+
+const SYNC_RULES = [
+  '<b>The tab’s Sync…</b> opens it, in Lumovi’s confirmation for a page’s change: options first, then the change and the cluster’s verdict. Lumovi’s bar’s Sync… stays the file’s own, with its three choices (group 1), for where the page doesn’t run.',
+  '<b>It starts from the Application:</b> its own sync options (<code>spec.syncPolicy.syncOptions</code>) are on, the rest off, as Argo CD’s are by default. <b>The options, in Argo CD’s order:</b> Revision; How (Prune, Dry run, Apply only, Force); Sync options (Server-side apply, Prune last, Only what’s out of sync, Create the namespace); If it fails (Retry, with its limit and backoff once on); Resources (All, Out of sync, or Choose…). Each says in a line what it does, in the plugin’s words.',
+  '<b>Harm, declared by the file and drawn by Lumovi.</b> Argo CD’s file says which values in what’s sent do harm, and in what words (a proposal’s <code>harm</code>: <code>operation.sync.prune: true</code>, “Deletes what’s no longer in the repository”; <code>…force: true</code>, “Pods restart, and what’s recreated loses what isn’t in the repository”; <code>…resources</code> set, “Hooks don’t run, and History gets no entry”). Lumovi checks the patch it sends against it and draws those lines in red, and the red button that names the harm (“Sync, prune and force”), whatever the code says. The code may add its own detail under them, labelled as Argo CD’s words (prune’s list, from the resources that need pruning), and may add harm, never take it away. The checker and the catalog review see it in the file.',
+  '<b>Dry run</b> turns the button into “Dry run”: nothing changes, and This sync shows what it would have done.',
+  '<b>Its height</b> is the kit’s form rule: the options get it first and scroll past the window; the change’s box keeps its floor; everything sent is shown, the chosen resources by name, never “and 2 more”.',
+  '<b>Replace</b> isn’t offered: Argo CD lets it only where an administrator allows it, and it replaces each resource whole. Where it’s allowed, it comes with the same plain words.',
+  '<b>Not on a phone.</b> A phone starts no sync; the tab says to open Lumovi on a larger screen.',
+  '<b>New in the kit:</b> a form of more than five fields, in sections (today’s limit is five); a checkbox; a field that shows others when on (Retry’s); a list to choose from (Resources); and a proposal’s <code>harm</code> in the file, which Lumovi checks against what it sends and draws in red, with the button. A form of more than five fields is a change to the door’s limit.',
+]
+
 export type ArgoFrame =
   | 'argo-sync'
   | 'argo-sync-phone'
@@ -1019,6 +1541,9 @@ export type ArgoFrame =
   | 'argo-overview-phone'
   | 'argo-list'
   | 'argo-list-phone'
+  | 'argo-app'
+  | 'argo-app-phone'
+  | 'argo-sync-dialog'
 
 export const ARGO_FRAMES: { id: ArgoFrame; title: string; size: Size }[] = [
   { id: 'argo-sync', title: 'Argo CD: while a sync runs', size: { width: 1440, height: 2400 } },
@@ -1027,6 +1552,13 @@ export const ARGO_FRAMES: { id: ArgoFrame; title: string; size: Size }[] = [
   { id: 'argo-overview-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
   { id: 'argo-list', title: 'Argo CD: the Applications page', size: { width: 1440, height: 2400 } },
   { id: 'argo-list-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
+  { id: 'argo-app', title: 'Argo CD: one application’s page', size: { width: 1440, height: 3000 } },
+  { id: 'argo-app-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
+  {
+    id: 'argo-sync-dialog',
+    title: 'Argo CD: the sync dialog',
+    size: { width: 1440, height: 2000 },
+  },
 ]
 
 const sheet = (
@@ -1058,6 +1590,11 @@ export function argoFrame(id: ArgoFrame, scheme: Scheme): string {
     'argo-list': () =>
       `<header><h1>Argo CD’s pages, 3: the Applications page (LMV-307)</h1><p>Péter: “bulk actions are required for syncing”. Every Application, searched and filtered by anything LMV-305 lists; several picked, synced or refreshed together after one question; and each sync followed to how it ended. Words are drafts for docs.</p></header>${appsPageFrame()}${bulkFrame()}<section class="blk"><h2>The rules</h2><ul class="rules">${LIST_RULES.map((r) => `<li>${r}</li>`).join('')}</ul></section>`,
     'argo-list-phone': listPhone,
+    'argo-app': () =>
+      `<header><h1>Argo CD’s pages, 4: one application’s page (LMV-307)</h1><p>Péter: “a graph view would be awesome in argo plugin”. An Application’s Argo CD tab: where a running sync is, the graph down to its Pods, the sync’s own result, every problem in one place, and History with Roll back. Words are drafts for docs.</p></header>${appPageFrame()}${remoteCase()}${appCases()}${appDialogs()}<section class="blk"><h2>The rules</h2><ul class="rules">${APP_RULES.map((r) => `<li>${r}</li>`).join('')}</ul></section>`,
+    'argo-app-phone': appPhone,
+    'argo-sync-dialog': () =>
+      `<header><h1>Argo CD’s pages, 5: the sync dialog (LMV-307)</h1><p>Every option Argo CD’s own sync has, in Argo CD’s order, each with a line on what it does, and the harmful ones in plain words: what prune deletes, what force restarts, what a partial sync skips. Words are drafts for docs.</p></header>${syncFrame()}<section class="blk"><h2>The rules</h2><ul class="rules">${SYNC_RULES.map((r) => `<li>${r}</li>`).join('')}</ul></section>`,
   }[id]()
   return sheet(scheme, f.size.width, body)
 }
