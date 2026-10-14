@@ -240,8 +240,8 @@ function startFrame(): string {
 function whereFrame(): string {
   const serverHeader = `<div style="width:900px">${pgframe('CloudNativePG', '1.1.0', `<div class="arr-stack" style="padding:16px">${header2('orders-db', ['healthy', 'Healthy'], ACTS())}</div>`)}</div>`
   const phone = phoneFrame(
-    'orders-db',
-    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.1.0', true)}</div><div class="under">${pill('healthy', 'Healthy')}</div><p class="larger">Open Lumovi on a larger screen to use <b style="font-weight:500;color:var(--text-2)">Shell into primary</b> and <b style="font-weight:500;color:var(--text-2)">Back up now</b>.</p><div class="ph-acts" style="display:flex;gap:8px;padding:12px 16px 0"><span class="btn secondary go2" style="height:44px;padding:0 14px">${icon('scroll-text', 14)}Primary’s logs</span></div><div class="sec"><h3>Instances<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-1' })}<span class="twist">${icon('chevron-right', 16)}</span></div><dl>${fact('Role', 'Primary')}${fact('Status', 'Ready')}${fact('Age', '12d')}</dl></li></ul></div>`,
+    'CloudNativePG',
+    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.1.0', true)}</div><h2 class="named">orders-db</h2><div class="under">${pill('healthy', 'Healthy')}</div><p class="larger">Open Lumovi on a larger screen to use <b style="font-weight:500;color:var(--text-2)">Shell into primary</b> and <b style="font-weight:500;color:var(--text-2)">Back up now</b>.</p><div class="ph-acts" style="display:flex;gap:8px;padding:12px 16px 0"><span class="btn secondary go2" style="height:44px;padding:0 14px">${icon('scroll-text', 14)}Primary’s logs</span></div><div class="sec"><h3>Instances<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-1' })}<span class="twist">${icon('chevron-right', 16)}</span></div><dl>${fact('Role', 'Primary')}${fact('Status', 'Ready')}${fact('Age', '12d')}</dl></li></ul></div>`,
     true,
   )
   return block(

@@ -201,7 +201,7 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .tag.o { outline: 1px dashed var(--accent); outline-offset: 5px; border-radius: 12px; }
 .stub { display: flex; height: 76px; align-items: center; justify-content: center; font-size: 12px; color: var(--text-3); }
 
-/* On a phone: the page's own top bar after picking, and buttons a finger's height. */
+/* On a phone: the picked one's own page (its name the first line, never in the top bar), and buttons a finger's height. */
 .ph .under { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px 0; }
 .ph .acts { display: flex; gap: 8px; padding: 12px 16px 4px; }
 .ph .acts .btn { height: 44px; padding: 0 16px; }
@@ -216,6 +216,9 @@ ul.cards { margin: 0; padding: 0; list-style: none; }
 .ph .pick .pi + .pi { margin-top: 0; border-top: 1px solid var(--line); }
 .ph .pick .pi.press { background: var(--surface-3); }
 .ph .bar h1 { overflow: hidden; white-space: nowrap; }
+.ph .named { margin: 0; padding: 16px 16px 0; font-size: 17px; line-height: 24px; font-weight: 600; color: var(--text-1); overflow-wrap: anywhere; }
+.phcol { display: flex; width: 392px; flex: none; flex-direction: column; gap: 8px; }
+.phcol > .cap { margin: 0; min-height: 34px; font-size: 12px; line-height: 17px; color: var(--text-3); }
 
 /* Parts that show something of Lumovi's by reference: the plugin names it, Lumovi shows it. */
 .kcard > h3 .by { margin-left: 10px; font-size: 12px; font-weight: 400; color: var(--text-3); }
@@ -891,8 +894,12 @@ function states(): string {
 export const fact = (label: string, value: string) =>
   `<div><dt>${label}</dt><dd>${value}</dd></div>`
 
-export function phoneFrame(title: string, body: string, back = false): string {
-  return `<div class="ph"><div class="bar"><span class="tap">${icon(back ? 'arrow-left' : 'menu', 20)}</span><h1>${title}</h1></div>${body}</div>`
+export function phoneFrame(title: string, body: string, back = false, tools = false): string {
+  // (The bar's own end, where the bar is what's shown: Search and Refresh.)
+  const end = tools
+    ? `<span class="tap">${icon('search', 20)}</span><span class="tap">${icon('rotate-cw', 20)}</span>`
+    : ''
+  return `<div class="ph"><div class="bar"><span class="tap">${icon(back ? 'arrow-left' : 'menu', 20)}</span><h1>${title}</h1>${end}</div>${body}</div>`
 }
 
 /** 6. On a phone a row is a card: the lead, then its other columns as labelled facts. */
@@ -1080,9 +1087,14 @@ function headerCases(): string {
 
 /** 4. On a phone: the list is the page, and what's picked is a page of its own. */
 function pagePhone(): string {
+  const strip = `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.24.1', true)}</div>`
+  const use = (names: string[]) =>
+    `<p class="larger">Open Lumovi on a larger screen to use ${names.map((n, i) => `${i === 0 ? '' : i === names.length - 1 ? ' and ' : ', '}<b style="font-weight:500;color:var(--text-2)">${n}</b>`).join('')}.</p>`
+  const col = (cap: string, phone: string) =>
+    `<div class="phcol"><p class="cap">${cap}</p>${phone}</div>`
   const list = phoneFrame(
     'CloudNativePG',
-    `<div class="pcount">5 clusters</div><div class="pick" style="border-top:1px solid var(--line)">${[
+    `${strip}<div class="pcount">5 clusters</div><div class="pick" style="border-top:1px solid var(--line)">${[
       WORST,
       ...CLUSTERS,
     ]
@@ -1091,16 +1103,27 @@ function pagePhone(): string {
           `<div class="pi${i === 1 ? ' press' : ''}">${lead(it.lead, { fit: 20 })}<span class="st">${pill(it.status[0], it.status[1])}</span></div>`,
       )
       .join('')}</div>`,
+    false,
+    true,
   )
   const one = phoneFrame(
-    'orders-db',
-    `<div class="under">${pill('warning', 'Not all ready')}</div>
-    <p class="larger">Open Lumovi on a larger screen to use <b style="font-weight:500;color:var(--text-2)">Back up now</b>, <b style="font-weight:500;color:var(--text-2)">Switch over</b> and <b style="font-weight:500;color:var(--text-2)">Restart</b>.</p>
+    'CloudNativePG',
+    `${strip}<h2 class="named">orders-db</h2><div class="under">${pill('warning', 'Not all ready')}</div>
+    ${use(['Back up now', 'Switch over', 'Restart'])}
     <div class="ptiles">${TILES()}</div>
     <div class="sec"><h3>Instances<small>3</small></h3><div class="stub" style="border:1px solid var(--line);border-radius:12px">a Table, as cards</div></div>`,
     true,
+    true,
   )
-  return `<section class="spec"><h2>On a phone<i>the list is the page; what’s picked is a page of its own</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${list}${one}</div><p style="max-width:820px">Under 640 px <b>a split is two pages</b>: the pick list first, full width, under a line that says how many (and, past twelve, a filter field 44 px high above it, as the phone’s lists have), its rows 60 px high as the phone’s lists are, and nothing picked (second row, pressed). Tapping one opens the rest as a page with Back, the picked thing’s name in the top bar (middle cut) and its Status on a line of its own under it. <b>A plugin’s own actions that change the cluster aren’t offered on a phone</b>: a phone changes only what Lumovi lists for it, so the header’s buttons give way to one line in Lumovi’s own words that names them as they’re written, without their “…”: “Open Lumovi on a larger screen to use Back up now.”, “… to use Back up now and Switch over.”, “… to use Back up now, Switch over and Restart.”, and past five the first four “and 3 more”. Each name is set apart by its weight, as a button’s name is anywhere in the app, and is the plugin’s text, drawn and cut like any other of its texts. The plugin writes none of the sentence. Buttons that only read or open something stay, 44 px high. <b>A row of tiles</b> is two across, then wraps, the chevron in the tile’s corner; a single tile takes the width. <b>A stack</b> is a stack. Back returns to the list where it was.</p></section>`
+  const long = phoneFrame(
+    'CloudNativePG',
+    `${strip}<h2 class="named">${LONG_DB}</h2><div class="under">${pill('critical', 'Unrecoverable')}</div>
+    ${use(['Back up now', 'Switch over', 'Restart'])}
+    <div class="ptiles">${tile('server', 'Instances ready', '0/3', '3 not ready', { level: 'critical', opens: true })}${tile('timer', 'Last backup', 'Never', 'No schedule', { words: true, level: 'warning' })}</div>`,
+    true,
+    true,
+  )
+  return `<section class="spec"><h2>On a phone<i>the list is the page; what’s picked is a page of its own, named in the page</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${col('The list: Menu, and the page’s title.', list)}${col('A row tapped: Back where Menu was, the page’s title as it was. The row’s name is the page’s first line.', one)}${col('The longest name: whole, on as many lines as it takes.', long)}</div><p style="max-width:1100px">Under 640 px <b>a split is two pages</b>: the pick list first, full width, under a line that says how many (and, past twelve, a filter field 44 px high above it, as the phone’s lists have), its rows 60 px high as the phone’s lists are, and nothing picked (second row, pressed). Tapping one opens the rest as a page of its own. <b>The top bar stays Lumovi’s on both</b>: the page’s title, as the plugin’s file names it, and Back where Menu was (“Back to the list” to a screen reader, never the list’s own title). Nothing a plugin’s code sends is ever drawn in it, a picked row’s name least of all. <b>The picked row’s name is the second page’s first line</b>, under Lumovi’s strip and inside the plugin’s page: 17 px semibold on a 24 px line, as a Header’s name is on a phone, the page’s 16 px from each edge, and <b>whole</b>: it wraps where it must, anywhere in a name with no break, on as many lines as it takes (third phone; a name is 253 characters at most, some seven lines). The list cuts a long name in its middle, and this is where a finger reads it. What follows starts 12 px under it. A Header there gives its Status on a line of its own, then its lines and buttons, and doesn’t say the name again. The line is the Split’s own, so a page with no Header is named too. It’s the heading under the bar’s for a screen reader, one level below it; on arriving the focus goes to Back, and Lumovi announces nothing that carries the name: a plugin’s text is read where it’s drawn. It scrolls with the page; Back and the title stay. Back returns to the list where it was. Beside a panel on a larger screen, where a split is two pages by its own width, the top bar has nothing of it either: Back is a row in the plugin’s page, named for the list, and the picked one’s Header says its name (“CloudNativePG as a plugin”, Beside a panel). <b>A plugin’s own actions that change the cluster aren’t offered on a phone</b>: a phone changes only what Lumovi lists for it, so the header’s buttons give way to one line in Lumovi’s own words that names them as they’re written, without their “…”: “Open Lumovi on a larger screen to use Back up now.”, “… to use Back up now and Switch over.”, “… to use Back up now, Switch over and Restart.”, and past five the first four “and 3 more”. Each name is set apart by its weight, as a button’s name is anywhere in the app, and is the plugin’s text, drawn and cut like any other of its texts. The plugin writes none of the sentence. Buttons that only read or open something stay, 44 px high. <b>A row of tiles</b> is two across, then wraps, the chevron in the tile’s corner; a single tile takes the width. <b>A stack</b> is a stack.</p></section>`
 }
 
 // ─── Parts shown by reference: a Secret's value, logs, events ──────────────────────────────
@@ -2653,7 +2676,7 @@ function pgNarrow(): string {
     'Beside a panel',
     'under 640 px of its own width, the Split is the phone’s two pages',
     `<div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap"><div class="arr-stack"><p class="cap">1024, a row of orders-db pressed: what was in view stays, with Back</p>${pane(kept)}</div><div class="arr-stack"><p class="cap">After Back: the list, names whole to their floor, every pill under, orders-db still picked</p>${pane(list)}</div></div>`,
-    `The Split goes by <b>its own width</b>, not the window’s: side by side from 640 px (the list’s 300, the gap, and enough for the rest’s tiles to stand two across); under that, the phone’s two pages, in place. So at 1440 or 1024 beside a row’s panel it’s two pages, and at 1024 with no panel it stays side by side. <b>Narrowing never takes away what’s in view</b>: a picked one’s page that was showing when the panel opened keeps showing, so the row just pressed is still there beside its panel, with a Back row first: the arrow and the list’s own title (“Clusters”), 36 px, the whole row pressable, focusable as any row. No title in the top bar (that’s the phone’s app bar), since the picked one’s header names it. <b>Arriving narrow</b> (a reload, a link) starts at the list, as on a phone. On the list page the picked one is marked and nothing is beside the list. <b>A name keeps the Table’s floor</b>, the least of its own width and 160 px; where any row’s pill can’t sit beside its name at that floor, <b>every</b> row’s pill goes on a line of its own under the name’s two, at the name’s edge (the list decides, so pills are never mixed), and a longer name is cut in its middle only past its floor. In the 300 px list side by side they stay beside. <b>Widening</b> (the panel closed) goes back side by side, the same one picked. Tiles under 320 px of row stand one across.`,
+    `The Split goes by <b>its own width</b>, not the window’s: side by side from 640 px (the list’s 300, the gap, and enough for the rest’s tiles to stand two across); under that, the phone’s two pages, in place. So at 1440 or 1024 beside a row’s panel it’s two pages, and at 1024 with no panel it stays side by side. <b>Narrowing never takes away what’s in view</b>: a picked one’s page that was showing when the panel opened keeps showing, so the row just pressed is still there beside its panel, with a Back row first: the arrow and the list’s own title (“Clusters”), 36 px, the whole row pressable, focusable as any row. Nothing a plugin’s code sends is in the top bar, here or on a phone: the picked one’s header names it. <b>Arriving narrow</b> (a reload, a link) starts at the list, as on a phone. On the list page the picked one is marked and nothing is beside the list. <b>A name keeps the Table’s floor</b>, the least of its own width and 160 px; where any row’s pill can’t sit beside its name at that floor, <b>every</b> row’s pill goes on a line of its own under the name’s two, at the name’s edge (the list decides, so pills are never mixed), and a longer name is cut in its middle only past its floor. In the 300 px list side by side they stay beside. <b>Widening</b> (the panel closed) goes back side by side, the same one picked. Tiles under 320 px of row stand one across.`,
   )
 }
 
@@ -2713,11 +2736,11 @@ function pgPhone(): string {
     `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.24.1', true)}</div><div class="pick">${PG_CLUSTERS.map((c) => `<div class="pi">${lead(c.lead, { fit: 22 })}<span class="st">${pill(c.status[0], c.status[1])}</span></div>`).join('')}</div>`,
   )
   const one = phoneFrame(
-    'orders-db',
-    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.24.1', true)}</div><div class="under">${pill('healthy', 'Healthy')}</div><div class="ptiles">${pgTiles()}</div><div class="sec"><h3>Instances<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-1' })}</div><dl>${fact('Role', 'Primary')}${fact('Status', 'Ready')}${fact('Age', '12d')}${fact('Node', 'ip-10-0-1-17')}${fact('Restarts', '0')}</dl></li><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-2' })}</div><dl>${fact('Role', 'Replica')}${fact('Status', 'Ready')}${fact('Age', '12d')}${fact('Node', 'ip-10-0-2-44')}${fact('Restarts', '0')}</dl></li></ul></div>`,
+    'CloudNativePG',
+    `<div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('CloudNativePG', '1.24.1', true)}</div><h2 class="named">orders-db</h2><div class="under">${pill('healthy', 'Healthy')}</div><div class="ptiles">${pgTiles()}</div><div class="sec"><h3>Instances<small>3</small></h3><ul class="cards"><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-1' })}</div><dl>${fact('Role', 'Primary')}${fact('Status', 'Ready')}${fact('Age', '12d')}${fact('Node', 'ip-10-0-1-17')}${fact('Restarts', '0')}</dl></li><li><div class="top">${lead({ level: 'healthy', name: 'orders-db-2' })}</div><dl>${fact('Role', 'Replica')}${fact('Status', 'Ready')}${fact('Age', '12d')}${fact('Node', 'ip-10-0-2-44')}${fact('Restarts', '0')}</dl></li></ul></div>`,
     true,
   )
-  return `<section class="spec"><h2>On a phone<i>the Split’s two pages</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${list}${one}</div><p style="max-width:820px">By the kit’s Split: the clusters as a list page, then the picked one as a page with Back, its name in the top bar and its status under. Tiles two across, each that opens with its “›” always shown, as a touch screen has no hover (on the desktop it shows on hover, the kit’s rule). The tables as cards, every column a fact, three across where every value fits a third of the card, else one a line. No buttons here either, so nothing is held back for a larger screen.</p></section>`
+  return `<section class="spec"><h2>On a phone<i>the Split’s two pages</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${list}${one}</div><p style="max-width:820px">By the kit’s Split: the clusters as a list page, then the picked one as a page with Back in the top bar, the page’s title as it was, and its name the page’s first line, whole, with its status under. Tiles two across, each that opens with its “›” always shown, as a touch screen has no hover (on the desktop it shows on hover, the kit’s rule). The tables as cards, every column a fact, three across where every value fits a third of the card, else one a line. No buttons here either, so nothing is held back for a larger screen.</p></section>`
 }
 
 // ─── Argo CD, as a plugin with code ────────────────────────────────────────────────────────
@@ -3065,7 +3088,7 @@ export const KIT_FRAMES: { id: KitFrame; title: string; size: Size }[] = [
     title: 'The pick list, the arrangements and the second-level header',
     size: { width: 1440, height: 1500 },
   },
-  { id: 'page-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
+  { id: 'page-phone', title: 'The same, on a phone', size: { width: 1340, height: 1040 } },
   { id: 'reference', title: 'Parts shown by reference', size: { width: 1440, height: 1500 } },
   { id: 'reference-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
   { id: 'form', title: 'A form inside Lumovi’s confirmation', size: { width: 1440, height: 1800 } },
