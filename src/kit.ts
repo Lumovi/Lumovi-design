@@ -2199,13 +2199,13 @@ const KARPENTER_TABS = (on: string, more = false) =>
     ltab('EC2NodeClasses', { count: '2' }),
   ].join('')
 
-const sideItem = (label: string, glyph: Parameters<typeof icon>[0], on = false) =>
+export const sideItem = (label: string, glyph: Parameters<typeof icon>[0], on = false) =>
   `<div class="sn${on ? ' on' : ''}">${icon(glyph, 16)}<span>${label}</span></div>`
 
-const PLUGINS_SECTION = (on = 'Karpenter') =>
+export const PLUGINS_SECTION = (on = 'Karpenter') =>
   `<h3>Plugins</h3>${sideItem('Argo CD', 'git-merge', on === 'Argo CD')}${sideItem('Karpenter', 'server-cog', on === 'Karpenter')}${sideItem('Platform Team’s Reconciliation and Settlement Workflows', 'boxes')}${sideItem('All plugins', 'plug')}`
 
-const pageHead = (title: string, glyph: Parameters<typeof icon>[0]) =>
+export const pageHead = (title: string, glyph: Parameters<typeof icon>[0]) =>
   `<div class="phd">${icon(glyph, 16)}<b>${title}</b></div>`
 
 const frameStub = (text = 'the plugin’s frame') => `<div class="stub">${text}</div>`
@@ -2387,10 +2387,16 @@ function marksTable(): string {
 // ─── Counts, Card and Pair: what Karpenter's overview is drawn from ──────────────────────────
 
 /** A row of Counts: the value, a bar for its share of the whole, and its count. */
-const crow = (value: string, n: number, total: number, mono = false) =>
+export const crow = (value: string, n: number, total: number, mono = false) =>
   `<div class="crow"><span class="cv${mono ? ' mono' : ''}">${value}</span><span class="cb"><i style="width:${Math.max(2, Math.round((n / total) * 100))}%"></i></span><span class="cn">${n}</span></div>`
 
-const cgroup = (title: string, rows: [string, number][], total: number, mono = false, more = 0) =>
+export const cgroup = (
+  title: string,
+  rows: [string, number][],
+  total: number,
+  mono = false,
+  more = 0,
+) =>
   `<div class="cg"><h4>${title}</h4>${rows.map(([v, n]) => crow(v, n, total, mono)).join('')}${more ? `<div class="cmore">${icon('chevron-down', 14)}${more} more</div>` : ''}</div>`
 
 /** A Card's quiet line about where its data came from, and a header button that only reads. */
