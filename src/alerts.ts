@@ -547,7 +547,7 @@ function notifications(): string {
     [
       [
         'Where',
-        'in the cluster’s settings, after Production, Read-only and Hidden and a rule, with the same switch row: “Notify me of new warnings” and its line. Off by default. On a server it’s each person’s own, in the same place, never another’s.',
+        'on the desktop, in the cluster’s settings, after Production, Read-only and Hidden and a rule, with the same switch row: “Notify me of new warnings” and its line. Off by default. A server has no such dialog, and there it’s each person’s own, never another’s: a row in the sidebar’s cluster menu under Read-only (a bell, the same words, its state under them: “Off”, “On, in shop and payments”), with a chevron instead of a switch, opening the small dialog drawn below with the cluster’s name as its header.',
       ],
       [
         'Watched namespaces',
