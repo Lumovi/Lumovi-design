@@ -680,7 +680,7 @@ function keepFrame(): string {
     <p class="cap">Then on Pods: storefront is a tab in the dock, open on its Logs, still following, with the terminal beside it</p>${after}
     <ul class="rules">
       <li><b>One button, in the panel’s top right</b>, before Expand panel: <b>Keep open below</b> (Lucide’s panel-bottom), its tooltip saying so. It keeps the object, not one of its tabs: the dock’s tab opens on the tab the panel was showing, so pressed on Logs it’s the logs that stay. The same button is on the object’s expanded panel, and “Keep open below” is in the command palette while an object is open. <b>Logs aren’t a kind of their own</b>: a pod’s or a Deployment’s logs are its Logs tab, kept.</li>
-      <li><b>Pressed, it adds a tab after the last one and shows it</b>, opening the dock at the height it had (288 px at first). The panel stays as it was; the person closes it if they like. <b>An object is kept once per window</b>: pressed again, or on an object already kept, the button shows its tab and is drawn pressed (the accent’s soft fill) with “Shown below”. Focus stays on the button.</li>
+      <li><b>Pressed, it adds a tab after the last one and shows it</b>, opening the dock at the height it had (288 px at first). The panel stays as it was; the person closes it if they like. <b>An object is kept once per window</b>: pressed again, or on an object already kept, the button shows its tab and is drawn pressed (the accent’s soft fill), its tooltip “Show below”. Focus stays on the button.</li>
       <li><b>A kept object keeps its own state</b> from then on: the tab it’s on, and on Logs its container, “Last 500 lines”, search, Follow, Timestamps, Wrap. It reads its cluster as the panel does, whatever page or namespace the window moves to, and stops reading only when its tab is closed. <b>Not on a phone, and not on a server’s web page</b>: there is no dock there today, and the button isn’t drawn.</li>
     </ul></section>`
 }
@@ -721,7 +721,7 @@ function tabsFrame(): string {
     <div class="row2"><div class="stack"><p class="cap">A kept object’s menu (right click)</p>${objMenu}</div><div class="stack"><p class="cap">A terminal’s menu: today’s, and Move to a new window</p>${termMenu}</div></div>
     <ul class="rules">
       <li><b>A tab says what it holds</b>: a terminal its cluster (and namespace), as today; a kept object its kind’s icon (the panel’s), its name, middle-cut past 192 px, and the tab it’s on, quiet, unless that’s Overview. <b>Another cluster</b> is named quietly after the name, only when it isn’t the window’s. The tooltip says it whole: kind, name, namespace, cluster, tab. A screen reader hears the same.</li>
-      <li><b>One bar for both kinds</b>, in the order they were opened. <b>Terminal</b>, at its left, always means a terminal: it shows the last terminal, or opens one if there’s none, as <kbd>⌃\`</kbd> does; with a terminal shown, both hide the dock. The chevron at the right shows and hides the dock on whichever tab was last shown. <b>+</b> is still a new terminal: objects come from their panel. Many tabs scroll sideways, the shown one kept in view, as today.</li>
+      <li><b>One bar for both kinds</b>, in the order they were opened. <b>Terminal</b>, at its left, always means a terminal: it shows the last terminal, or opens one if there’s none, as <kbd>⌃\`</kbd> does; with a terminal shown, both hide the dock. The chevron at the right shows and hides the dock on whichever tab was last shown. <b>+</b> is still a new terminal: objects come from their panel. Many tabs scroll sideways, the shown one kept in view, as today. <b>No “dock” where a person reads it</b> (a Mac’s “Keep in Dock” is the system’s): Terminal’s tooltip is “Show the terminal (⌃\`)” with one kept, “Open a terminal (⌃\`)” without; the chevron “Show the tabs below” / “Hide the tabs below”; maximize “Maximize the tabs below” / “Restore the tabs below”; the section’s label “Tabs below”.</li>
       <li><b>A kept object’s row</b> replaces the panel’s header, which the tab already names: its tabs on the left, then its status, its actions (the panel’s, smaller; under 900 px of dock they go into ⋯), and <b>Open in the panel</b> (↗), which opens it in this window’s panel and keeps the tab. Under it the tab, at the dock’s width and height, scrolling as in the panel; maximized, the dock gives it 85% of the height. <b>⌘W</b> closes the shown tab while focus is in the dock, as it does for a terminal today; elsewhere it closes the window.</li>
     </ul></section>`
 }
@@ -734,30 +734,30 @@ function statesFrame(): string {
     `<div class="mn" style="width:${MW}px;margin:0;flex:none">${dock(tabs, { html, height, term })}</div>`
   const deleted = box(
     [T_PROD, T_STORE, { ...T_CART, on: true, gone: true, state: 'deleted', quiet: 'Logs' }],
-    `<div class="dim" style="position:relative;display:flex;flex-direction:column;height:100%">${kept({ tabs: POD_TABS, on: 'Logs', pill: pill('neutral', 'Deleted'), body: logs({ pod: true, n: 9 }) })}<div class="notice"><b>Pod cart-7d9f6c5b8-x2kqp was deleted at 14:32.</b><p>Its lines up to then stay here until you close this tab.</p><p>It belonged to the Deployment cart, which is still there.</p><div class="bs"><span class="btn primary">Keep cart open instead</span><span class="btn">Close the tab</span></div></div></div>`,
+    `<div class="dim" style="position:relative;display:flex;flex-direction:column;height:100%">${kept({ tabs: POD_TABS, on: 'Logs', pill: pill('neutral', 'Deleted'), body: logs({ pod: true, n: 9 }) })}<div class="notice"><b>Pod cart-7d9f6c5b8-x2kqp was deleted at 14:32.</b><p>Its lines up to then stay here until you close this tab.</p><p>It belonged to the Deployment cart, which is still there.</p><div class="bs"><span class="btn primary">Keep cart open instead</span><span class="btn">Close this tab</span></div></div></div>`,
   )
   const away = box(
     [
       T_PROD,
-      { ...T_STORE, on: true, quiet: 'Logs · staging', state: 'can’t reach' },
+      { ...T_STORE, on: true, quiet: 'Logs · staging', state: 'unreachable' },
       { glyph: 'square-terminal', name: 'staging' },
     ],
     `<div class="strip">${icon('wifi-off', 14)}<span>Can’t reach staging since 14:30. Lumovi tries again on its own, and the lines go on from the last one here.</span></div>${kept({ tabs: DEPLOY_TABS, on: 'Logs', pill: pill('healthy', 'Ready'), body: logs({ n: 8 }) })}`,
   )
   const restarted = box(
     [{ ...T_PROD, on: true, state: 'ended' }, T_STORE, { ...T_CART, quiet: '' }],
-    `<div class="dim" style="position:relative;height:100%">${TERMINAL.replace('<span class="c"></span>', '')}<div class="notice"><b>The shell ended when Lumovi quit.</b><p>A terminal’s shell can’t outlive Lumovi. Its name, cluster and namespace are kept; Restart starts a new shell in them.</p><div class="bs"><span class="btn primary">${icon('rotate-cw', 14)}Restart</span></div></div></div>`,
+    `<div class="dim" style="position:relative;height:100%">${TERMINAL.replace('<span class="c"></span>', '')}<div class="notice"><b>The shell ended when Lumovi quit.</b><p>A terminal’s shell can’t outlive Lumovi. Its name, cluster and namespace are kept for a new one.</p><div class="bs"><span class="btn primary">${icon('rotate-cw', 14)}Start a new shell</span></div></div></div>`,
     240,
     true,
   )
   return `<section class="blk"><h2>When what’s kept goes, can’t be reached, or Lumovi restarts<i>the tab stays, and says so; nothing starts by itself</i></h2>
     <p class="cap">A kept pod deleted (a rollout replaced it): its last lines stay, dimmed, under a notice that offers what owned it</p>${deleted}
     <p class="cap">A kept object on a cluster Lumovi can’t reach: what was read stays, a strip says since when; the lines go on when it’s back</p>${away}
-    <p class="cap">After a restart: the windows, their pages and their tabs come back; a terminal comes back ended, with Restart</p>${restarted}
+    <p class="cap">After a restart: the windows, their pages and their tabs come back; a terminal comes back ended, with Start a new shell</p>${restarted}
     <ul class="rules">
-      <li><b>Deleted</b>: the tab’s name goes quiet with “deleted” after it, its icon quiet. What it showed stays, at 45%, under the terminal’s notice card: when it was deleted, that its lines (or its last state) stay until the tab closes, and, when Lumovi knows what owned it, that owner, with <b>Keep cart open instead</b> (replaces the tab with the owner, on the same tab) and <b>Close the tab</b>. A pod is the common case: every rollout replaces them, so a kept pod that ends this way is normal, not an error. No red.</li>
-      <li><b>Can’t reach its cluster</b>: “can’t reach” after the name. The tab keeps what it read; a strip under the row says since when and that Lumovi tries again by itself, as the cluster’s pages do. When it’s back the strip goes and the logs carry on from the last line shown, nothing missed and nothing twice, where the cluster still has them. A terminal doesn’t depend on the cluster (it’s a shell on this computer), so it has no such state.</li>
-      <li><b>After a restart</b> every window comes back as it was: its screen, place and size; its cluster and page (with its panel, which the page’s address holds); its dock open or closed, its height, its tabs and the one shown. A kept object reads again as if just opened, with its own choices, so its logs show their last 500 lines, which covers the time Lumovi was closed; no note is needed, since each line has its time. <b>A terminal comes back ended</b>, never as a new shell by itself (a shell runs the person’s profile, which Lumovi shouldn’t start unasked): its tab with “ended”, its old lines dimmed, and Restart.</li>
+      <li><b>Deleted</b>: the tab’s name goes quiet with “deleted” after it, its icon quiet. What it showed stays, at 45%, under the terminal’s notice card: when it was deleted, that its lines (or its last state) stay until the tab closes, and, when Lumovi knows what owned it, that owner, with <b>Keep cart open instead</b> (replaces the tab with the owner, on the same tab) and <b>Close this tab</b>. A pod is the common case: every rollout replaces them, so a kept pod that ends this way is normal, not an error. No red.</li>
+      <li><b>Can’t reach its cluster</b>: “unreachable” after the name, Lumovi’s word for such a cluster. The tab keeps what it read; a strip under the row says since when and that Lumovi tries again by itself, as the cluster’s pages do. When it’s back the strip goes and the logs carry on from the last line shown, nothing missed and nothing twice, where the cluster still has them. A terminal doesn’t depend on the cluster (it’s a shell on this computer), so it has no such state.</li>
+      <li><b>After a restart</b> every window comes back as it was: its screen, place and size; its cluster and page (with its panel, which the page’s address holds); its dock open or closed, its height, its tabs and the one shown. A kept object reads again as if just opened, with its own choices, so its logs show their last 500 lines, which covers the time Lumovi was closed; no note is needed, since each line has its time. <b>A terminal comes back ended</b>, never as a new shell by itself (a shell runs the person’s profile, which Lumovi shouldn’t start unasked): its tab with “ended”, its old lines dimmed, and <b>Start a new shell</b> (“Restart” alone would read as restarting Lumovi).</li>
     </ul></section>`
 }
 
@@ -828,7 +828,7 @@ export const WINDOWS_FRAMES: { id: WindowsFrame; title: string; size: Size }[] =
 ]
 
 const INTRO =
-  '<header><h1>More than one window, and tabs for what you watch (LMV-176)</h1><p>The dock along the bottom of a cluster’s pages holds terminals today. It now keeps objects too: any object, from its panel, open on whichever tab it was on, so its logs or its state stay in view while the window moves around. A tab can move into a window of its own, and File → New Window opens another window on any cluster. Windows and their tabs come back after a restart. Words are drafts for docs.</p></header>'
+  '<header><h1>More than one window, and tabs for what you watch (LMV-176)</h1><p>The dock along the bottom of a cluster’s pages holds terminals today. It now keeps objects too: any object, from its panel, open on whichever tab it was on, so its logs or its state stay in view while the window moves around. A tab can move into a window of its own, and File → New Window opens another window on any cluster. Windows and their tabs come back after a restart. Words are docs’ (14 Oct).</p></header>'
 
 /** One of the frames, in one theme. */
 export function windowsFrame2(id: WindowsFrame, scheme: Scheme): string {
