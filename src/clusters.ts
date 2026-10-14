@@ -27,6 +27,11 @@ export interface Cluster {
   latency?: number
   /** What the check found, if not the version. */
   problem?: 'checking' | 'unreachable' | 'auth'
+  /**
+   * Signs in through a program (a credential plugin, an auth provider): its name, read from the
+   * kubeconfig. The page doesn't ask its version, which would run it (LMV-176).
+   */
+  signsIn?: string
   production?: boolean
   readOnly?: boolean
   /** The kubeconfig's current context. */
@@ -240,7 +245,7 @@ header.top p { margin: 20px 0 0; font-size: 14px; color: var(--text-2); }
 .chips { display: flex; flex: none; gap: 4px; }
 .chip { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border: 1px solid var(--line); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); white-space: nowrap; }
 .chip.hit { border-color: transparent; background: var(--accent-soft); color: var(--accent-strong); }
-.meta { flex: none; width: 116px; text-align: right; font-size: 12px; color: var(--text-3); white-space: nowrap; }
+.meta { flex: none; min-width: 116px; text-align: right; font-size: 12px; color: var(--text-3); white-space: nowrap; }
 .meta .v { font-family: 'JetBrains Mono', monospace; color: var(--text-2); }
 .meta .bad { color: var(--critical-text); }
 .meta .wait { display: inline-block; width: 72px; height: 10px; border-radius: 4px; background: var(--surface-3); vertical-align: middle; }
@@ -440,7 +445,7 @@ const health = (c: Cluster) =>
 /** A cluster's tile: its color and letters, with its status in the corner. */
 export function tile(c: Cluster, big = false): string {
   const color = c.color ? `--c: var(--series-${c.color});` : ''
-  return `<span class="tile${c.color ? '' : ' plain'}${big ? ' big' : ''}" style="${color}">${escape(initials(c))}${big ? '' : `<span class="dot" style="--d:${health(c)}"></span>`}</span>`
+  return `<span class="tile${c.color ? '' : ' plain'}${big ? ' big' : ''}" style="${color}">${escape(initials(c))}${big || c.signsIn ? '' : `<span class="dot" style="--d:${health(c)}"></span>`}</span>`
 }
 
 const PROBLEM = { unreachable: 'Unreachable', auth: 'Couldn’t sign in', checking: '' }
@@ -461,8 +466,9 @@ export interface RowOptions {
 export function row(c: Cluster, o: RowOptions = {}): string {
   const labels = (c.labels ?? []).filter(([k, v]) => `${k}=${v}` === o.match)
   const sub = c.name ? middle(c.context, labels.length ? 34 : 46) : `${c.host} · ${c.user}`
-  const meta =
-    c.problem === 'checking'
+  const meta = c.signsIn
+    ? 'Signs in when opened'
+    : c.problem === 'checking'
       ? '<span class="wait"></span>'
       : c.problem
         ? `<span class="bad">${PROBLEM[c.problem]}</span>`
@@ -491,6 +497,7 @@ export type State =
   | 'group-by'
   | 'by-label'
   | 'hidden'
+  | 'signs-in'
   | 'files'
   | 'partial'
   | 'empty'
@@ -571,12 +578,26 @@ ${CSS}
 
 const SEARCH_PH = '<span class="ph">Search clusters and labels…</span>'
 
+/** The program a cloud's cluster signs in through, as its kubeconfig names it (LMV-176). */
+function signingIn(c: Cluster): Cluster {
+  const program = c.host.endsWith('.eks.amazonaws.com')
+    ? 'aws'
+    : c.context.startsWith('gke_')
+      ? 'gke-gcloud-auth-plugin'
+      : undefined
+  return program ? { ...c, signsIn: program, problem: undefined } : c
+}
+
+/** The list alone, without the page around it. */
+export const picker = (state: State) => content(state, state.startsWith('locked'))
+
 function content(state: State, locked: boolean): string {
   const panel = (inside: string) => `<div class="picker empty-panel">${inside}</div>`
   if (state === 'empty' || state === 'locked-empty') return panel(empty(state === 'locked-empty'))
   if (state === 'unreadable') return panel(unreadable())
   if (state === 'missing') return panel(missing())
-  const visible = CLUSTERS.filter((c) => !c.hidden || state === 'hidden')
+  const all = state === 'signs-in' ? CLUSTERS.map(signingIn) : CLUSTERS
+  const visible = all.filter((c) => !c.hidden || state === 'hidden')
   const total = CLUSTERS.filter((c) => !c.hidden).length
   let query = ''
   let groups: string
@@ -597,7 +618,8 @@ function content(state: State, locked: boolean): string {
           ? { name: 'docker-desktop', recent: false }
           : { name: 'Payments EU', recent: true }
     const byLabel = state === 'by-label'
-    const recent = state === 'added' ? [] : RECENT.map(find)
+    const recent =
+      state === 'added' ? [] : RECENT.map((name) => all.find((c) => title(c) === name)!)
     const key = (c: Cluster) =>
       byLabel ? (c.labels?.find(([k]) => k === 'env')?.[1] ?? '') : (c.group ?? '')
     const byKey = new Map<string, Cluster[]>()

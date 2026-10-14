@@ -4,13 +4,14 @@
  * pages, the detail panel and its Logs tab. What's new: an object kept open below, a tab's way to
  * a window of its own, a second window from the File menu, and what comes back after a restart.
  */
-import { tokens, type Size } from './clusters.ts'
+import { CSS as START_CSS, picker, tokens, type Size } from './clusters.ts'
 import { type Scheme } from './colors.ts'
 import { icon, type IconName } from './lucide.ts'
 import { FONTS } from './scene.ts'
 import { escape } from './svg.ts'
 
-const CSS = `
+/** The sheet a frame is laid out on: its header, blocks, captions and rules. */
+const SHEET = `
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--app-bg); font-family: 'Inter', sans-serif; font-size: 13px; line-height: 20px; color: var(--text-1); -webkit-font-smoothing: antialiased; }
 svg.i { flex: none; display: block; }
@@ -26,6 +27,9 @@ svg.i { flex: none; display: block; }
 .rules li b { font-weight: 600; color: var(--text-1); }
 .row2 { display: flex; gap: 28px; align-items: flex-start; }
 .stack { display: flex; flex-direction: column; gap: 10px; }
+`
+
+const CSS = `${SHEET}
 .new { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--accent-soft); font-size: 10.5px; line-height: 16px; font-style: normal; font-weight: 500; color: var(--accent-strong); vertical-align: 1px; }
 
 /* The window, as the desktop app draws it. */
@@ -808,9 +812,68 @@ function windowsFrame(): string {
     </ul></section>`
 }
 
+// ─── Frame 5: on the start screen, a cluster that signs in through a program ───────────────
+
+/** Drawn on the start screen's own styles: the list is the clusters page's, as it is. */
+const SIGNIN_CSS = `
+body { overflow: visible; }
+.on-start { position: relative; flex: none; width: 720px; }
+.tip { position: absolute; z-index: 5; padding: 5px 9px; border-radius: 7px; background: var(--text-1); font-size: 12px; line-height: 17px; color: var(--surface); white-space: nowrap; box-shadow: var(--shadow-pop); }
+.ptr { position: absolute; z-index: 6; width: 18px; height: 22px; }
+.swm { position: relative; flex: none; width: 300px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.swm .in { height: 40px; padding: 0 12px; border-bottom: 1px solid var(--line); font-size: 13px; line-height: 40px; color: var(--text-3); }
+.swm .ls { max-height: 320px; overflow: hidden; padding: 4px; }
+.swm .si { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; font-size: 13px; color: var(--text-1); }
+.swm .si.hl { background: var(--surface-3); }
+.swm .si svg.i { color: var(--text-3); }
+.swm .sd { width: 8px; height: 8px; flex: none; border-radius: 50%; }
+.swm .sd[style] { box-shadow: 0 0 0 2px var(--surface); }
+.swm .nm { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.swm hr { height: 1px; margin: 4px; border: 0; background: var(--line); }
+.swm .ro { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-top: 1px solid var(--line); }
+.swm .ro .tx { flex: 1; min-width: 0; }
+.swm .ro b { display: block; font-size: 13px; font-weight: 400; }
+.swm .ro small { display: block; font-size: 12px; line-height: 16px; color: var(--text-3); }
+.swm .tg { position: relative; width: 32px; height: 18px; flex: none; border-radius: 999px; background: var(--line-strong); }
+.swm .tg::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 0.2); }
+`
+
+/** The sidebar's switcher, open: each cluster with its status, or none where asking would sign in. */
+function switcher(): string {
+  const item = (name: string, d?: string, o: { on?: boolean; hl?: boolean } = {}) =>
+    `<div class="si${o.hl ? ' hl' : ''}"><span class="sd"${d ? ` style="background:var(--${d})"` : ''}></span><span class="nm">${escape(name)}</span>${o.on ? icon('check', 16, 2, 'color:var(--accent)') : ''}</div>`
+  return `<div class="swm">
+    <div class="in">Switch to…</div>
+    <div class="ls">${[
+      item('Payments EU', undefined, { hl: true }),
+      item('Payments US'),
+      item('Payments staging', 'good'),
+      item('Platform tools'),
+      item('CI runners'),
+      item('kind-lumovi', 'good', { on: true }),
+      item('minikube', 'critical'),
+      item('docker-desktop', 'good'),
+    ].join('')}<hr><div class="si">${icon('list', 16)}All clusters</div></div>
+    <div class="ro">${icon('lock', 16, 2, 'color:var(--text-3)')}<span class="tx"><b>Read-only</b><small>Lumovi won’t change kind-lumovi</small></span><span class="tg"></span></div>
+    <span class="tip" style="left:132px;top:58px">Signs in when opened</span>${pointer(116, 44)}
+  </div>`
+}
+
+function signInFrame(): string {
+  const tip = `<span class="tip" style="right:86px;top:558px">Signs in through gke-gcloud-auth-plugin, so Lumovi checks it when you open it.</span>${pointer(612, 532)}`
+  return `<section class="blk"><h2>On the start screen: a cluster that signs in through a program<i>no dot and no version until it’s opened, so nothing signs in at launch</i></h2>
+    <div class="row2"><div class="stack"><p class="cap">The list, its clouds’ clusters signing in through their programs (aws, gke-gcloud-auth-plugin); the pointer on CI runners’ words</p><div class="on-start">${picker('signs-in')}${tip}</div></div>
+    <div class="stack"><p class="cap">The sidebar’s switcher, open in kind-lumovi</p>${switcher()}</div></div>
+    <ul class="rules">
+      <li><b>No dot, and words in its place.</b> A cluster whose kubeconfig signs in through a program (a credential plugin, as the clouds’ clusters do, or an auth provider) isn’t asked its version on the start screen: asking runs the program, which can open a browser. Its tile has no dot, since nothing is known and nothing pretends. Where the version and latency go: <b>Signs in when opened</b>, quiet (text-3, not mono), read as part of the row. Recent’s line the same. The column keeps its right edge and grows for these words, one line (126 px in Inter at 12): <code>min-w-[116px] whitespace-nowrap</code> for <code>w-[116px]</code>.</li>
+      <li><b>Its tooltip</b>, on the words as a row’s error has its own, names the program: “Signs in through gke-gcloud-auth-plugin, so Lumovi checks it when you open it.” The name is read from the kubeconfig, never run: an exec’s command, its last part, or an auth provider’s name. Opening the cluster signs in as today. Back on the start screen the row stays the same: it says what kind of cluster this is, not a status that would go stale. A folder’s cluster not yet allowed keeps “Asks before it runs” first, which needs nothing run. Most clouds’ clusters sign in this way, so on many lists most rows read this, as drawn.</li>
+      <li><b>The sidebar’s switcher</b> asks every cluster’s version as it opens, which would run the same programs (a browser for a cluster you didn’t pick). There too: no dot, its place kept so the names stay in line, and the row’s tooltip <b>Signs in when opened</b>. The cluster that’s open keeps its dot, there and on the sidebar, since it’s signed in. Light and dark use the tokens the list has: nothing new.</li>
+    </ul></section>`
+}
+
 // ─── The frames ────────────────────────────────────────────────────────────────────────────
 
-export type WindowsFrame = 'wn-keep' | 'wn-tabs' | 'wn-states' | 'wn-windows'
+export type WindowsFrame = 'wn-keep' | 'wn-tabs' | 'wn-states' | 'wn-windows' | 'wn-signin'
 
 export const WINDOWS_FRAMES: { id: WindowsFrame; title: string; size: Size }[] = [
   { id: 'wn-keep', title: 'Keep an object open below', size: { width: 1504, height: 2200 } },
@@ -825,6 +888,11 @@ export const WINDOWS_FRAMES: { id: WindowsFrame; title: string; size: Size }[] =
     size: { width: 1504, height: 1300 },
   },
   { id: 'wn-windows', title: 'More than one window', size: { width: 2400, height: 1900 } },
+  {
+    id: 'wn-signin',
+    title: 'Signs in when opened, on the start screen',
+    size: { width: 1504, height: 1100 },
+  },
 ]
 
 const INTRO =
@@ -838,11 +906,13 @@ export function windowsFrame2(id: WindowsFrame, scheme: Scheme): string {
     'wn-tabs': tabsFrame,
     'wn-states': statesFrame,
     'wn-windows': windowsFrame,
+    'wn-signin': signInFrame,
   }[id]()
+  const css = id === 'wn-signin' ? `${START_CSS}${SHEET}${SIGNIN_CSS}` : CSS
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${tokens(scheme)} }
 html, body { width: ${f.size.width}px; }
-${CSS}
+${css}
 </style><div class="sheet">${body}</div>`
 }
