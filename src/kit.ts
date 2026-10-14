@@ -1594,7 +1594,7 @@ const CARD_W = 232
 const CARD_H = 56
 const ROW = CARD_H + 44
 
-interface GNode {
+export interface GNode {
   id: string
   glyph: Parameters<typeof icon>[0]
   kind: string
@@ -1607,7 +1607,7 @@ interface GNode {
   more?: number
 }
 
-type GEdge = [from: string, to: string, o?: { dash?: boolean; label?: string; cls?: string }]
+export type GEdge = [from: string, to: string, o?: { dash?: boolean; label?: string; cls?: string }]
 
 export const TEXT: Record<Level, string> = {
   critical: 'critical-text',
@@ -1628,7 +1628,7 @@ function gcard(n: GNode, x: number, y: number): string {
 }
 
 /** Cards in rows, and the lines between them; a back edge runs up the side and ends in a head. */
-function graph(
+export function graph(
   nodes: GNode[],
   edges: GEdge[],
   cols: number,
@@ -1680,7 +1680,7 @@ function graph(
     .join('')}${labels}</div>`
 }
 
-const legend = (view: 'Graph' | 'Table') =>
+export const legend = (view: 'Graph' | 'Table') =>
   `<div class="gbar"><span class="leg"><svg width="22" height="6"><path d="M0 3h22" stroke="var(--text-3)" stroke-width="1.5" fill="none"/></svg>Owns</span><span class="leg"><svg width="22" height="6"><path d="M0 3h22" stroke="var(--text-3)" stroke-width="1.5" stroke-dasharray="3 3" fill="none"/></svg>Uses</span><span class="end gseg"><span class="${view === 'Graph' ? 'on' : ''}">Graph</span><span class="${view === 'Table' ? 'on' : ''}">Table</span></span></div>`
 
 const APP_NODES: GNode[] = [

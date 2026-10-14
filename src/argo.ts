@@ -136,6 +136,41 @@ const CSS = `
 .ov .ktile .s > span:last-child, .ph .ktile .s > span:last-child { white-space: normal; line-height: 17px; }
 .ktile .s .pt { display: inline-block; }
 
+/* The Applications page: its filter bar, rows that select, Lumovi's own selection bar. */
+.lpage { position: relative; }
+.fbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.fbar .kfield { width: 280px; }
+.fb { display: inline-flex; height: 32px; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); font-size: 13px; font-weight: 500; color: var(--text-1); white-space: nowrap; }
+.fb svg.i { color: var(--text-3); }
+.fb.on { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--accent-strong); }
+.fb.on svg.i { color: var(--accent-strong); }
+.fb .v { font-weight: 400; }
+.fcount { margin-left: auto; font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.fclear { font-size: 13px; font-weight: 500; color: var(--accent-strong); }
+.cb { display: inline-grid; width: 16px; height: 16px; place-items: center; border: 1.5px solid var(--line-strong); border-radius: 4px; background: var(--surface); color: #fff; }
+.cb.on { border-color: var(--accent); background: var(--accent); }
+.cb.some { border-color: var(--accent); background: var(--accent); }
+.t .tr.sel { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.selbar { position: absolute; bottom: 24px; left: 50%; z-index: 4; display: flex; align-items: center; gap: 4px; padding: 6px 6px 6px 14px; transform: translateX(-50%); border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-pop); white-space: nowrap; }
+.selbar b { margin-right: 8px; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.selbar .btn { height: 28px; padding: 0 10px; font-size: 12px; }
+.selbar .sep { width: 1px; height: 20px; margin: 0 4px; background: var(--line); }
+.selbar .x { display: grid; width: 28px; height: 28px; place-items: center; color: var(--text-3); }
+.fmenu { position: absolute; z-index: 5; width: 240px; padding: 4px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.fmenu .mi { display: flex; height: 32px; align-items: center; gap: 10px; padding: 0 8px; border-radius: 8px; font-size: 13px; }
+.fmenu .mi.hl { background: var(--surface-3); }
+.fmenu .mi small { margin-left: auto; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.objs { overflow: hidden; border: 1px solid var(--line); border-radius: 10px; }
+.objs .o { display: flex; height: 36px; align-items: center; gap: 10px; padding: 0 12px; font-size: 13px; }
+.objs .o + .o { border-top: 1px solid var(--line); }
+.objs .o small { font-size: 12px; color: var(--text-3); }
+.objs .o .st { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); }
+.objs .o .st.bad { color: var(--critical-text); }
+.objs .o .st svg.i { flex: none; }
+.objs .o.out { color: var(--text-3); }
+.left { display: flex; gap: 6px; margin: 10px 0 0; font-size: 12px; line-height: 17px; color: var(--text-2); }
+.left svg.i { flex: none; margin-top: 1px; color: var(--text-3); }
+
 /* On a phone. */
 .ph .tbp { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
 .ph .tbp > b { font-size: 17px; line-height: 24px; font-weight: 600; }
@@ -302,7 +337,7 @@ const RULES = [
   '<b>The time</b> counts every second from when Argo CD started the operation (<code>operationState.startedAt</code>, once its phase is Running), as Lumovi says a duration: 42s, 1m 05s, 12m 30s, 1h 02m. Its digits are of one width, so it doesn’t jiggle. The plugin says when it started; Lumovi counts, by the cluster’s clock where this machine’s differs (as the API server’s answers date them). A start that still looks ahead is 0s, and the count never goes back. “May be stuck” is judged by the same count.',
   '<b>A busy button</b> looks like a secondary one, whatever it was: never filled, as there’s nothing to press. Its text is quieter and it has no hover. It can’t be pressed, but the keyboard reaches it, and a screen reader hears its state in words (“Sync, busy: syncing, 1 minute 5 seconds”), not the glyphs. Its tooltip says the same to a pointer. Its word has no “…”, which in Lumovi means a button asks first.',
   '<b>Once, in a row.</b> The time is said once a row: beside the name in the header’s second status, so the tab’s busy button has none; in Lumovi’s bar and a row’s menu, where no status says it, the button has it. Two would be two clocks.',
-  '<b>The header’s second status</b> says the operation, beside health. (1) While one runs: Syncing or Terminating, and how long; at 10 minutes, amber, and the line under starts “May be stuck after 14 minutes:” before Argo CD’s message. (2) If the last one failed: Sync failed, or Sync error, in red, with Argo CD’s message under it, until the next sync; if it was terminated, Sync terminated, in grey. (3) Otherwise the sync status: Synced, Out of sync, or Unknown.',
+  '<b>The header’s second status</b> says the operation, beside health. (1) While one runs: Syncing or Terminating, and how long; at 10 minutes, amber, and the line under starts “May be stuck after N minutes:” (the minutes as counted) before Argo CD’s message. (2) If the last one failed: Sync failed, or Sync error, in red, with Argo CD’s message under it, until the next sync; if it was terminated, Sync terminated, in grey. (3) Otherwise the sync status: Synced, Out of sync, or Unknown.',
   '<b>Where Sync shows</b>, it’s busy in all of them at once: Lumovi’s bar on the Application’s page (above every tab), the tab’s header, and the row’s menu on Lumovi’s list of Applications. When the sync ends, each is Sync… again.',
   '<b>New in the kit</b>, each a new property of a kit part, so each is declared, comes in at <code>PLUGIN_SINCE</code> next, is checked by the door and is on docs’ kit page, as Card’s about was: the busy state, for a Header’s button and a view’s action (LMV-305 §5); and, beyond §5, a Header’s second status. The rest is the kit’s Header and Lumovi’s own bar, menu and list, as built.',
   '<b>On a phone</b> neither Sync nor Terminate sync… is offered, as no file’s action is there, and the header’s two statuses say what’s happening. Lumovi’s line for what a phone doesn’t do leaves a busy button out, so while a sync runs there’s no such line.',
@@ -540,7 +575,7 @@ const WHERE = card(
     'Clusters',
     [
       ['in-cluster', 24],
-      ['production-eu', 11],
+      ['prod-us', 11],
       ['staging', 3],
     ],
     38,
@@ -618,7 +653,7 @@ const OV_RULES = [
   '<b>Four tiles, what needs me first:</b> Healthy and Synced, each of all the applications, their line under naming the rest; Syncing now, its line the longest one’s time (amber once one may be stuck); Last sync failed, naming them, or how many past two. Each opens the Applications page (frame 3) filtered to those.',
   '<b>A dot is always health:</b> an application’s, as Lumovi’s Lead has it everywhere; a project’s or an ApplicationSet’s is its worst application’s. What’s wrong besides is a status of its own (Needs attention’s Why). The quiet word beside an application’s name is its project.',
   '<b>Needs attention</b> is everything that wants a look, worst first, each once, under the first reason that holds: Degraded, Sync failed, Sync error, May be stuck, Missing, a condition that’s an error, Out of sync. The line is Argo CD’s own, end-cut, whole in the row’s tooltip. Six show, then “Show all”. A row opens the Application, on its Argo CD tab. Nothing needs a look: “All 38 applications are synced and healthy.”',
-  '<b>Running now</b> is every operation in progress: its phase and time, as the tab’s second status says them; its wave (“2 of 3”: the wave of what it waits on, of the distinct waves among the application’s resources, both read from <code>status.resources[].syncWave</code>; or the hook phase, PreSync or PostSync, while a hook runs; where neither can be told, the phase alone); and what it waits on, read from Argo CD’s message where it has the shape “waiting for healthy state of group/Kind/name” (in any other shape, the message whole, end-cut). It’s empty, and quiet, most of the time: “Nothing is syncing.”',
+  '<b>Running now</b> is every operation in progress: its phase and time, as the tab’s second status says them; its wave (“2 of 3”: where the wave of what it waits on stands among the application’s distinct waves, sorted, negative ones first; never the wave’s own number, which can be −1 or 10. Read from <code>status.resources[].syncWave</code>, matched by group, kind, namespace and name, a missing one being wave 0, as Argo CD leaves 0 out; or the hook phase, PreSync or PostSync, while a hook runs; where neither can be told, the phase alone); and what it waits on, read from Argo CD’s message where it has the shape “waiting for healthy state of group/Kind/name” (in any other shape, the message whole, end-cut). It’s empty, and quiet, most of the time: “Nothing is syncing.”',
   '<b>By state</b> breaks health and sync down, each count a row that opens the Applications page filtered to it. <b>Where they run</b> does the same by cluster and namespace (four, then “10 more”).',
   '<b>Recent syncs</b> are the last 20 operations across applications, newest first: how each ended (Succeeded, Failed, Error, Terminated), the revision and branch, who started it (a person, or Auto-sync), and when. Argo CD keeps a finished sync in its history, and a failure only until the application’s next sync, so an older failure isn’t listed. Terminated is a sync that ended Failed, “Operation terminated”, as group 1 has it.',
   '<b>Projects and ApplicationSets</b>, read already and shown now: how many applications each has, how many of them are healthy and synced, and, for a project, how many need a look; worst first. An ApplicationSet says what it makes its applications from. A row opens the object; a project’s dot is its worst application’s health.',
@@ -644,13 +679,354 @@ function overviewPhone(): string {
   return `<section class="blk"><h2>On a phone<i>the same page, read: tiles two across, each table as cards</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${top}</div><p class="cap" style="max-width:820px">As the kit draws every page on a phone: tiles two across, the chevron always shown on one that opens; each table as cards, every column a fact, a line that’s long whole on its card (a finger has no tooltip). Needs attention goes on with its six cards and “Show all 11”, then each section below as cards, in the same order.</p></section>`
 }
 
-export type ArgoFrame = 'argo-sync' | 'argo-sync-phone' | 'argo-overview' | 'argo-overview-phone'
+// ─── 3. The Applications page ──────────────────────────────────────────────────────────────
+
+const LIST_TABS =
+  ltab('Overview', { plug: true }) +
+  ltab('Applications', { plug: true, on: true }) +
+  ltab('AppProjects', { count: '4' }) +
+  ltab('ApplicationSets', { count: '2' })
+
+type AppRow = [
+  string, // name
+  string, // project
+  string, // repository · path
+  [Level, string], // health
+  [Level, string], // sync
+  string, // operation, as a status: '' for a sync that succeeded
+  string, // revision: target · synced
+  string, // destination: cluster · namespace
+  string, // auto-sync
+  string, // last sync
+]
+
+const APPS: AppRow[] = [
+  [
+    'legacy-batch',
+    'default',
+    'acme/deploy · jobs/legacy-batch',
+    ['critical', 'Degraded'],
+    ['warning', 'Out of sync'],
+    '',
+    'main · 4f1c9aa',
+    'in-cluster · batch',
+    'On',
+    '2h',
+  ],
+  [
+    'payments',
+    'payments',
+    'acme/deploy · apps/payments',
+    ['healthy', 'Healthy'],
+    ['warning', 'Out of sync'],
+    pill('critical', 'Failed'),
+    'v2.4.2 · b07e2d1',
+    'prod-us · payments',
+    'Off',
+    '14m',
+  ],
+  [
+    'reports',
+    'batch',
+    'acme/deploy · jobs/reports',
+    ['healthy', 'Healthy'],
+    ['neutral', 'Unknown'],
+    pill('critical', 'Error'),
+    'main · 7c1e0b4',
+    'in-cluster · batch',
+    'On',
+    '3h',
+  ],
+  [
+    'orders',
+    'shop',
+    'acme/deploy · apps/orders',
+    ['progressing', 'Progressing'],
+    ['warning', 'Out of sync'],
+    opPill('warning', 'Syncing', '14m 20s'),
+    'main · 6d1f2a9',
+    'prod-us · shop',
+    'Off',
+    '1d',
+  ],
+  [
+    'search',
+    'shop',
+    'acme/deploy · apps/search',
+    ['warning', 'Missing'],
+    ['warning', 'Out of sync'],
+    '',
+    'v1.9.0 · e5d2b19',
+    'prod-us · search',
+    'On',
+    '1h',
+  ],
+  [
+    'inventory',
+    'shop',
+    'acme/deploy · apps/inventory',
+    ['healthy', 'Healthy'],
+    ['warning', 'Out of sync'],
+    '',
+    'main · 2a6f8c0',
+    'in-cluster · shop',
+    'Off',
+    '6h',
+  ],
+  [
+    'storefront',
+    'shop',
+    'acme/deploy · apps/storefront',
+    ['healthy', 'Healthy'],
+    ['healthy', 'Synced'],
+    opPill('progressing', 'Syncing', '1m 05s'),
+    'main · 9b2e771',
+    'prod-us · shop',
+    'On',
+    '5h',
+  ],
+  [
+    'catalog',
+    'shop',
+    'acme/deploy · apps/catalog',
+    ['healthy', 'Healthy'],
+    ['healthy', 'Synced'],
+    pill('neutral', 'Terminated'),
+    'main · 91ac0f3',
+    'in-cluster · shop',
+    'Off',
+    '41m',
+  ],
+  [
+    'checkout',
+    'shop',
+    'acme/deploy · apps/checkout',
+    ['healthy', 'Healthy'],
+    ['healthy', 'Synced'],
+    '',
+    'main · 4f1c9aa',
+    'prod-us · shop',
+    'On',
+    '3m',
+  ],
+  [
+    'cart',
+    'shop',
+    'acme/deploy · apps/cart',
+    ['healthy', 'Healthy'],
+    ['healthy', 'Synced'],
+    '',
+    'main · 4f1c9aa',
+    'prod-us · shop',
+    'On',
+    '22m',
+  ],
+  [
+    'ledger',
+    'payments',
+    'acme/deploy · apps/ledger',
+    ['healthy', 'Healthy'],
+    ['healthy', 'Synced'],
+    '',
+    'v2.4.1 · 8e3b6d0',
+    'prod-us · payments',
+    'Off',
+    '1d',
+  ],
+  [
+    'billing',
+    'payments',
+    'acme/deploy · apps/billing',
+    ['healthy', 'Healthy'],
+    ['healthy', 'Synced'],
+    '',
+    'v2.4.1 · 8e3b6d0',
+    'prod-us · payments',
+    'Off',
+    '1d',
+  ],
+]
+
+const CHECK = (on: boolean | 'some') =>
+  `<span class="cb${on === 'some' ? ' some' : on ? ' on' : ''}">${on === 'some' ? icon('minus', 12, 3) : on ? icon('check', 12, 3) : ''}</span>`
+
+/** The Applications table: a box to pick each row, then the lead and seven columns. */
+function appsTable(
+  rows: AppRow[],
+  picked: (name: string) => boolean = () => false,
+  head0: boolean | 'some' = false,
+): string {
+  return table(
+    '16px minmax(0,1.5fr) 112px 116px 132px minmax(0,1fr) minmax(0,1.1fr) 80px 76px',
+    [
+      CHECK(head0),
+      head('Name'),
+      head('Health', { sorted: 'down' }),
+      head('Sync'),
+      head('Operation'),
+      head('Revision'),
+      head('Destination'),
+      head('Auto-sync'),
+      head('Last sync', { r: true }),
+    ],
+    rows.map(([name, project, repo, health, sync, op, rev, dest, auto, last]) => ({
+      cells: [
+        CHECK(picked(name)),
+        lead({ level: health[0], name, beside: project, under: repo }),
+        `<span>${pill(...health)}</span>`,
+        `<span>${pill(...sync)}</span>`,
+        `<span>${op || '<span class="q3">—</span>'}</span>`,
+        `<span class="q mono">${rev}</span>`,
+        `<span class="q">${dest}</span>`,
+        `<span class="q${auto === 'Off' ? ' q3' : ''}">${auto}</span>`,
+        ago(last),
+      ],
+      cls: `opens${picked(name) ? ' sel' : ''}`,
+    })),
+  )
+}
+
+const fb = (label: string, value = '') =>
+  value
+    ? `<span class="fb on">${label}: <span class="v">${value}</span>${icon('x', 12)}</span>`
+    : `<span class="fb">${label}${icon('chevron-down', 14)}</span>`
+
+const FBAR = (o: { search?: string; set?: [string, string][]; count: string; menu?: string }) =>
+  `<div class="fbar" style="position:relative"><span class="kfield${o.search ? '' : ' ph'}">${icon('search', 16)}<span>${o.search ?? 'Name or namespace'}</span></span>${['Health', 'Sync', 'Operation', 'Project'].map((f) => fb(f, o.set?.find(([k]) => k === f)?.[1])).join('')}${fb('More filters')}${o.set?.length ? '<span class="fclear">Clear filters</span>' : ''}<span class="fcount">${o.count}</span>${o.menu ?? ''}</div>`
+
+/** The Applications page in Lumovi's window: its filter bar, its table, and what's under it. */
+function listPage(body: string, after = ''): string {
+  return `<div class="pwin"><aside class="pside"><h3>Configuration</h3>${sideItem('ConfigMaps', 'file-code-2')}${sideItem('Secrets', 'key-round')}${PLUGINS_SECTION('Argo CD')}</aside><div class="pmain lpage">${pageHead('Argo CD', 'git-merge')}<nav class="lts">${LIST_TABS}</nav>${pgframe('Argo CD', '1.3.0', `<div class="arr-stack ov" style="padding:16px">${body}</div>`)}${after}</div></div>`
+}
+
+const HEALTH_MENU = `<div class="fmenu" style="top:40px;left:290px">${[
+  ['Healthy', '33', false],
+  ['Degraded', '3', false],
+  ['Missing', '1', false],
+  ['Progressing', '1', false],
+  ['Suspended', '0', false],
+  ['Unknown', '0', false],
+]
+  .map(
+    ([v, n, on]) =>
+      `<span class="mi${v === 'Degraded' ? ' hl' : ''}">${CHECK(on as boolean)}${v}<small>${n}</small></span>`,
+  )
+  .join('')}</div>`
+
+const PICKED = [
+  'payments',
+  'reports',
+  'search',
+  'inventory',
+  'storefront',
+  'checkout',
+  'cart',
+  'ledger',
+  'billing',
+  'legacy-batch',
+]
+
+const SELBAR = `<div class="selbar"><b>10 selected</b><span class="btn ghost">${icon('refresh-cw', 14)}Sync…</span><span class="btn ghost">${icon('radar', 14)}Refresh…</span><span class="sep"></span><span class="x">${icon('x', 16)}</span></div>`
+
+/** 3. The page as it opens, a filter being chosen, and ten rows picked. */
+function appsPageFrame(): string {
+  const whole = listPage(
+    `${FBAR({ count: '38 applications', menu: HEALTH_MENU })}${card('Applications', '', appsTable(APPS))}<p class="cap">… and 26 more rows, worst first</p>`,
+  )
+  const filtered = listPage(
+    `${FBAR({ set: [['Operation', 'Failed, Error']], count: '2 of 38' })}${card('Applications', '', appsTable(APPS.filter(([n]) => n === 'payments' || n === 'reports')))}`,
+  )
+  const picked = listPage(
+    `${FBAR({ count: '38 applications' })}${card(
+      'Applications',
+      '',
+      appsTable(APPS, (n) => PICKED.includes(n), 'some'),
+    )}<p class="cap">… and 26 more rows</p>`,
+    SELBAR,
+  )
+  return `<section class="blk"><h2>The Applications page<i>the plugin’s own list: search, filters, every column LMV-305 asks for, and rows to pick</i></h2>
+    <p class="cap"><b>As it opens</b>, worst first, with the Health filter’s menu open.</p>${whole}
+    <p class="cap" style="margin-top:12px"><b>Filtered</b>, as the Overview’s “Last sync failed” opens it.</p>${filtered}
+    <p class="cap" style="margin-top:12px"><b>Ten picked:</b> Lumovi’s own selection bar, as its lists have it. No Delete: nothing is deleted in bulk.</p>${picked}</section>`
+}
+
+/**
+ * Lumovi's own dialog for a file's action on the rows a person ticked: asked once, then each one
+ * followed, by the file's own busy state, to how it ended.
+ */
+function bulkDialog(stage: 'ask' | 'after'): string {
+  const objs = PICKED.filter((n) => n !== 'storefront')
+  const AFTER: Record<string, string> = {
+    ledger: `<span class="st bad">${icon('circle-x', 14)}Changed while you looked at it: not sent</span>`,
+    payments: `<span class="st bad">${icon('circle-x', 14)}Failed: one or more objects failed to apply</span>`,
+    search: `<span class="st">${icon('loader-circle', 14)}Syncing<span class="q3">1m 52s</span></span>`,
+    'legacy-batch': `<span class="st">${icon('loader-circle', 14)}Syncing<span class="q3">2m 10s</span></span>`,
+  }
+  const row = (name: string) => {
+    const app = APPS.find(([n]) => n === name)!
+    const st =
+      stage === 'ask'
+        ? `<span class="st">${icon('circle-check', 14)}<span style="color:var(--good-text)">Accepted</span></span>`
+        : (AFTER[name] ??
+          `<span class="st">${icon('circle-check', 14)}<span style="color:var(--good-text)">Succeeded</span></span>`)
+    return `<div class="o"><span>${name}</span><small>to ${app[7]}</small>${st}</div>`
+  }
+  const order =
+    stage === 'after'
+      ? [...objs].sort(
+          (a, b) =>
+            Number(AFTER[b]?.includes('bad') ?? false) - Number(AFTER[a]?.includes('bad') ?? false),
+        )
+      : objs
+  const head = `<div class="dh"><span class="g" style="background:var(--surface-3);color:var(--text-2)">${icon('refresh-cw', 18)}</span><div><h3>${stage === 'ask' ? 'Sync 9 Applications?' : 'Started 8 of 9 syncs'}</h3><div class="sub"><span>Applications · argocd · <b>production-eu</b></span><span class="prodm">Production</span></div></div></div>`
+  const options = `<div class="part opts"><div class="fld"><label>Prune</label><span class="ksw"><i></i></span><p>Delete what is no longer in the repository.</p></div><div class="fld"><label>Strategy</label><span class="kseg"><span>Apply</span><span class="on">Hook</span></span><p>Asked once, for all nine. Each syncs to the revision it tracks, so Revision isn’t asked.</p></div></div>`
+  const list = `<div class="part send"><div class="kcap">${stage === 'ask' ? 'The nine it syncs' : 'How each is going'}</div><div class="objs">${order.map(row).join('')}</div>${stage === 'ask' ? `<p class="left">${icon('info', 14)}<span>Left out: storefront, which is syncing already.</span></p>${command(`kubectl patch application ${objs.join(' ')} -n argocd --type merge -p '{"operation":{"sync":{"syncStrategy":{"hook":{}}}}}' --context production-eu`)}<p class="left">${icon('info', 14)}<span>Lumovi also sends each with the version it judged it on, which a command can’t say.</span></p>` : ''}</div>`
+  const foot = `<div class="df"><span class="btn ghost sm">${stage === 'ask' ? 'Cancel' : 'Close'}</span><span class="btn primary sm">${stage === 'ask' ? 'Sync 9' : 'Try the 2 again…'}</span></div>`
+  return `<div class="kdlg" style="width:600px">${head}<div class="db">${stage === 'ask' ? options : ''}${list}</div>${foot}</div>`
+}
+
+function bulkFrame(): string {
+  return `<section class="blk"><h2>Sync, several at once<i>Argo CD’s file’s own Sync, which Lumovi applies to the rows you ticked</i></h2>
+    <div class="dlgs" style="gap:32px"><div class="col" style="width:600px"><p class="cap"><b>Asked once</b>, in Lumovi’s own dialog: the file’s options for its Sync, the nine it syncs, each to where it deploys, and what is left out.</p>${bulkDialog('ask')}</div><div class="col" style="width:600px"><p class="cap"><b>Then each one followed</b> to how it ended, failures first, until the dialog is closed. Eight started; one changed while you looked at it.</p>${bulkDialog('after')}</div></div></section>`
+}
+
+const LIST_RULES = [
+  '<b>The plugin’s own Applications page</b>, second of its tabs, standing in for Lumovi’s own list of Applications in Argo CD’s place (new: a plugin’s page may take a kind’s tab there; Lumovi’s own list stays where Lumovi lists every kind). It lists every column LMV-305 asks for, in a Table: the name, its project beside it and its repository and path under it; Health and Sync; Operation (one running, with its time, or how the last ended when it didn’t succeed: Failed, Error, Terminated; empty after a sync that succeeded); the revision it tracks and the one it’s at; the destination, cluster then namespace, said so everywhere; Auto-sync; and when it last synced. Worst first. A row opens the Application, on its Argo CD tab.',
+  '<b>Search and filters</b>: a field that matches name and namespace, then Health, Sync, Operation and Project, and More filters for Cluster, Namespace, Auto-sync and Labels. Each filter is a menu of the values there are, with how many have each; values in one filter are either, filters together are all. A filter set shows its values, with × to take it off, and Clear filters takes off all; the count says “2 of 38”. Matching nothing: “No applications match these filters.”, with Clear filters. The Overview’s counts open the page with their filter set.',
+  '<b>Picking rows</b>: a box at each row’s start, and one in the headings for every row shown (a dash when some are). Picking any brings up <b>Lumovi’s own selection bar</b>, as its lists have it: how many, Sync…, Refresh…, and × to let go. There is no Delete in bulk.',
+  '<b>Sync…, for several, is Lumovi’s.</b> It’s Argo CD’s file’s own Sync, which Lumovi applies to the rows the person ticked. The plugin’s code never picks rows or starts a change to several; it isn’t told of one. It asks once, in Lumovi’s own dialog, titled for what the person asked (“Sync 9 Applications?”): the file’s options, but no Revision, as each syncs to the revision it tracks; the Applications, each to where it deploys; those it leaves out (one syncing already) and why; and one command. The place it names is where the change happens: the Applications, in Argo CD’s namespace, on the connected cluster, with its Production mark, never where they deploy.',
+  '<b>Sent, then followed.</b> Lumovi sends them four at a time, as its own bulk changes go, each with the version it judged it on (the command can’t say so, and a line under it does). Then, in the same dialog, each one is followed by the file’s own busy state to how it ended, failures first, until the dialog is closed; “Started 8 of 9 syncs”, not “synced”, as nothing has ended yet. Closed sooner, they go on, and each row’s Operation says how it went. <b>Try again</b> reads each one afresh and judges it again: sent with its new version, or left out with why.',
+  '<b>Refresh…, for several</b>, asks Normal or Hard once, in the same dialog, and says what happened to each; a refresh is quick, so there’s nothing to follow after.',
+  '<b>On a phone</b> the page is read: the field, and Filters, which opens the filters as a sheet; the rows as cards, a fact a line, as values this long don’t fit a third of a card. Nothing is picked or changed there.',
+  '<b>New in the kit:</b> the search and filter bar for a Table; rows that can be ticked, with Lumovi’s own selection bar offering the file’s actions for them; and, on a file’s action, how its work ends (<code>ends</code>: a path on the action’s own object, its values as words and levels, and a path for the message beside them), so Lumovi can say “Failed: one or more objects failed to apply” and read nothing else. <b>The rest is the kit as built</b>, and Lumovi’s own selection bar and bulk dialog, as its lists have them.',
+]
+
+/** On a phone: the page read, filters as a sheet, rows as cards. */
+function listPhone(): string {
+  const cardRow = ([name, project, repo, health, sync, op, rev, dest]: AppRow) =>
+    `<li><div class="top">${lead({ level: health[0], name, beside: project, under: repo })}</div><dl class=\"one\">${fact('Health', pill(...health))}${fact('Sync', pill(...sync))}${op ? fact('Operation', op) : ''}${fact('Revision', `<span class="mono">${rev}</span>`)}${fact('Destination', dest)}</dl></li>`
+  const page = phoneFrame(
+    'Argo CD',
+    `<nav class="lts">${LIST_TABS}</nav><div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip('Argo CD', '1.3.0', true)}</div><div class="sec" style="display:flex;gap:8px;padding-bottom:0"><span class="kfield ph" style="flex:1;height:44px">${icon('search', 16)}<span>Name or namespace</span></span><span class="fb" style="height:44px">${icon('sliders-horizontal', 16)}Filters</span></div><div class="pcount">38 applications</div><div class="sec" style="padding-top:0"><ul class="cards">${APPS.slice(0, 3).map(cardRow).join('')}</ul></div>`,
+  )
+  return `<section class="blk"><h2>On a phone<i>read, not changed: filters as a sheet, rows as cards</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${page}</div></section>`
+}
+
+export type ArgoFrame =
+  | 'argo-sync'
+  | 'argo-sync-phone'
+  | 'argo-overview'
+  | 'argo-overview-phone'
+  | 'argo-list'
+  | 'argo-list-phone'
 
 export const ARGO_FRAMES: { id: ArgoFrame; title: string; size: Size }[] = [
   { id: 'argo-sync', title: 'Argo CD: while a sync runs', size: { width: 1440, height: 2400 } },
   { id: 'argo-sync-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
   { id: 'argo-overview', title: 'Argo CD: the Overview', size: { width: 1440, height: 2400 } },
   { id: 'argo-overview-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
+  { id: 'argo-list', title: 'Argo CD: the Applications page', size: { width: 1440, height: 2400 } },
+  { id: 'argo-list-phone', title: 'The same, on a phone', size: { width: 920, height: 1040 } },
 ]
 
 const sheet = (
@@ -679,6 +1055,9 @@ export function argoFrame(id: ArgoFrame, scheme: Scheme): string {
     'argo-overview': () =>
       `<header><h1>Argo CD’s pages, 2: the Overview (LMV-307)</h1><p>Péter: “the overview page must be super informative and useful”. What’s happening, and what needs a look, in the order a person asks: is anything wrong, is anything running, what happened lately, and where. Words are drafts for docs.</p></header>${overviewFrame()}<section class="blk"><h2>The rules</h2><ul class="rules">${OV_RULES.map((r) => `<li>${r}</li>`).join('')}</ul></section>`,
     'argo-overview-phone': overviewPhone,
+    'argo-list': () =>
+      `<header><h1>Argo CD’s pages, 3: the Applications page (LMV-307)</h1><p>Péter: “bulk actions are required for syncing”. Every Application, searched and filtered by anything LMV-305 lists; several picked, synced or refreshed together after one question; and each sync followed to how it ended. Words are drafts for docs.</p></header>${appsPageFrame()}${bulkFrame()}<section class="blk"><h2>The rules</h2><ul class="rules">${LIST_RULES.map((r) => `<li>${r}</li>`).join('')}</ul></section>`,
+    'argo-list-phone': listPhone,
   }[id]()
   return sheet(scheme, f.size.width, body)
 }
