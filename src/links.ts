@@ -56,6 +56,7 @@ const CSS = `${WINDOW_CSS}
 .cards { display: grid; grid-template-columns: repeat(3, 460px); gap: 28px 28px; align-items: start; }
 .cards .stack { gap: 8px; }
 .ring2 { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.primary .kbd,
 .menu .mi.hl .kbd { border-color: rgb(255 255 255 / 0.45); background: transparent; color: #fff; }
 .mark { display: inline-block; margin: 0 2px; padding: 0 4px; border: 1px solid var(--line-strong); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; line-height: 15px; color: var(--text-2); vertical-align: 1px; }
 `
@@ -131,7 +132,7 @@ function copyFrame(): string {
     on: 'Logs',
   })
   // The panel's More actions, open: Copy link first, then what changes it.
-  const more = `<div class="menu" style="position:absolute;z-index:4;left:922px;top:160px;width:272px"><div class="mi hl">${icon('link', 16)}Copy link<span class="k"><span class="kbd">⇧</span><span class="kbd">⌘</span><span class="kbd">C</span></span></div><hr><div class="mi">${icon('tag', 16)}Edit labels…</div><div class="mi">${icon('pencil', 16)}Edit YAML</div><hr><div class="mi" style="color:var(--critical-text)">${icon('trash-2', 16)}Delete…<span class="k"><span class="kbd">⌘</span><span class="kbd">⌫</span></span></div></div>`
+  const more = `<div class="menu" style="position:absolute;z-index:4;left:922px;top:160px;width:272px"><div class="mi hl">${icon('link', 16)}Copy link</div><hr><div class="mi">${icon('tag', 16)}Edit labels…</div><div class="mi">${icon('pencil', 16)}Edit YAML</div><hr><div class="mi" style="color:var(--critical-text)">${icon('trash-2', 16)}Delete…<span class="k"><span class="kbd">⌘</span><span class="kbd">⌫</span></span></div></div>`
   const menuWin = win({
     w: W,
     h: H,
@@ -162,15 +163,15 @@ function copyFrame(): string {
     extra: toast,
   })
   // The page's own: a button in the top bar, before Refresh. Its tooltip names the key.
-  const bar = `<div class="mn" style="width:1180px;margin:0;flex:none;position:relative;overflow:visible"><header class="hd"><span class="ib">${icon('arrow-left', 16)}</span><span class="ib dim" style="margin-left:-6px">${icon('arrow-right', 16)}</span><h1>${icon('box', 16)}Pods</h1><span class="ns">${icon('layout-grid', 14)}shop${icon('chevron-down', 14)}</span><span class="find">${icon('search', 14)}<span>Search…</span><span class="kbd">⌘</span><span class="kbd">K</span></span><span class="ib">${icon('plus', 16)}</span><span class="ib">${icon('history', 16)}</span><span class="ib lk-b">${icon('link', 16)}</span><span class="ib">${icon('rotate-cw', 16)}</span></header><div style="height:120px;overflow:hidden">${pods()}</div><span class="tip" style="right:20px;top:58px">Copy link to this view<span class="k">⇧⌘C</span></span>${pointer(1180 - 12 - 32 - 32 + 14, 30)}</div>`
-  return `<section class="blk"><h2>Copy link<i>in an object’s More actions, and the page’s own in the top bar; ⇧⌘C for what’s shown</i></h2>
-    <p class="cap">checkout open in the panel, on its Logs: More actions (⋯) opened, Copy link first, with its key</p>${menuWin}
+  const bar = `<div class="mn" style="width:1180px;margin:0;flex:none;position:relative;overflow:visible"><header class="hd"><span class="ib">${icon('arrow-left', 16)}</span><span class="ib dim" style="margin-left:-6px">${icon('arrow-right', 16)}</span><h1>${icon('box', 16)}Pods</h1><span class="ns">${icon('layout-grid', 14)}shop${icon('chevron-down', 14)}</span><span class="find">${icon('search', 14)}<span>Search…</span><span class="kbd">⌘</span><span class="kbd">K</span></span><span class="ib">${icon('plus', 16)}</span><span class="ib">${icon('history', 16)}</span><span class="ib lk-b">${icon('link', 16)}</span><span class="ib">${icon('rotate-cw', 16)}</span></header><div style="height:120px;overflow:hidden">${pods()}</div><span class="tip" style="right:20px;top:58px">Copy link to this view</span>${pointer(1180 - 12 - 32 - 32 + 14, 30)}</div>`
+  return `<section class="blk"><h2>Copy link<i>in an object’s More actions, and the page’s own in the top bar; no key</i></h2>
+    <p class="cap">checkout open in the panel, on its Logs: More actions (⋯) opened, Copy link first</p>${menuWin}
     <p class="cap">Pressed: the toast, as Lumovi’s toasts are, at the window’s bottom right; its second sentence says what a link doesn’t carry</p>${copied}
     <p class="cap">The page’s own: a link button before Refresh, on every cluster page, under the pointer; Pods filtered to shop, so the link is to that view</p>${bar}
     <ul class="rules">
-      <li><b>In an object’s More actions</b>, first, in a group of its own above what changes the object: <b>Copy link</b>, <b>⇧⌘C</b> (Ctrl+Shift+C on Windows and Linux), Lucide’s link. It copies this page with this object open, on the tab it’s showing, cut to what a link may carry. In the command palette too, while an object is open, and in a kept object’s ⋯ below, where it’s the object on its tab.</li>
-      <li><b>The page’s own</b> has no ⋯ in Lumovi’s top bar, so it’s a button there: <b>Copy link to this view</b>, before Refresh, on every cluster page (lists, Overview, Metrics, Alerts, a plugin’s pages). Its tooltip names the key. What it copies is the page as it stands, its filters, sort and namespace, and the panel’s object if one is open: so with a panel open, the button and the panel’s item copy the same link, and <b>⇧⌘C</b> is one key for both, “the link to what’s shown”. The key acts where the panel or the page has the keyboard, never in a terminal or a field, which keep their own keys.</li>
-      <li><b>The toast</b> is docs’: “Link copied. It names the cluster, not how to reach it.” It goes after Lumovi’s usual time. <b>On a server</b> the same item and button copy the page’s own https address, which already works there, and the toast is “Link copied.” alone. Where the organization’s policy turns links off (<code>"links": "off"</code>), neither is drawn and the key does nothing. Not on a phone’s bar: there it’s the panel’s ⋯ alone.</li>
+      <li><b>In an object’s More actions</b>, first, in a group of its own above what changes the object: <b>Copy link</b>, Lucide’s link, with no key: ⇧⌘C is All clusters, and Ctrl+Alt on Windows is AltGr on many keyboards. It copies this page with this object open, on the tab it’s showing, cut to what a link may carry. In the command palette too, while an object is open, and in a kept object’s ⋯ below, where it’s the object on its tab.</li>
+      <li><b>The page’s own</b> has no ⋯ in Lumovi’s top bar, so it’s a button there: <b>Copy link to this view</b>, before Refresh, on every cluster page (lists, Overview, Metrics, Alerts, a plugin’s pages). What it copies is the page as it stands, its filters, sort and namespace, and the panel’s object if one is open: so with a panel open, the button and the panel’s item copy the same link. In the command palette as “Copy link to this view” on every page.</li>
+      <li><b>The toast</b> is docs’: “Link copied. It names the cluster, not how to reach it.” It goes after Lumovi’s usual time. <b>On a server</b> the same item and button copy the page’s own https address, which already works there, and the toast is “Link copied.” alone. Where the organization’s policy turns links off (<code>"links": "off"</code>), neither is drawn, nor the palette’s. Not on a phone’s bar: there it’s the panel’s ⋯ alone.</li>
     </ul></section>`
 }
 
@@ -268,7 +269,7 @@ function askFrame(): string {
       ],
     })}
     ${card('Several contexts reach the cluster at its address, none by the link’s name', {
-      title: `Open ${their('checkout-7d9f6c5b8-hqnnn')} as which context?`,
+      title: `Open ${their('checkout-7d9f6c5b8-hqnnn')} in which context?`,
       what: 'Pod in shop, on its Logs tab',
       pick: [
         { name: 'prod-admin', detail: 'admin@corp · shop' },
@@ -292,7 +293,7 @@ function askFrame(): string {
     ${cards}
     <ul class="rules">
       <li><b>Where</b>: a card at the top of the front window, 460 px, over the page and centred on the window, with the shadow of Lumovi’s menus. The page behind isn’t dimmed and still works: a link is a question, not a stop. A window that already shows the cluster comes forward and asks there, “<b>Go to</b> … ?”, with Go and Cancel. <b>One at a time</b>: a newer link replaces the card in place (it doesn’t stack); after one’s answered or replaced, links that come within 2 s are dropped. A window comes forward once per card. An unanswered card stays until it’s answered, another link replaces it, or its window closes, and doing nothing does nothing.</li>
-      <li><b>The keyboard</b>: <b>Cancel is focused</b>, with its ring, and Enter does nothing for the first 500 ms. While a terminal or a text field has the keyboard (being typed in), the card shows without taking it, and its first line says <b>⌘L to answer</b> (Ctrl+Shift+L on Windows and Linux). That key, only while a card waits, goes to the card’s Cancel, from anywhere: terminals leave it to Lumovi as they leave the dock’s keys, and the YAML editor’s own ⌘L (select line) gives way while a card waits. Esc on the card is Cancel. A screen reader hears the card as an alert dialog that isn’t modal, its title first.</li>
+      <li><b>The keyboard</b>: <b>Cancel is focused</b>, with its ring, and Enter does nothing for the first 500 ms. While a terminal or a text field has the keyboard (being typed in), the card shows without taking it, and its first line says <b>⌘L to answer</b>; on Windows and Linux, where Ctrl+L is the shell’s (it clears the screen), <b>Ctrl+⇧L to answer</b>, as the dock’s keys add ⇧ there. The card draws the key for the platform it’s on. That key, only while a card waits, goes to the card’s Cancel, from anywhere: terminals leave it to Lumovi as they leave the dock’s keys, and the YAML editor’s own ⌘L (select line) gives way while a card waits. Esc on the card is Cancel. A screen reader hears the card as an alert dialog that isn’t modal, its title first.</li>
       <li><b>What it says</b>: “A link”, quiet, with the link’s icon; the title names the object and <b>the context here</b> that matched, as their text: bidi and zero-width characters shown, long names cut in the middle, never markup. Under it, what opens: kind, namespace, tab (or the page: “Alerts, filtered to warning”). <b>“the link calls it …”</b>, quiet, only when the link’s name differs. Then, each on its line with its icon: “Opening it signs in with aws.” (exec or auth provider, named as on the start screen); “Some of the link was left out: the Shell tab.” (named as the page calls them). <b>Unsaved work</b> (an edit, a form) puts New window first and filled, and says why. <b>Several contexts</b> at the cluster’s address and none by the link’s name: the person picks, user and namespace under each; Open and New window wait for a pick. Titles are 2 lines at most.</li>
     </ul></section>`
 }
@@ -305,7 +306,7 @@ function unknownFrame(): string {
   return `<section class="blk"><h2>When the cluster isn’t here, or the link can’t be read<i>said in the same card, in the front window</i></h2>
     <div class="cards">
     ${card('A cluster here has the link’s name, at another address', {
-      title: `Open ${their('checkout-7d9f6c5b8-hqnnn')} in your ${their('production')}?`,
+      title: `Open ${their('checkout-7d9f6c5b8-hqnnn')} in your cluster called ${their('production')}?`,
       what: 'Pod in shop, on its Logs tab',
       lines: [
         {
@@ -317,7 +318,7 @@ function unknownFrame(): string {
       buttons: [{ label: 'Cancel', focused: true }, { label: `Open production anyway` }],
     })}
     ${card('No cluster here has its address or its name', {
-      title: 'This link’s cluster isn’t here',
+      title: 'Lumovi doesn’t know this link’s cluster',
       lines: [
         {
           glyph: 'info',
@@ -336,8 +337,8 @@ function unknownFrame(): string {
     </div>
     <ul class="rules">
       <li><b>Same name, another address</b>: the warning line is docs’, in the warning’s text colour, and <b>Open production anyway</b> is not filled: a team can reach one cluster by two addresses, but it’s for the person to say. Cancel is focused. Two people whose kubeconfigs name the same server with another certificate authority land here too.</li>
-      <li><b>Not here</b>: docs’ sentence, with <b>Add a cluster</b>, filled (its key on the button, ⌘N, not in the sentence), and <b>Close</b>, focused. Add a cluster opens Lumovi’s own Add a cluster; the link isn’t kept for after, since nothing says the cluster added is the link’s. The title is design’s, for docs.</li>
-      <li><b>Can’t be opened</b>: docs’ sentence, the reason in plain words: “it names a port, and a link never does”, “it’s longer than 4 KB”, “it names a user”, “its page isn’t one of Lumovi’s”, “an object’s name in it isn’t one Kubernetes allows”. One button, Close. Nothing reaches a cluster.</li>
+      <li><b>Not here</b>: docs’ sentence, with <b>Add a cluster</b>, filled (its key on the button, ⌘N, not in the sentence), and <b>Close</b>, focused. Add a cluster opens Lumovi’s own Add a cluster; the link isn’t kept for after, since nothing says the cluster added is the link’s.</li>
+      <li><b>Can’t be opened</b>: docs’ sentence, the reason in plain words: “it names a port, and a link never does”, “it’s longer than 4 KB”, “it names a user or a password”, “it isn’t a link to a cluster”, “it isn’t written as a link is”, “its page isn’t one a link can open”, “its cluster isn’t named as Lumovi names one”, “an object’s name in it isn’t one Kubernetes allows” (docs’). One button, Close. Nothing reaches a cluster.</li>
     </ul></section>`
 }
 
@@ -356,7 +357,7 @@ export const LINKS_FRAMES: { id: LinksFrame; title: string; size: Size }[] = [
 ]
 
 const INTRO =
-  '<header><h1>Links that open a view in the desktop app (LMV-193)</h1><p>A link is the address of what a window shows: its cluster, page, filters, the object open and its tab, plus a mark that finds the same cluster under another name. It carries no credential and opens no shell. Copied from an object or a page; opened from anywhere, it always asks first, in the front window, and nothing connects or signs in before a press. Words are docs’ (15 Oct); the card’s first line, its titles and the pick’s are design’s, for docs.</p></header>'
+  '<header><h1>Links that open a view in the desktop app (LMV-193)</h1><p>A link is the address of what a window shows: its cluster, page, filters, the object open and its tab, plus a mark that finds the same cluster under another name. It carries no credential and opens no shell. Copied from an object or a page; opened from anywhere, it always asks first, in the front window, and nothing connects or signs in before a press. Words are docs’ (15 Oct).</p></header>'
 
 /** One of the frames, in one theme. */
 export function linksFrame(id: LinksFrame, scheme: Scheme): string {
