@@ -248,6 +248,8 @@ export default {
             url: WEBSITE,
             titleSize: 36,
             header: true,
+            // (Phones show its middle: the mark comes in beside the words, not at the edge.)
+            beside: true,
           }),
           1200,
           200,
