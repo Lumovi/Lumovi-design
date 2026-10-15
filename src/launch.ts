@@ -77,16 +77,18 @@ export const videos: Video[] = [
     lead: 'An AI assistant’s fix, approved by you.',
     // Why it asks, the change in red and green, and the Approve button under it.
     picture: { second: 16.6 },
-    crop: { x: 564, y: 146, width: 792, height: 717 },
-    square: { x: 1082, y: 78, width: 1500 },
+    // (1.22.0's film shows the whole dialog here: the crop takes it from WHY to Approve.)
+    crop: { x: 515, y: 138, width: 880, height: 797 },
+    square: { x: 1000, y: 56, width: 1500 },
   },
   {
     id: 'platform',
     title: ['Monday.'],
     lead: 'The same app, for your whole team.',
     picture: { second: 30 },
-    crop: { x: 100, y: 50, width: 860, height: 779 },
-    square: { x: 100, y: 80, width: 1500 },
+    // (1.22.0's film shows the whole Access page here: the crop takes the table from its heading.)
+    crop: { x: 60, y: 245, width: 773, height: 700 },
+    square: { x: 100, y: 500, width: 1500 },
   },
   {
     id: 'map',
@@ -156,9 +158,9 @@ export const posters: Poster[] = [
   // The two pods that crash-loop, in their box, with the Deployment they belong to.
   { name: '2am-v3', id: 'incident', second: 24, crop: { x: 1215, y: 215, width: 2460 } },
   // The whole request: why, the change, the command, and Approve.
-  { name: 'asked-first-v2', id: 'approval', second: 21, crop: { x: 172, y: 20, width: 3318 } },
+  { name: 'asked-first-v3', id: 'approval', second: 21, crop: { x: 172, y: 20, width: 3318 } },
   // What each profile may do, with changes lit.
-  { name: 'monday-v2', id: 'platform', second: 30, crop: { x: 100, y: 80, width: 3640 } },
+  { name: 'monday-v3', id: 'platform', second: 30, crop: { x: 100, y: 80, width: 3640 } },
   // The app itself, under the video's own line.
   { name: 'hero-v1', id: 'hero', second: 9 },
 ]
