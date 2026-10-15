@@ -548,20 +548,20 @@ const region = (x0: number, x1: number, y0: number, y1: number, aspect = 9 / 16)
   return { scale, ratio, at: `${pct(x0, w).toFixed(2)}% ${pct(y0, h).toFixed(2)}%` }
 }
 
-/** The regions of the films' stills the pages use: each a clean, readable moment, nothing named that isn't Lumovi's. */
+/** The regions of the films' stills the pages use: each a clean, readable moment, nothing named that isn't Lumovi's. (Set on the 1.22.0 posters, -v3.) */
 const CROPS = {
   /** The overview window, from its tiles down: no address line. */
   heroWindow: region(0.33, 0.955, 0.4, 0.975),
   /** Access rules, the first columns with their row names whole. */
-  accessLeft: region(0.025, 0.475, 0.0, 0.78),
+  accessLeft: region(0.0, 0.45, 0.0, 0.78),
   /** Access rules, the later columns. */
   accessRight: region(0.475, 0.975, 0.0, 0.78),
   /** The approval: its reason and the change, no title row, no manifest row. */
-  approval: region(0.282, 0.771, 0.15, 0.63),
+  approval: region(0.25, 0.81, 0.135, 0.665),
   /** The approval's foot: its kubectl command, the time it waits, Reject and Approve. */
-  approvalFoot: region(0.282, 0.771, 0.71, 0.925),
+  approvalFoot: region(0.25, 0.81, 0.765, 0.99),
   /** On a phone, close enough to read: the cluster's verdict and the two changed lines. */
-  approvalPhone: region(0.29, 0.62, 0.3, 0.5),
+  approvalPhone: region(0.255, 0.585, 0.36, 0.56),
   /** The app's screenshots (16:10). Needs attention and recent warnings, no sidebar. */
   attention: region(0.185, 0.972, 0.09, 0.635, 10 / 16),
   /** Karpenter's page: its tiles, pools and nodes, no sidebar. */
@@ -629,13 +629,13 @@ const CROPS = {
   /** Assistant permissions: one namespace checked, setting by setting. */
   permissionsPhone: region(0.695, 0.905, 0.06, 0.6, 10 / 16),
   /** The Monday film: what everyone may do, row by row. */
-  mondayPhone: region(0.025, 0.36, 0.0, 0.5),
+  mondayPhone: region(0.0, 0.335, 0.0, 0.5),
   /** The same, for a card: the rows and what everyone may do. */
-  accessLeftPhone: region(0.025, 0.32, 0.0, 0.5),
+  accessLeftPhone: region(0.0, 0.295, 0.0, 0.5),
   /** The approval on a phone, as the page's picture: why, and the change. */
-  approvalNear: region(0.282, 0.58, 0.15, 0.62),
+  approvalNear: region(0.25, 0.55, 0.135, 0.62),
   /** The approval's foot on a phone: its kubectl command and the time it waits. */
-  approvalFootNear: region(0.282, 0.58, 0.71, 0.925),
+  approvalFootNear: region(0.25, 0.55, 0.765, 0.99),
   /** Sign-in on a phone: the button and its line. */
   signInPhone: region(0.375, 0.625, 0.315, 0.6, 10 / 16),
   /** The scale dialog on a phone: its title, the number, and the kubectl command's start. */
@@ -677,7 +677,7 @@ function homePage(scheme: Scheme, phone = false): string {
     `${icon('users', 14)}For teams`,
     'Give it to your whole team.',
     'Install one Helm chart in your cluster. Everyone signs in as themselves, and what’s done is on the record.',
-    `<div class="cards2"><div class="c2"><b>Everyone, as themselves</b><p>Single sign-on, and each person sees and changes only what their own Kubernetes access allows.</p>${still(P('monday-v2'), phone ? CROPS.accessLeftPhone : CROPS.accessLeft)}</div><div class="c2"><b>Who may do what, and who did</b><p>Decide more on top of RBAC, team by team, and keep a record of what’s done. <span class="inl">How it’s kept secure${icon('arrow-right', 12)}</span></p>${phone ? '' : still(P('monday-v2'), CROPS.accessRight)}</div></div><div class="vid">${icon('play', 16)}Watch “Monday”, 1 min</div>`,
+    `<div class="cards2"><div class="c2"><b>Everyone, as themselves</b><p>Single sign-on, and each person sees and changes only what their own Kubernetes access allows.</p>${still(P('monday-v3'), phone ? CROPS.accessLeftPhone : CROPS.accessLeft)}</div><div class="c2"><b>Who may do what, and who did</b><p>Decide more on top of RBAC, team by team, and keep a record of what’s done. <span class="inl">How it’s kept secure${icon('arrow-right', 12)}</span></p>${phone ? '' : still(P('monday-v3'), CROPS.accessRight)}</div></div><div class="vid">${icon('play', 16)}Watch “Monday”, 1 min</div>`,
     'For teams',
   )
   const tools = ['Karpenter', 'Argo CD', 'Flux', 'CloudNativePG', 'cert-manager', 'Istio']
@@ -687,7 +687,7 @@ function homePage(scheme: Scheme, phone = false): string {
     'Your assistant, with you in charge.',
     'Any AI agent or assistant that speaks MCP works through Lumovi, as you. Where your permissions say so, its changes wait for you with the diff, the reason and the kubectl command.',
     `<div class="fit" style="max-width:${phone ? 358 : 880}px">${looped(
-      still(P('asked-first-v2'), {
+      still(P('asked-first-v3'), {
         ...(phone ? CROPS.approvalPhone : CROPS.approval),
         cls: 'shadowed',
       }),
@@ -869,9 +869,9 @@ const TEAMS: Part = {
   lead: 'Install one Helm chart in your cluster. Everyone signs in as themselves, sees only what their own Kubernetes access allows, and what’s done is on the record.',
   actions: ['Install in your cluster', 'Try it on your computer'],
   hero: {
-    poster: 'monday-v2',
+    poster: 'monday-v3',
     ...CROPS.monday,
-    phone: { poster: 'monday-v2', ...CROPS.mondayPhone },
+    phone: { poster: 'monday-v3', ...CROPS.mondayPhone },
   },
   film: 'Monday, 1 min',
   foot: 'cluster',
@@ -989,9 +989,9 @@ const AI: Part = {
   lead: 'Any AI agent or assistant that speaks MCP works through Lumovi, as you. Where your permissions say so, its changes wait for you with the diff, the reason and the kubectl command.',
   actions: ['Download for macOS', 'Install in your cluster'],
   hero: {
-    poster: 'asked-first-v2',
+    poster: 'asked-first-v3',
     ...CROPS.approval,
-    phone: { poster: 'asked-first-v2', ...CROPS.approvalNear },
+    phone: { poster: 'asked-first-v3', ...CROPS.approvalNear },
   },
   film: 'It asked first, 1 min',
   things: [
@@ -1012,9 +1012,9 @@ const AI: Part = {
       pic: {
         loop: 'approval',
         steps: APPROVAL_STEPS,
-        poster: 'asked-first-v2',
+        poster: 'asked-first-v3',
         ...CROPS.approvalFoot,
-        phone: { poster: 'asked-first-v2', ...CROPS.approvalFootNear },
+        phone: { poster: 'asked-first-v3', ...CROPS.approvalFootNear },
       },
     },
     {
