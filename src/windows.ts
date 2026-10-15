@@ -29,7 +29,7 @@ svg.i { flex: none; display: block; }
 .stack { display: flex; flex-direction: column; gap: 10px; }
 `
 
-const CSS = `${SHEET}
+export const CSS = `${SHEET}
 .new { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--accent-soft); font-size: 10.5px; line-height: 16px; font-style: normal; font-weight: 500; color: var(--accent-strong); vertical-align: 1px; }
 
 /* The window, as the desktop app draws it. */
@@ -218,7 +218,7 @@ const LEVELS: Record<Level, [string, IconName]> = {
   critical: ['critical', 'circle-x'],
   neutral: ['neutral', 'circle'],
 }
-const pill = (level: Level, label: string) =>
+export const pill = (level: Level, label: string) =>
   `<span class="spill" style="--m:var(--${LEVELS[level][0]});color:var(--${LEVELS[level][0]}-text)">${icon(LEVELS[level][1], 14, 2.25)}${escape(label)}</span>`
 
 /** The sidebar as the app has it, cut where the window ends. */
@@ -262,7 +262,7 @@ interface Win {
   extra?: string
 }
 
-function win(o: Win): string {
+export function win(o: Win): string {
   const nav = NAV.map((n) =>
     typeof n === 'string'
       ? `<h3>${n}</h3>`
@@ -289,7 +289,7 @@ const DEPLOYMENTS: [string, string, Level, string, string, string][] = [
   ['storefront', 'shop', 'healthy', 'Ready', '3/3', '88d'],
 ]
 
-function deployments(o: { sel?: string; narrow?: boolean } = {}): string {
+export function deployments(o: { sel?: string; narrow?: boolean } = {}): string {
   const cols = o.narrow
     ? '28px minmax(0,1.4fr) 150px 70px'
     : '28px minmax(0,1.3fr) 160px 80px minmax(0,1.6fr) 70px'
@@ -313,7 +313,7 @@ const PODS: [string, string, Level, string, string, string][] = [
   ['storefront-6b8d9c7f5-7697d', 'shop', 'healthy', 'Running', '1/1', '0'],
 ]
 
-function pods(): string {
+export function pods(): string {
   const cols = '28px minmax(0,1.8fr) 190px 70px 90px 70px'
   return `<div class="tbar"><span class="count">23 items</span><span class="chip" style="--d:var(--critical)"><i></i>Failing <b>3</b></span><span class="chip" style="--d:var(--good)"><i></i>Healthy <b>20</b></span><span class="grow"></span><span class="fld" style="width:240px">${icon('search', 14)}Filter pods</span></div>
     <div class="th" style="grid-template-columns:${cols}"><span></span><span>Name</span><span>Status</span><span>Ready</span><span class="r">Restarts</span><span class="r">Age</span></div>
@@ -519,7 +519,7 @@ const POD_LINES: [string, 'INFO' | 'ERROR', string][] = [
 ]
 
 /** The Logs view: its toolbar, its chips, its lines. */
-function logs(o: { n?: number; pod?: boolean; container?: string } = {}): string {
+export function logs(o: { n?: number; pod?: boolean; container?: string } = {}): string {
   const tools = `<span class="ib s on">${icon('play', 15)}</span><span class="ib s">${icon('history', 15)}</span><span class="ib s on">${icon('clock', 15)}</span><span class="ib s">${icon('wrap-text', 15)}</span><span class="ib s">${icon('copy', 15)}</span><span class="ib s">${icon('download', 15)}</span>`
   const lines = o.pod
     ? POD_LINES.slice(0, o.n ?? POD_LINES.length)
@@ -544,11 +544,11 @@ function logs(o: { n?: number; pod?: boolean; container?: string } = {}): string
   return `<div class="lv"><div class="ltb"><span class="sel2" style="width:${o.pod ? 110 : 130}px">${o.container ?? 'app'}${icon('chevron-down', 14)}</span><span class="sel2" style="width:150px">Last 500 lines${icon('chevron-down', 14)}</span><span class="srch">${icon('search', 13)}Search</span><span class="grow"></span>${tools}</div><div class="lchips">${chips}</div><div class="lines">${lines}</div></div>`
 }
 
-const DEPLOY_TABS = ['Overview', 'Pods', 'Logs', 'Metrics', 'Map', 'Events', 'Audit', 'YAML']
+export const DEPLOY_TABS = ['Overview', 'Pods', 'Logs', 'Metrics', 'Map', 'Events', 'Audit', 'YAML']
 const POD_TABS = ['Overview', 'Logs', 'Shell', 'Metrics', 'Map', 'Events', 'Audit', 'YAML']
 
 /** The detail panel's header and tabs, with the new button before Expand panel. */
-function panelHead(o: {
+export function panelHead(o: {
   kind: string
   glyph: IconName
   ns: string
@@ -589,7 +589,7 @@ const tab = (t: Tab) =>
   `<span class="dt${t.on ? ' on' : ''}${t.hover ? ' hov' : ''}${t.gone ? ' gone' : ''}${t.ring ? ' ring' : ''}">${icon(t.glyph, 14)}<b>${escape(t.name)}</b>${t.quiet ? `<span class="q">${escape(t.quiet)}</span>` : ''}${t.state ? `<span class="st">${t.state}</span>` : ''}<span class="x">${icon('x', 12)}</span></span>`
 
 /** The dock's bar, and what it holds when open. */
-function dock(
+export function dock(
   tabs: Tab[],
   open?: { html: string; height: number; term?: boolean },
   extra = '',
@@ -626,13 +626,13 @@ const STOREFRONT_KEPT = (body: string, on = 'Logs') =>
     body,
   })
 
-const TERMINAL = `<div class="tl q">› kubectl points at production in this terminal. It’s v1.34.12, to match the cluster.</div><div class="tl"><span class="p">~ ›</span> kubectl get deployments -n shop</div><div class="tl">NAME              READY   UP-TO-DATE   AVAILABLE   AGE</div><div class="tl">cart              2/2     2            2           88d</div><div class="tl">checkout          1/3     3            1           88d</div><div class="tl">recommendations   0/1     1            0           30d</div><div class="tl">storefront        3/3     3            3           88d</div><div class="tl"><span class="p">~ ›</span> <span class="c"></span></div>`
+export const TERMINAL = `<div class="tl q">› kubectl points at production in this terminal. It’s v1.34.12, to match the cluster.</div><div class="tl"><span class="p">~ ›</span> kubectl get deployments -n shop</div><div class="tl">NAME              READY   UP-TO-DATE   AVAILABLE   AGE</div><div class="tl">cart              2/2     2            2           88d</div><div class="tl">checkout          1/3     3            1           88d</div><div class="tl">recommendations   0/1     1            0           30d</div><div class="tl">storefront        3/3     3            3           88d</div><div class="tl"><span class="p">~ ›</span> <span class="c"></span></div>`
 
-const T_PROD: Tab = { glyph: 'square-terminal', name: 'production' }
-const T_STORE: Tab = { glyph: 'layers', name: 'storefront', quiet: 'Logs' }
+export const T_PROD: Tab = { glyph: 'square-terminal', name: 'production' }
+export const T_STORE: Tab = { glyph: 'layers', name: 'storefront', quiet: 'Logs' }
 const T_CART: Tab = { glyph: 'box', name: 'cart-7d9f6c5b8-x2kqp' }
 
-const pointer = (x: number, y: number) =>
+export const pointer = (x: number, y: number) =>
   `<svg class="ptr" style="left:${x}px;top:${y}px" viewBox="0 0 18 22"><path d="M1.5 1.5 L1.5 17 L5.6 13.3 L8.4 19.8 L11 18.7 L8.3 12.4 L13.8 12.2 Z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg>`
 
 // ─── Frame 1: keeping an object open below ─────────────────────────────────────────────────
