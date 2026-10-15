@@ -162,7 +162,7 @@ export const posters: Poster[] = [
   // What each profile may do, with changes lit.
   { name: 'monday-v3', id: 'platform', second: 30, crop: { x: 100, y: 80, width: 3640 } },
   // The app itself, under the video's own line.
-  { name: 'hero-v1', id: 'hero', second: 9 },
+  { name: 'hero-v2', id: 'hero', second: 9 },
 ]
 
 export const sources = {

@@ -651,7 +651,7 @@ function homePage(scheme: Scheme, phone = false): string {
   const P = (n: string) => posterUrl(n, scheme)
   const more = (to: string) => `<span class="doc">${to}${icon('arrow-right', 14)}</span>`
   const hero = `<div class="hero2"><div class="aurora"></div><div class="wrap center"><span class="rel">New<b>Lumovi 1.22 is out</b>${icon('arrow-right', 13)}</span><h1 class="h1 xl">Your clusters,<br>at a glance.</h1><p class="lead c">Lumovi is a calm, fast Kubernetes dashboard, on your desktop or in your cluster. Run it in your cluster for your whole team: everyone signs in as themselves, sees only what their own Kubernetes access allows, and what’s done is on the record.</p><div class="acts c">${phone ? `<span class="dl big">${icon('share', 18)}Get it on your computer</span><span class="btn2">Install in your cluster</span>` : `<span class="dl big">${icon('download', 18)}Download for macOS</span><span class="btn2">Install in your cluster</span>`}</div><p class="facts2"><span>Free and open source</span><i></i><span>No telemetry, no accounts</span><i></i><span>macOS, Windows, Linux, or your cluster</span><i></i><a>${icon('shield-check', 14)}How it’s kept secure</a></p></div>
-    <div class="stage">${phone ? still(shotUrl('workloads', scheme), { ...CROPS.workloadsPhone, cls: 'shadowed' }) : still(P('hero-v1'), { ...CROPS.heroWindow, cls: 'tilt' })}<span class="playc">${icon('play', 22)}<b>Lumovi in a minute</b></span></div></div>`
+    <div class="stage">${phone ? still(shotUrl('workloads', scheme), { ...CROPS.workloadsPhone, cls: 'shadowed' }) : still(P('hero-v2'), { ...CROPS.heroWindow, cls: 'tilt' })}<span class="playc">${icon('play', 22)}<b>Lumovi in a minute</b></span></div></div>`
   const block = (
     eyebrow: string,
     title: string,
