@@ -1,6 +1,7 @@
 // social/: link previews (Open Graph), GitHub's social previews and profile banner, the
-// avatar, a header for X, Bluesky and Mastodon, and the launch's art: a LinkedIn banner,
-// YouTube's channel art and video thumbnails, and Product Hunt's thumbnail and gallery.
+// avatar, a header for X, Bluesky and Mastodon, and the launch's art: LinkedIn's banner and
+// background, Reddit's banner, YouTube's channel art and video thumbnails, and Product Hunt's
+// thumbnail and gallery.
 import { address, description, site, tagline } from '../../src/brand.ts'
 import { filled } from '../../src/icon.ts'
 import {
@@ -234,21 +235,62 @@ export default {
     // The launch: in light and dark, so either can be picked for each account.
     for (const theme of ['dark', 'light'] as const) {
       // LinkedIn's company banner. The page's logo sits over its bottom left, so the copy is
-      // set in from the left, as on the header for X.
+      // set in from the left, as on the header for X. 4200 × 700: LinkedIn's larger cover, which
+      // its older 1128 × 191 takes too (the same 6:1, near enough).
       await ctx.png(
         `social/linkedin/banner-${theme}.png`,
         await render(
           card({
-            width: 1128,
-            height: 191,
+            width: 1200,
+            height: 200,
             theme,
             title: tagline,
             url: WEBSITE,
-            titleSize: 34,
+            titleSize: 36,
             header: true,
           }),
-          1128,
-          191,
+          1200,
+          200,
+          3.5,
+        ),
+      )
+      // A person's LinkedIn background (1584 × 396): the profile photo covers its bottom left,
+      // and phones crop its sides, so the copy is set in and the mark comes in beside it.
+      await ctx.png(
+        `social/linkedin/background-${theme}.png`,
+        await render(
+          card({
+            width: 1584,
+            height: 396,
+            theme,
+            title: tagline,
+            url: WEBSITE,
+            titleSize: 54,
+            header: true,
+            beside: true,
+          }),
+          1584,
+          396,
+          2,
+        ),
+      )
+      // Reddit's profile banner (1920 × 384, 5:1): the avatar sits over its bottom left, and
+      // Reddit asks for a small file, so it's at its own size.
+      await ctx.png(
+        `social/reddit/banner-${theme}.png`,
+        await render(
+          card({
+            width: 1920,
+            height: 384,
+            theme,
+            title: tagline,
+            url: WEBSITE,
+            titleSize: 54,
+            header: true,
+            beside: true,
+          }),
+          1920,
+          384,
         ),
       )
       await ctx.png(
