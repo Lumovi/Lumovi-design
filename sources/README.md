@@ -20,7 +20,8 @@ To take them again, for new screenshots or other frames:
    video's frame from its dark and its light version (`npm run stills`), at the second
    `src/launch.ts` has, written to one decimal place: `incident-24.0.png` and
    `incident-light-24.0.png`. `npm run sources` lists the ones it can't find.
-2. There too, capture the app's screens for the gallery (`npm run capture`): `overview-dark.png`
-   and so on, in `public/captures/`.
+2. There too, capture the app's screens for the gallery and for the tour's thumbnail and poster
+   (`npm run capture`): `overview-dark.png`, `tour-palette-plugins-dark.png` and so on, in
+   `public/captures/`.
 3. Here, `npm run sources`, then `npm run build -- social`.
 4. Look at the thumbnails again: a different frame may need a different crop.

@@ -109,10 +109,15 @@ export default {
     const page = (html: string, width: number, height: number, scale = 1) =>
       renderHtml(html, { width, height, scale, transparent: false })
 
-    // The website's video posters: each video's frame, cut to what tells it, at the player's size.
+    // The website's video posters: each video's frame, or the screen captured for it, cut to what
+    // tells it, at the player's size.
     for (const p of posters) {
       for (const theme of ['dark', 'light'] as const) {
-        const still = sharp(join(root, 'sources', 'site', `${p.id}-${theme}.webp`))
+        const still = sharp(
+          'capture' in p
+            ? join(root, 'sources', 'captures', `${p.capture}-${theme}.webp`)
+            : join(root, 'sources', 'site', `${p.id}-${theme}.webp`),
+        )
         const part = p.crop
           ? still.extract({
               left: p.crop.x,

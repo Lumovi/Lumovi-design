@@ -30,17 +30,22 @@ export interface Video {
   title: string[]
   /** A line under the title, or none. */
   lead?: string
-  /** What the thumbnail shows: a frame of the video, or one of the app's screenshots. */
+  /**
+   * What the thumbnail shows: a frame of the video, one of the app's screenshots, or a screen
+   * Lumovi-marketing captured for it.
+   */
   picture:
     | {
         /** The second its frame in sources/posters/ is taken at (npm run stills). */ second: number
       }
     | { /** A screenshot in sources/screenshots/, in the thumbnail's theme. */ screen: string }
+    | { /** A capture in sources/captures/, in the thumbnail's theme. */ capture: string }
   /** The part of the picture the thumbnail shows: the moment, without a caption. */
   crop: Crop
   /**
    * The part its square still shows, in the pixels of its frame without a caption
-   * (sources/site/, 3840 wide), or of its screenshot: as tall as the still's window makes it.
+   * (sources/site/, 3840 wide), or of its screenshot or capture: as tall as the still's window
+   * makes it.
    */
   square: { x: number; y: number; width: number }
 }
@@ -101,12 +106,16 @@ export const videos: Video[] = [
   },
   {
     id: 'tour',
+    // Its second version: the tour made again from 1.22.1.
+    name: 'tour-v2',
     title: ['A tour of', 'the whole app.'],
-    lead: 'Nine minutes, one feature at a time.',
-    // Command K, open over the overview: the list of everywhere it goes.
-    picture: { second: 100 },
-    crop: { x: 668, y: 259, width: 584, height: 529 },
-    square: { x: 1056, y: 172, width: 1500 },
+    lead: 'Ten minutes, one feature at a time.',
+    // Command K, open over the overview with "argo" typed: plugins' pages and kinds among
+    // Lumovi's own.
+    picture: { capture: 'tour-palette-plugins' },
+    // (From the palette's corner to its last row: the window's edge cuts it above its keys.)
+    crop: { x: 760, y: 213, width: 900, height: 815 },
+    square: { x: 690, y: 213, width: 1500 },
   },
 ]
 
@@ -140,17 +149,21 @@ export const gallery: Shot[] = [
  * A video's poster on the website: what its player shows before it plays. A bare frame of the
  * video, at the telling moment, rendered without its caption, and cut so the app fills the
  * frame: no backdrop at a side, and a calm band along the bottom, where the browser draws its
- * controls.
+ * controls. Or, where its thumbnail shows a screen captured for it, that screen.
  */
-export interface Poster {
+export type Poster = {
   /** Its file's name: the video's on the website, with its version. */
   name: string
-  /** The video's id in Lumovi-marketing, and the second its frame is taken at. */
-  id: string
-  second: number
-  /** The part of the frame it shows, in the still's pixels; 16:9 from its width. All, if none. */
+  /** The part of its picture it shows, in the picture's pixels; 16:9 from its width. All, if none. */
   crop?: { x: number; y: number; width: number }
-}
+} & (
+  | {
+      /** The video's id in Lumovi-marketing, and the second its frame is taken at. */
+      id: string
+      second: number
+    }
+  | { /** A capture in sources/captures/, 2880 × 1800. */ capture: string }
+)
 
 export const POSTER = { width: 1920, height: 1080 }
 
@@ -163,17 +176,17 @@ export const posters: Poster[] = [
   { name: 'monday-v3', id: 'platform', second: 30, crop: { x: 100, y: 80, width: 3640 } },
   // The app itself, under the video's own line.
   { name: 'hero-v2', id: 'hero', second: 9 },
+  // Command K over the overview, as the tour's thumbnail has it: the window from its bar.
+  { name: 'tour-v2', capture: 'tour-palette-plugins', crop: { x: 0, y: 0, width: 2880 } },
 ]
 
 export const sources = {
   // The website's posters: Lumovi-marketing renders them without captions, as poster-<id>-….
-  // The squares' frames are the same ones, and the map's and the tour's with them.
+  // The squares' frames are the same ones, and the map's with them.
   site: [
-    ...posters,
+    ...posters.flatMap((p) => ('second' in p ? [p] : [])),
     // The map's at four times the video's size: its square shows a small part of it.
     { id: 'map', second: 19, scale: '@4x' },
-    // The palette once it has opened, two seconds after the thumbnail's frame.
-    { id: 'tour', second: 102 },
   ].flatMap((p: { id: string; second: number; scale?: string }) =>
     (['dark', 'light'] as const).map((theme) => ({
       still: `poster-${p.id}-${theme}-${p.second.toFixed(1)}${p.scale ?? ''}.png`,
@@ -194,11 +207,18 @@ export const sources = {
     .flatMap((screen) =>
       (['dark', 'light'] as const).map((theme) => `screenshots/${screen}-${theme}.webp`),
     ),
-  // The gallery's screens in both themes: Lumovi-marketing names them <screen>-<theme>.png.
-  captures: gallery.flatMap((s) =>
+  // The gallery's screens in both themes, and those a thumbnail or a poster shows:
+  // Lumovi-marketing names them <screen>-<theme>.png.
+  captures: [
+    ...new Set([
+      ...gallery.map((s) => s.capture ?? s.screen),
+      ...videos.flatMap((v) => ('capture' in v.picture ? [v.picture.capture] : [])),
+      ...posters.flatMap((p) => ('capture' in p ? [p.capture] : [])),
+    ]),
+  ].flatMap((name) =>
     (['dark', 'light'] as const).map((theme) => ({
-      capture: `${s.capture ?? s.screen}-${theme}.png`,
-      file: `captures/${s.capture ?? s.screen}-${theme}.webp`,
+      capture: `${name}-${theme}.png`,
+      file: `captures/${name}-${theme}.webp`,
     })),
   ),
 }
@@ -281,7 +301,9 @@ export function thumbnail(v: Video, theme: Theme): string {
   const [picture, size] =
     'screen' in v.picture
       ? [source(`screenshots/${v.picture.screen}-${theme}.webp`), SCREENSHOT]
-      : [source(`posters/${v.id}-${theme}.webp`), FRAME]
+      : 'capture' in v.picture
+        ? [source(`captures/${v.picture.capture}-${theme}.webp`), SCREENSHOT]
+        : [source(`posters/${v.id}-${theme}.webp`), FRAME]
   return page(
     W,
     H,
@@ -315,7 +337,9 @@ export function square(v: Video, theme: Theme): string {
   const [picture, size] =
     'screen' in v.picture
       ? [source(`screenshots/${v.picture.screen}-${theme}.webp`), SCREENSHOT]
-      : [source(`site/${v.id}-${theme}.webp`), STILL]
+      : 'capture' in v.picture
+        ? [source(`captures/${v.picture.capture}-${theme}.webp`), SCREENSHOT]
+        : [source(`site/${v.id}-${theme}.webp`), STILL]
   const crop = { ...v.square, height: (v.square.width * box.height) / box.width }
   return page(
     S,
