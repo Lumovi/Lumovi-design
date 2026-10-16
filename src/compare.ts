@@ -39,10 +39,12 @@ ${only(HELM, /^(\.ad|\.prodm)/)}
 .pk .o.on .rd { border: 4px solid var(--accent); }
 .pk .o .dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--good); }
 .pk .o .dot.off { background: var(--line-strong); }
+.pk .o .dot.bad { background: var(--critical); }
 .pk .o .cword { min-width: 0; flex: 1; }
 .pk .o .cword b { font-weight: 500; }
 .pk .o .cword small { display: block; font-size: 12px; line-height: 16px; color: var(--text-3); }
 .pk .o .tag { flex: none; font-size: 12px; color: var(--text-3); }
+.pk .o .cword small.bad { color: var(--critical-text); }
 .pk .o .btn { flex: none; height: 26px; padding: 0 8px; font-size: 12px; }
 .pk .o .mono { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
 .pk .empty { display: flex; gap: 10px; padding: 14px 12px; font-size: 13px; line-height: 1.55; color: var(--text-2); }
@@ -278,7 +280,7 @@ const mi = (
 
 const MORE = `<div class="pm"><div class="lbl">Actions</div>${mi('link', 'Copy link')}${mi('git-compare', 'Compare with…', { hl: true })}<hr>${mi('tag', 'Edit labels…')}${mi('pencil', 'Edit YAML')}<hr>${mi('trash-2', 'Delete…', { k: '⌘ ⌫', danger: true })}</div>`
 
-type Objects = 'list' | 'not-served' | 'none' | 'forbidden' | 'unopened'
+type Objects = 'list' | 'not-served' | 'none' | 'forbidden' | 'unopened' | 'unreachable'
 
 function picker(o: { cluster: string; objects: Objects; kind?: string; opened?: boolean }): string {
   const clusters: [string, string, boolean, boolean][] = [
@@ -288,7 +290,7 @@ function picker(o: { cluster: string; objects: Objects; kind?: string; opened?: 
     ['dev-anna', '', false, !!o.opened],
   ]
   const crow = ([name, tag, prod, open]: (typeof clusters)[number]) =>
-    `<div class="o${name === o.cluster ? ' on' : ''}"><span class="rd"></span><span class="dot${open ? '' : ' off'}"></span><span class="cword"><b>${name}</b> ${prod ? prodm : ''}${open ? '' : '<small>Signs in when opened</small>'}</span>${open ? `<span class="tag">${tag}</span>` : `<span class="btn">Open ${name}</span>`}</div>`
+    `<div class="o${name === o.cluster ? ' on' : ''}"><span class="rd"></span><span class="dot${open ? (name === o.cluster && o.objects === 'unreachable' ? ' bad' : '') : ' off'}"></span><span class="cword"><b>${name}</b> ${prod ? prodm : ''}${open ? (name === o.cluster && o.objects === 'unreachable' ? '<small class="bad">Didn’t answer in time. Pick it again to try once more.</small>' : '') : '<small>Signs in when opened</small>'}</span>${open ? `<span class="tag">${tag}</span>` : `<span class="btn">Open ${name}</span>`}</div>`
   const cert = o.kind === 'Certificates'
   const kind = o.kind ?? 'Deployments'
   const objs = {
@@ -306,11 +308,12 @@ function picker(o: { cluster: string; objects: Objects; kind?: string; opened?: 
     'not-served': `<div class="pk"><div class="empty">${icon('info', 16)}<span>dev-anna doesn’t serve Certificates (cert-manager.io/v1), so there’s nothing to compare with there.</span></div></div>`,
     none: `<div class="pk"><div class="empty">${icon('info', 16)}<span>No Deployments in shop on staging. Pick another namespace, or another cluster.</span></div></div>`,
     forbidden: `<div class="pk"><div class="empty">${icon('lock', 16)}<span>Your access on prod-us doesn’t list Deployments in shop.</span></div></div>`,
+    unreachable: `<div class="pk"><div class="empty">${icon('circle-x', 16)}<span>staging didn’t answer in time, so there’s nothing to pick there yet. Pick another cluster, or staging again.</span></div></div>`,
     unopened: `<div class="pk"><div class="empty">${icon('info', 16)}<span>dev-anna isn’t open. Open it, with the button on its row, to see its namespaces and Deployments.</span></div></div>`,
   }[o.objects]
   const ready = o.objects === 'list'
   const ns =
-    o.objects === 'unopened'
+    o.objects === 'unopened' || o.objects === 'unreachable'
       ? `<span class="sel" style="color:var(--text-3)">—${icon('chevron-down', 14)}</span>`
       : `<span class="sel">shop${icon('chevron-down', 14)}</span>`
   return `<div class="ad"><header><span class="g">${icon('git-compare', 18)}</span><div class="t"><h3>Compare ${cert ? 'shop-tls' : 'checkout'} with…</h3><p class="sub2">${cert ? 'Certificate' : 'Deployment'} · shop · <b>production-eu</b>${prodm}</p></div></header><div class="body">
@@ -327,13 +330,15 @@ function pickerFrame(): string {
     <div class="col"><p class="cap"><b>Nothing of it there</b>: Compare waits for an object.</p>${picker({ cluster: 'staging', objects: 'none' })}</div></div>
     <div class="row"><div class="col"><p class="cap"><b>Your access doesn’t list it there.</b></p>${picker({ cluster: 'prod-us', objects: 'forbidden' })}</div>
     <div class="col"><p class="cap"><b>The kind isn’t served there</b>, comparing a Certificate, on dev-anna once opened with its button.</p>${picker({ cluster: 'dev-anna', objects: 'not-served', kind: 'Certificates', opened: true })}</div></div>
-    <div class="row"><div class="col"><p class="cap"><b>A cluster that signs in when opened</b>, picked (with a click or the arrow keys): nothing opens, signs in or reads until its Open button is pressed.</p>${picker({ cluster: 'dev-anna', objects: 'unopened' })}</div></div></section>`
+    <div class="row"><div class="col"><p class="cap"><b>A cluster that signs in when opened</b>, picked (with a click or the arrow keys): nothing opens, signs in or reads until its Open button is pressed.</p>${picker({ cluster: 'dev-anna', objects: 'unopened' })}</div><div class="col"><p class="cap"><b>A cluster that didn’t answer</b>: said on its own line, and the dialog goes on; another cluster can be picked at once.</p>${picker({ cluster: 'staging', objects: 'unreachable' })}</div></div></section>`
 }
 
 const PICK_RULES = [
   '<b>“Compare with…”</b> is in every object’s More actions, after Copy link (both read, neither changes anything), and in the palette’s Actions while an object is open. It has no key. It’s read-only throughout: nothing it shows can be changed from it.',
   '<b>The picker</b>, titled “Compare checkout with…”, under it the object’s kind, namespace and cluster: <b>Cluster</b>, this one first (“This one”), then every cluster the person has, with their Production marks; <b>Namespace</b> for a namespaced kind, the same one to start; then the <b>objects of the same kind</b> there, filtered by a field, the same-named one picked (“Same name”). Compare opens the page. Esc and Cancel leave.',
   '<b>A cluster that signs in when opened</b> (its kubeconfig signs in through a program, exec or an auth provider, and hasn’t this session): listed without being read, its dot quiet, its row saying “Signs in when opened”, as the sidebar and start screen say it, with an <b>Open dev-anna</b> button. Picking the row, with a click or by arrowing through the list, opens nothing: its namespace and objects wait (“dev-anna isn’t open. Open it, with the button on its row, to see its namespaces and Deployments.”), and Compare waits. Only the button opens it, sign-in included. A context with a token or a certificate is read when picked, as the start screen reads it, since reading it signs nothing in; on a server every fleet cluster is.',
+  '<b>Reading waits for the pick to settle</b>: a cluster, namespace or object picked is read after about 300 ms with no other pick, and a read under way is cancelled when the pick moves on, so arrowing through the list reads only where it stops.',
+  '<b>A cluster that doesn’t answer, or refuses</b>, says so on its own line in red, in Lumovi’s words (“Didn’t answer in time. Pick it again to try once more.”; “Refused: your credentials for staging were rejected.”), and in the list under it. It never holds the dialog: another cluster can be picked at once, and picking it again tries once more.',
   '<b>Where there’s nothing to pick</b>, the list says why in one line, and Compare waits: the kind isn’t served there (“dev-anna doesn’t serve Certificates (cert-manager.io/v1), so there’s nothing to compare with there.”); none of it there (“No Deployments in shop on staging. Pick another namespace, or another cluster.”); access doesn’t list it (“Your access on prod-us doesn’t list Deployments in shop.”).',
 ]
 
@@ -401,7 +406,7 @@ const STATE_RULES = [
 export type CompareFrame = 'cmp-picker' | 'cmp-page' | 'cmp-states'
 
 export const COMPARE_FRAMES: { id: CompareFrame; title: string; size: Size }[] = [
-  { id: 'cmp-picker', title: 'Compare: the picker', size: { width: 1440, height: 2735 } },
+  { id: 'cmp-picker', title: 'Compare: the picker', size: { width: 1440, height: 2800 } },
   { id: 'cmp-page', title: 'Compare: the comparison', size: { width: 1440, height: 2795 } },
   { id: 'cmp-states', title: 'Compare: its states', size: { width: 1440, height: 2600 } },
 ]
