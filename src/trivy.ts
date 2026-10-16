@@ -857,7 +857,7 @@ const REPORT_RULES = [
   '<b>A report’s own tab</b>, the plugin’s, on its own kind (as the kit allows today): the image, its OS, the container and when it was scanned, then every vulnerability in it, fixable first and worst first: its ID, severity, package, the version installed and the one that fixes it (“No fix yet” where there’s none), and Trivy’s title. Search and the Severity and Fixable filters; Download CSV.',
   '<b>A row opens the vulnerability’s own page</b>, the link Trivy gives it, in the browser, as Lumovi’s links out do. Nothing else leaves: Lumovi doesn’t look a vulnerability up anywhere.',
   '<b>Withheld fields</b>, new in the kit (2) and first of the four: the plugin’s file names fields (<code>withheld: [report.secrets[].match]</code>) that Lumovi drops as it reads the object, before anything else sees it. Not in the plugin’s code, not in details, not in the YAML tab, not in a CSV, not in a copy. The YAML tab keeps the key with a quiet <b>Withheld</b> where its value was, so the object’s shape still reads; a line under it says whose file withholds it.',
-  '<b>A kind with a withheld field has no Edit YAML</b>: what Lumovi doesn’t show, it can’t send back. Trivy’s reports are written by Trivy, so nothing is lost. (For app-2 and docs: confirm, or say how an edit keeps the field.)',
+  '<b>A kind with a withheld field has no Edit YAML or Apply</b>, refused by Lumovi’s backend as well as its page: what Lumovi doesn’t show, it can’t send back. Its labels and annotations can still be edited, as those patches carry nothing withheld. Trivy’s reports are written by Trivy, so nothing is lost.',
 ]
 
 // ─── 3. On Lumovi's own pages: objects that point here, and a Findings column ──────────────
@@ -979,7 +979,7 @@ export const TRIVY_FRAMES: { id: TrivyFrame; title: string; size: Size }[] = [
   {
     id: 'trivy-report',
     title: 'Trivy: a report, and a withheld field',
-    size: { width: 1440, height: 1935 },
+    size: { width: 1440, height: 1975 },
   },
   { id: 'trivy-lumovi', title: 'Trivy on Lumovi’s own pages', size: { width: 1440, height: 1200 } },
   { id: 'trivy-phone', title: 'Trivy on a phone', size: { width: 920, height: 1110 } },
