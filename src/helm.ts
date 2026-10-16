@@ -15,7 +15,7 @@ import { FONTS } from './scene.ts'
 const CONTEXT = 'production-eu'
 const MASK = '••••••••'
 
-const CSS = `
+export const CSS = `
 .sheet { display: flex; flex-direction: column; gap: 44px; padding: 32px; }
 .sheet > header h1 { margin: 0; font-size: 20px; font-weight: 600; }
 .sheet > header p { margin: 6px 0 0; max-width: 1100px; font-size: 13px; line-height: 20px; color: var(--text-2); }
