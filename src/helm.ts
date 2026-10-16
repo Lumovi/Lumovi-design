@@ -125,6 +125,7 @@ const CSS = `
 .diff .r { background: color-mix(in srgb, var(--critical) 10%, transparent); color: var(--critical-text); }
 .diff .gap { margin: 4px 0; padding: 2px 20px; background: color-mix(in srgb, var(--surface-3) 60%, transparent); font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-3); }
 .diff .sg { display: inline-block; width: 12px; margin-right: 12px; color: var(--text-3); }
+.diff .so { font-family: 'Inter', sans-serif; font-style: italic; opacity: 0.85; }
 .diff .mk { padding: 0 3px; border-radius: 3px; background: color-mix(in srgb, var(--surface-3) 80%, transparent); }
 .hid { display: flex; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; line-height: 1.6; color: var(--text-2); }
 .hid svg.i { flex: none; margin-top: 3px; color: var(--text-3); }
@@ -133,6 +134,19 @@ const CSS = `
 .xm { position: relative; display: block; border-radius: 10px; outline: 1.5px dashed var(--accent); outline-offset: 4px; }
 
 /* On a phone: the dialog is a sheet. */
+.phr { display: flex; width: 390px; height: 560px; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 28px; background: var(--surface); }
+.phr .pb { display: flex; height: 52px; flex: none; align-items: center; gap: 4px; padding: 0 4px; border-bottom: 1px solid var(--line); font-size: 15px; }
+.phr .tap { display: grid; width: 44px; height: 44px; place-items: center; color: var(--text-2); }
+.phr .pin { padding: 16px 16px 12px; }
+.phr .pin small { display: block; font-size: 12px; color: var(--text-3); }
+.phr .pin h3 { margin: 2px 0 10px; font-size: 17px; line-height: 24px; font-weight: 600; }
+.spill2 { display: inline-flex; height: 24px; align-items: center; gap: 5px; padding: 0 9px; border-radius: 999px; background: color-mix(in srgb, var(--good) 12%, transparent); font-size: 12px; font-weight: 500; color: var(--good-text); }
+.phr .ptabs { display: flex; gap: 18px; overflow: hidden; padding: 0 16px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text-3); white-space: nowrap; }
+.phr .ptabs span { padding: 10px 0; }
+.phr .ptabs .on { color: var(--text-1); box-shadow: inset 0 -2px 0 var(--accent); }
+.phr .pfacts { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 16px; }
+.phr .pfacts dt { font-size: 12px; color: var(--text-3); }
+.phr .pfacts dd { margin: 2px 0 0; font-size: 14px; }
 .phw { position: relative; display: flex; width: 390px; height: 844px; flex-direction: column; justify-content: flex-end; overflow: hidden; border: 1px solid var(--line); border-radius: 28px; background: var(--app-bg); }
 .phw .dim { position: absolute; inset: 0; background: rgb(0 0 0 / 0.3); }
 .phw .ad { position: relative; width: 100%; max-height: calc(100% - 24px); border-bottom: 0; border-radius: 16px 16px 0 0; }
@@ -171,7 +185,7 @@ const dhead = (glyph: IconName, title: string, subject: string, phone = false) =
 const cmd = (text: string) => `<div class="cmd"><p>Equivalent command</p><code>${text}</code></div>`
 
 const foot = (confirm: string, busy = false) =>
-  `<footer><span class="btn ghost">Cancel</span><span class="btn primary${busy ? ' busy' : ''}">${busy ? icon('loader-circle', 14) : ''}${confirm}</span></footer>`
+  `<footer><span class="btn ghost">${busy ? 'Close' : 'Cancel'}</span><span class="btn primary${busy ? ' busy' : ''}">${busy ? icon('loader-circle', 14) : ''}${confirm}</span></footer>`
 
 // ─── 1. Install and upgrade: Wait, Atomic, Timeout ─────────────────────────────────────────
 
@@ -264,7 +278,7 @@ function optionsFrame(): string {
     <div class="row"><div class="col"><p class="cap"><b>On Install a chart</b>, Undo it if it fails says what it does there: Helm uninstalls it.</p>${installOptions()}</div>
     <div class="col"><p class="cap"><b>A Timeout out of range</b>: said under it, and Review waits for 1 to 60.</p><div class="ad" style="width:600px"><div class="body">${options({ timeout: '90', bad: true })}</div></div></div></div></section>
     <section class="blk"><h2>While it waits, and how it ends<i>the review step, Upgrade pressed with Undo it if it fails and 10 minutes</i></h2>
-    <div class="row"><div class="col"><p class="cap"><b>Waiting</b>: Upgrade is busy, and a line says what it waits for, how long it may, and that closing doesn’t stop it.</p>${reviewDialog('waiting')}</div>
+    <div class="row"><div class="col"><p class="cap"><b>Waiting</b>: Upgrade is busy, a line says what it waits for, how long it may, and that closing doesn’t stop it, and Cancel is Close.</p>${reviewDialog('waiting')}</div>
     <div class="col"><p class="cap"><b>Not ready in time</b>: Lumovi says what happened, first, then Helm’s own words.</p>${reviewDialog('rolled-back')}</div></div></section>`
 }
 
@@ -273,7 +287,7 @@ const OPT_RULES = [
   '<b>Off by default, every time</b>: both boxes clear and Timeout blank, its placeholder “5 minutes, Helm’s default”. Nothing is remembered between dialogs. The equivalent command gains only what’s set, after <code>--values</code>.',
   '<b>Undo it if it fails waits</b>, as Helm’s flag implies <code>--wait</code>: ticking it ticks Wait and holds it, dimmed, its line saying why (“On, as undoing a failure has to wait to see it.”), and the command says <code>--rollback-on-failure</code> alone. Its own line says what undoing is there: on an upgrade, the revision it goes back to (“rolls it back to revision 7”); on an install, that Helm uninstalls it.',
   '<b>Timeout</b> is a number of minutes, 1 to 60; blank is Helm’s default. Out of range is said under it in red (“From 1 to 60 minutes.”) and Review waits. The command writes it as Helm does, <code>--timeout 10m0s</code>. It applies with or without Wait, as Helm’s does: hooks have it too.',
-  '<b>While it waits</b>, after Upgrade (or Install) is pressed with Wait: the button is busy, as ActionDialog’s are, and a line under the diff says what it waits for, how long it may (“up to 10 minutes, 1m 12s so far”), and that <b>closing the dialog doesn’t stop it</b>: the release’s page and its History say how it ended. (Helm runs in Lumovi’s backend as its own process, which nothing in the page cancels. Quitting Lumovi on the desktop ends it, as it ends Lumovi’s own processes: so quitting while one runs asks first, “payments-api is still upgrading. Quitting stops Helm, and can leave the release pending.”, with Quit anyway and Keep it open.)',
+  '<b>While it waits</b>, after Upgrade (or Install) is pressed with Wait: the button is busy, as ActionDialog’s are, and a line under the diff says what it waits for, how long it may (“up to 10 minutes, 1m 12s so far”), and that <b>closing the dialog doesn’t stop it</b>: the release’s page and its History say how it ended. So, while it runs, the quiet button is <b>Close</b>, not Cancel (Esc closes too): it says what it does. (Helm runs in Lumovi’s backend as its own process, which nothing in the page cancels. Quitting Lumovi on the desktop ends it, as it ends Lumovi’s own processes: so quitting while one runs asks first, “payments-api is still upgrading. Quitting stops Helm, and can leave the release pending.”, with Quit anyway and Keep it open.)',
   '<b>How it ends.</b> Ready: the dialog closes and Lumovi’s toast says “Upgraded payments-api”, as today. Failed and undone: the error, where ActionDialog puts it, leads with Lumovi’s words (“It wasn’t ready within 10 minutes, so Helm rolled it back to revision 7.”; on an install, “… so Helm uninstalled it.”), then Helm’s own, in mono. Failed without it: Helm’s words alone, as today.',
 ]
 
@@ -314,8 +328,8 @@ const MANIFEST = (revealed: boolean): DLine[] => {
     ['s', 'metadata:'],
     ['s', '  name: payments-api-db'],
     ['s', 'data:'],
-    ['r', `  password: ${v('c2VjcmV0LTI=')}`],
-    ['a', `  password: ${v('c2VjcmV0LTE=')}`],
+    ['r', `  password: ${v('<span class="so">‹its value in revision 8›</span>')}`],
+    ['a', `  password: ${v('<span class="so">‹its value in revision 6›</span>')}`],
     ['gap', '31 unchanged lines'],
     ['s', '      containers:'],
     ['s', '        - name: api'],
@@ -360,7 +374,7 @@ function rollbackDialog(state: 'masked' | 'revealed' | 'hidden'): string {
 function rollbackFrame(): string {
   return `<section class="blk"><h2>Roll back<i>what changes, before it does: the values by key, the manifest as a diff, Secrets’ data masked</i></h2>
     <div class="row"><div class="col"><p class="cap"><b>Revision 6 picked</b>, as it opens for someone whose access shows Secrets’ values: masked until asked.</p>${rollbackDialog('masked')}</div>
-    <div class="col"><p class="cap"><b>Reveal values pressed</b>: the Secret’s data as it is in each revision; Hide values masks it again.</p>${rollbackDialog('revealed')}</div></div>
+    <div class="col"><p class="cap"><b>Reveal values pressed</b>: the Secret’s data as it is in each revision (drawn here as a stand-in: no frame shows a Secret’s value); Hide values masks it again.</p>${rollbackDialog('revealed')}</div></div>
     <div class="row"><div class="col"><p class="cap"><b>For someone whose access hides Secrets’ values</b>: nothing of the values or manifests, as the release’s own tabs, and why.</p>${rollbackDialog('hidden')}</div></div></section>`
 }
 
@@ -369,17 +383,24 @@ const RB_RULES = [
   '<b>Values</b>, by key only, never their values: a values file often holds passwords, and the key is what a person checks. Each key whole, dotted as Helm’s <code>--set</code> takes it (<code>resources.limits.memory</code>, <code>ingress.hosts[0].host</code>), in mono, grouped by what going back does to it: <b>Changed</b>, <b>Added</b> (only in the revision picked), <b>Removed</b> (only in the one running now); a group with none isn’t drawn. Nothing: “No values change.”',
   '<b>Manifest changes</b>, the same diff as Upgrade’s review step (DiffView: additions green, removals red, the rest folded as “31 unchanged lines”), its counts in the box’s bar. Nothing: “The manifest doesn’t change.”',
   '<b>Secrets’ data masked</b>, as the YAML tab masks it: each value under a Secret’s <code>data</code> and <code>stringData</code>, and its last-applied annotation, reads <code>••••••••</code>, on both sides of a change, so a changed password shows as a changed line with neither value. The diff is worked out on the real text first, so a change is never hidden by the mask. <b>Reveal values</b> in the bar shows them, for someone whose access shows Secrets’ values, and Hide values masks them again; it’s never remembered.',
+  '<b>What masking is, for docs:</b> it keeps Secrets’ values off the screen until asked. It isn’t a guard against every secret: a chart that renders <code>database.password</code> into a Deployment’s <code>env</code> or a ConfigMap shows it in the diff, as it shows in the Manifest tab. The values part, keys only, is the stronger guard.',
   '<b>Someone whose access hides Secrets’ values</b> (on a server, below “values”) sees neither the keys nor the diff, as the release’s Values and Manifest tabs are hidden from them today: “What it changes is hidden”, with the reason Lumovi already gives there (“Its values and manifests can hold Secrets, and your access shows only their keys in payments.”), and that Roll back still goes back to everything the revision had. Roll back itself is as their access allows, as today.',
-  '<b>On a phone</b> it’s ActionDialog’s sheet: the revisions, then the keys, wrapping, then the diff, each long line wrapped under its own text (as DiffView wraps on a phone), Reveal values a 44 px button (frame 3).',
+  '<b>On a phone</b> nothing changes: a release is read there, and Upgrade, Roll back and Uninstall wait for a larger screen, as main’s phone gate refuses Helm’s changes under 640 px (frame 3).',
   '<b>For a later ticket, not this one:</b> the release’s own Manifest tab shows a Secret’s data unmasked to anyone whose access shows Secrets’ values. With this, rollback masks it until asked and the tab doesn’t; the tab should mask it the same way.',
 ]
 
 // ─── 3. On a phone ──────────────────────────────────────────────────────────────────────────
 
 function phones(): string {
-  const up = `<div class="phw"><span class="dim"></span><div class="ad"><div class="grab"><i></i></div>${dhead('circle-arrow-up', 'Upgrade payments-api', 'Helm release · payments', true)}<div class="body">${options({ atomic: true, timeout: '10' }, true)}${cmd(`helm upgrade payments-api ./payments-api-2.4.3 --values values.yaml <i>--rollback-on-failure --timeout 10m0s</i> --namespace payments --kube-context ${CONTEXT}`)}</div><footer><span class="btn ghost">Cancel</span><span class="btn primary">Review</span></footer></div></div>`
-  const rb = `<div class="phw"><span class="dim"></span><div class="ad"><div class="grab"><i></i></div>${dhead('history', 'Roll back payments-api', 'Helm release · payments', true)}<div class="body"><div class="rev on"><span class="rd"></span><span><b>Revision 6</b><span class="m">superseded · 9d ago</span><small>Chart payments-api-2.4.0, app 2.4.0 · Upgrade complete</small></span></div><p class="now">Running now: revision 8. Going back to 6 changes 4 of its values and 8 lines of its manifest.</p><p class="lbl">What changes</p>${keyList()}${manifestBox(false, true)}</div><footer><span class="btn ghost">Cancel</span><span class="btn primary">Roll back</span></footer></div></div>`
-  return `<section class="blk"><h2>On a phone<i>ActionDialog’s sheet, as every dialog is there</i></h2><div class="row">${up}${rb}</div><p class="cap" style="max-width:820px">Left: Upgrade scrolled to its options, each a 44 px row; Helm’s flags aren’t beside the words there (no room), and are in the command. Right: Roll back scrolled to what changes: revision 6 picked, the keys wrapping, the diff wrapping each long line under its own text, Reveal values a 44 px button.</p></section>`
+  const facts: [string, string][] = [
+    ['Chart', 'payments-api 2.4.2'],
+    ['App version', '2.4.2'],
+    ['Revision', '8'],
+    ['Last change', 'Upgrade complete'],
+    ['Installed', 'Sep 3, 2026'],
+  ]
+  const page = `<div class="phr"><div class="pb"><span class="tap">${icon('arrow-left', 20)}</span><b>payments-api</b></div><div class="pin"><small>Helm release · payments</small><h3>payments-api</h3><span class="spill2">${icon('circle-check', 14)}Deployed</span></div><nav class="ptabs"><span class="on">Overview</span><span>Resources</span><span>Values</span><span>Manifest</span><span>History</span></nav><dl class="pfacts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl></div>`
+  return `<section class="blk"><h2>On a phone<i>a release is read there, as main has it: this ticket doesn’t change that</i></h2><div class="row">${page}</div><p class="cap" style="max-width:820px">Main’s phone shows a release as a page, with no Upgrade, Roll back or Uninstall: its phone gate lets Helm’s reads through and refuses its changes under 640 px, as everything that changes a cluster waits for a larger screen. So the options and the rollback’s diff are a larger screen’s; on a phone, the release’s Values, Manifest and History tabs read as today.</p></section>`
 }
 
 // ─── The frames ─────────────────────────────────────────────────────────────────────────────
@@ -390,14 +411,14 @@ export const HELM_FRAMES: { id: HelmFrame; title: string; size: Size }[] = [
   {
     id: 'helm-options',
     title: 'Helm: wait, atomic and timeout',
-    size: { width: 1440, height: 2400 },
+    size: { width: 1440, height: 2455 },
   },
   {
     id: 'helm-rollback',
     title: 'Helm: what a rollback changes',
-    size: { width: 1440, height: 2620 },
+    size: { width: 1440, height: 2640 },
   },
-  { id: 'helm-phone', title: 'Helm on a phone', size: { width: 920, height: 1010 } },
+  { id: 'helm-phone', title: 'Helm on a phone', size: { width: 920, height: 730 } },
 ]
 
 const sheet = (
