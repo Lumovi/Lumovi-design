@@ -288,7 +288,7 @@ function picker(o: { cluster: string; objects: Objects; kind?: string; opened?: 
     ['dev-anna', '', false, !!o.opened],
   ]
   const crow = ([name, tag, prod, open]: (typeof clusters)[number]) =>
-    `<div class="o${name === o.cluster ? ' on' : ''}"><span class="rd"></span><span class="dot${open ? '' : ' off'}"></span><span class="cword"><b>${name}</b> ${prod ? prodm : ''}${open ? '' : '<small>Not open yet. Opening it may ask you to sign in.</small>'}</span>${open ? `<span class="tag">${tag}</span>` : `<span class="btn">Open ${name}</span>`}</div>`
+    `<div class="o${name === o.cluster ? ' on' : ''}"><span class="rd"></span><span class="dot${open ? '' : ' off'}"></span><span class="cword"><b>${name}</b> ${prod ? prodm : ''}${open ? '' : '<small>Signs in when opened</small>'}</span>${open ? `<span class="tag">${tag}</span>` : `<span class="btn">Open ${name}</span>`}</div>`
   const cert = o.kind === 'Certificates'
   const kind = o.kind ?? 'Deployments'
   const objs = {
@@ -327,13 +327,13 @@ function pickerFrame(): string {
     <div class="col"><p class="cap"><b>Nothing of it there</b>: Compare waits for an object.</p>${picker({ cluster: 'staging', objects: 'none' })}</div></div>
     <div class="row"><div class="col"><p class="cap"><b>Your access doesn’t list it there.</b></p>${picker({ cluster: 'prod-us', objects: 'forbidden' })}</div>
     <div class="col"><p class="cap"><b>The kind isn’t served there</b>, comparing a Certificate, on dev-anna once opened with its button.</p>${picker({ cluster: 'dev-anna', objects: 'not-served', kind: 'Certificates', opened: true })}</div></div>
-    <div class="row"><div class="col"><p class="cap"><b>A cluster that isn’t open</b>, picked (with a click or the arrow keys): nothing opens or reads until its Open button is pressed.</p>${picker({ cluster: 'dev-anna', objects: 'unopened' })}</div></div></section>`
+    <div class="row"><div class="col"><p class="cap"><b>A cluster that signs in when opened</b>, picked (with a click or the arrow keys): nothing opens, signs in or reads until its Open button is pressed.</p>${picker({ cluster: 'dev-anna', objects: 'unopened' })}</div></div></section>`
 }
 
 const PICK_RULES = [
   '<b>“Compare with…”</b> is in every object’s More actions, after Copy link (both read, neither changes anything), and in the palette’s Actions while an object is open. It has no key. It’s read-only throughout: nothing it shows can be changed from it.',
   '<b>The picker</b>, titled “Compare checkout with…”, under it the object’s kind, namespace and cluster: <b>Cluster</b>, this one first (“This one”), then every cluster the person has, with their Production marks; <b>Namespace</b> for a namespaced kind, the same one to start; then the <b>objects of the same kind</b> there, filtered by a field, the same-named one picked (“Same name”). Compare opens the page. Esc and Cancel leave.',
-  '<b>A cluster that isn’t open</b> is listed without being read, its dot quiet, its row saying “Not open yet. Opening it may ask you to sign in.”, with an <b>Open dev-anna</b> button. Picking the row, with a click or by arrowing through the list, opens nothing: its namespace and objects wait (“dev-anna isn’t open. Open it, with the button on its row, to see its namespaces and Deployments.”), and Compare waits. Only the button opens it, as the cluster switcher does, sign-in included; nothing is read from it before.',
+  '<b>A cluster that signs in when opened</b> (its kubeconfig signs in through a program, exec or an auth provider, and hasn’t this session): listed without being read, its dot quiet, its row saying “Signs in when opened”, as the sidebar and start screen say it, with an <b>Open dev-anna</b> button. Picking the row, with a click or by arrowing through the list, opens nothing: its namespace and objects wait (“dev-anna isn’t open. Open it, with the button on its row, to see its namespaces and Deployments.”), and Compare waits. Only the button opens it, sign-in included. A context with a token or a certificate is read when picked, as the start screen reads it, since reading it signs nothing in; on a server every fleet cluster is.',
   '<b>Where there’s nothing to pick</b>, the list says why in one line, and Compare waits: the kind isn’t served there (“dev-anna doesn’t serve Certificates (cert-manager.io/v1), so there’s nothing to compare with there.”); none of it there (“No Deployments in shop on staging. Pick another namespace, or another cluster.”); access doesn’t list it (“Your access on prod-us doesn’t list Deployments in shop.”).',
 ]
 
