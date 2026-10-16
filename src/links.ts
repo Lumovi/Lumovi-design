@@ -52,13 +52,43 @@ const CSS = `${WINDOW_CSS}
 .toast { position: absolute; z-index: 4; right: 20px; bottom: 56px; display: flex; width: 380px; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-pop); font-size: 13px; line-height: 19px; }
 .toast svg.i { margin-top: 1px; }
 .toast .x { margin-left: auto; color: var(--text-3); }
-.ib.lk-b { color: var(--text-1); background: var(--surface-3); }
 .cards { display: grid; grid-template-columns: repeat(3, 460px); gap: 28px 28px; align-items: start; }
 .cards .stack { gap: 8px; }
 .ring2 { outline: 2px solid var(--accent); outline-offset: 2px; }
 .btn.primary .kbd,
 .menu .mi.hl .kbd { border-color: rgb(255 255 255 / 0.45); background: transparent; color: #fff; }
 .mark { display: inline-block; margin: 0 2px; padding: 0 4px; border: 1px solid var(--line-strong); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; line-height: 15px; color: var(--text-2); vertical-align: 1px; }
+/* Lumovi's menus, as built: the bar's More (⋯), and an object's More actions. */
+.pm { position: absolute; z-index: 4; width: max-content; min-width: 192px; padding: 4px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.pm .mi { display: flex; height: 32px; align-items: center; gap: 10px; padding: 0 8px; border-radius: 8px; font-size: 13px; white-space: nowrap; }
+.pm .mi svg.i { color: var(--text-3); }
+.pm .mi .n { flex: 1; padding-right: 16px; }
+.pm .mi .k { display: flex; gap: 2px; }
+.pm .mi.hl { background: var(--surface-3); }
+.pm .mi.danger, .pm .mi.danger svg.i { color: var(--critical-text); }
+.pm .lbl { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px 6px; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.pm hr { height: 1px; margin: 4px; border: 0; background: var(--line); }
+.ib.open { background: var(--surface-3); color: var(--text-1); }
+/* A phone: a server's page there, its narrow bar, and the palette as the whole screen. */
+.phs { display: flex; gap: 28px; align-items: flex-start; }
+.ph { display: flex; width: 390px; height: 400px; flex: none; flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 28px; background: var(--surface); box-shadow: var(--shadow-panel); }
+.ph .pb { display: flex; height: 52px; flex: none; align-items: center; padding: 0 4px; border-bottom: 1px solid var(--line); }
+.ph .tap { display: grid; width: 44px; height: 44px; flex: none; place-items: center; border-radius: 8px; color: var(--text-2); }
+.ph .tap.pr { background: var(--surface-3); color: var(--text-1); }
+.ph .pb h1 { flex: 1; margin: 0; padding: 0 4px; font-size: 15px; line-height: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.ph .ctx { display: flex; height: 44px; flex: none; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+.ph .cc { display: inline-flex; height: 32px; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 500; }
+.ph .cc svg.i { color: var(--text-3); }
+.ph .cc .d { width: 8px; height: 8px; border-radius: 50%; background: var(--good); }
+.ph .rest { display: flex; flex: 1; margin: 16px; align-items: center; justify-content: center; border: 1px dashed var(--line-strong); border-radius: 12px; font-size: 12px; color: var(--text-3); }
+.ph.pal { background: var(--surface-2); }
+.ph .pf { display: flex; height: 48px; flex: none; align-items: center; padding-right: 4px; border-bottom: 1px solid var(--line); }
+.ph .pf .in { flex: 1; min-width: 0; overflow: hidden; padding: 0 16px; font-size: 15px; color: var(--text-3); white-space: nowrap; }
+.ph .pl { padding: 8px; }
+.ph .pl .g { padding: 8px 8px 4px; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.ph .pl .it { display: flex; height: 44px; align-items: center; gap: 12px; padding: 0 10px; border-radius: 8px; font-size: 13.5px; }
+.ph .pl .it svg.i { color: var(--text-3); }
+.ph .pl .it.pr { background: var(--surface-3); }
 `
 
 // ─── The prompt ────────────────────────────────────────────────────────────────────────────
@@ -132,7 +162,7 @@ function copyFrame(): string {
     on: 'Logs',
   })
   // The panel's More actions, open: Copy link first, then what changes it.
-  const more = `<div class="menu" style="position:absolute;z-index:4;left:922px;top:160px;width:272px"><div class="mi hl">${icon('link', 16)}Copy link</div><hr><div class="mi">${icon('tag', 16)}Edit labels…</div><div class="mi">${icon('pencil', 16)}Edit YAML</div><hr><div class="mi" style="color:var(--critical-text)">${icon('trash-2', 16)}Delete…<span class="k"><span class="kbd">⌘</span><span class="kbd">⌫</span></span></div></div>`
+  const more = `<div class="pm" style="left:922px;top:160px;min-width:224px"><div class="lbl">Actions<span class="kbd">.</span></div>${mi('link', 'Copy link', { hl: true })}<hr>${mi('tag', 'Edit labels…')}${mi('pencil', 'Edit YAML')}<hr>${mi('trash-2', 'Delete…', { keys: '⌘ ⌫', danger: true })}</div>`
   const menuWin = win({
     w: W,
     h: H,
@@ -143,6 +173,7 @@ function copyFrame(): string {
     page: deployments({ sel: 'checkout', narrow: true }),
     panel: { width: panelW, html: `${head}${logs({ n: 18 })}` },
     dock: dock([T_PROD]),
+    more: true,
     extra: more,
   })
   // Copied: the toast, at the window's bottom right, over the dock's bar.
@@ -160,19 +191,79 @@ function copyFrame(): string {
       html: `${head.replace(' ring" style="width:30px;padding:0;background:var(--surface-3)"', '" style="width:30px;padding:0"')}${logs({ n: 18 })}`,
     },
     dock: dock([T_PROD]),
+    more: true,
     extra: toast,
   })
-  // The page's own: a button in the top bar, before Refresh. Its tooltip names the key.
-  const bar = `<div class="mn" style="width:1180px;margin:0;flex:none;position:relative;overflow:visible"><header class="hd"><span class="ib">${icon('arrow-left', 16)}</span><span class="ib dim" style="margin-left:-6px">${icon('arrow-right', 16)}</span><h1>${icon('box', 16)}Pods</h1><span class="ns">${icon('layout-grid', 14)}shop${icon('chevron-down', 14)}</span><span class="find">${icon('search', 14)}<span>Search…</span><span class="kbd">⌘</span><span class="kbd">K</span></span><span class="ib">${icon('plus', 16)}</span><span class="ib">${icon('history', 16)}</span><span class="ib lk-b">${icon('link', 16)}</span><span class="ib">${icon('rotate-cw', 16)}</span></header><div style="height:120px;overflow:hidden">${pods()}</div><span class="tip" style="right:20px;top:58px">Copy link to this view</span>${pointer(1180 - 12 - 32 - 32 + 14, 30)}</div>`
-  return `<section class="blk"><h2>Copy link<i>in an object’s More actions, and the page’s own in the top bar; no key</i></h2>
+  // The page's own: first in the bar's More (⋯), after Refresh, above what's there already.
+  const lumovis = bar({
+    title: 'Pods',
+    glyph: 'box',
+    ns: 'shop',
+    page: pods(),
+    menu: `${mi('link', 'Copy link to this view', { hl: true })}<hr>${mi('keyboard', 'Keyboard shortcuts', { keys: '?' })}`,
+  })
+  const plugin = bar({
+    title: 'Applications',
+    glyph: 'git-merge',
+    ns: 'All namespaces',
+    page: ARGO_APPS,
+    height: 124,
+    menu: `${mi('link', 'Copy link to this view', { hl: true })}<hr>${mi('shield-check', 'What Argo CD may do')}<hr>${mi('keyboard', 'Keyboard shortcuts', { keys: '?' })}`,
+  })
+  return `<section class="blk"><h2>Copy link<i>in an object’s More actions, and the page’s own in the bar’s More (⋯); no key</i></h2>
     <p class="cap">checkout open in the panel, on its Logs: More actions (⋯) opened, Copy link first</p>${menuWin}
     <p class="cap">Pressed: the toast, as Lumovi’s toasts are, at the window’s bottom right; its second sentence says what a link doesn’t carry</p>${copied}
-    <p class="cap">The page’s own: a link button before Refresh, on every cluster page, under the pointer; Pods filtered to shop, so the link is to that view</p>${bar}
+    <p class="cap">The page’s own: the bar’s More (⋯) opened, Copy link to this view first, under the pointer; Pods filtered to shop, so the link is to that view</p>${lumovis}
+    <p class="cap">On a plugin’s page, Argo CD’s Applications: the plugin’s line between, as the ⋯ has it today</p>${plugin}
     <ul class="rules">
-      <li><b>In an object’s More actions</b>, first, in a group of its own above what changes the object: <b>Copy link</b>, Lucide’s link, with no key: ⇧⌘C is All clusters, and Ctrl+Alt on Windows is AltGr on many keyboards. It copies this page with this object open, on the tab it’s showing, cut to what a link may carry. In the command palette too, while an object is open, and in a kept object’s ⋯ below, where it’s the object on its tab.</li>
-      <li><b>The page’s own</b> has no ⋯ in Lumovi’s top bar, so it’s a button there: <b>Copy link to this view</b>, before Refresh, on every cluster page (lists, Overview, Metrics, Alerts, a plugin’s pages). What it copies is the page as it stands, its filters, sort and namespace, and the panel’s object if one is open: so with a panel open, the button and the panel’s item copy the same link. In the command palette as “Copy link to this view” on every page.</li>
-      <li><b>The toast</b> is docs’: “Link copied. It names the cluster, not how to reach it.” It goes after Lumovi’s usual time. <b>On a server</b> the same item and button copy the page’s own https address, which already works there, and the toast is “Link copied.” alone. Where the organization’s policy turns links off (<code>"links": "off"</code>), neither is drawn, nor the palette’s. Not on a phone’s bar: there it’s the panel’s ⋯ alone.</li>
+      <li><b>In an object’s More actions</b>, first, in a group of its own above what changes the object: <b>Copy link</b>, Lucide’s link (Link2 is the plugins’ “It links to …” line), with no key: ⇧⌘C is All clusters, and Ctrl+Alt on Windows is AltGr on many keyboards. It copies this page with this object open, on the tab it’s showing, cut to what a link may carry. In a kept object’s ⋯ below too, where it’s the object on its tab.</li>
+      <li><b>The page’s own</b> is in the bar’s More (⋯), at its end after Refresh, on every cluster page (lists, Overview, Metrics, Alerts, a plugin’s pages): <b>Copy link to this view</b>, first, in a group of its own, the same icon, no key. Then, as today, a plugin’s page’s “What Argo CD may do”, and “Keyboard shortcuts” (not under a finger), each in its group. It copies the page as it stands, its filters, sort and namespace, and the panel’s object on its tab if one is open: so with a panel open, it and the panel’s item copy the same link. The bar has no link button: it keeps the buttons it had.</li>
+      <li><b>The palette</b> has it in <b>Actions</b>, with the page’s own: Copy link to this view, then a plugin page’s “What Argo CD may do”. While an object is open, its Copy link heads Actions instead, its name at the right, and the page’s isn’t listed: it’s the same link, said once. <b>The toast</b> is docs’: “Link copied. It names the cluster, not how to reach it.” It goes after Lumovi’s usual time. <b>On a server</b> the same items copy the page’s own https address, which already works there, and the toast is “Link copied.” alone. Where the organization’s policy turns links off (<code>"links": "off"</code>), none is drawn, and the ⋯ keeps its other lines.</li>
+    </ul></section>
+    <section class="blk"><h2>On a phone<i>no ⋯ in a narrow bar: the palette’s Actions</i></h2>
+    <div class="phs"><div class="stack"><p class="cap">Argo CD’s Applications on a phone: Menu, the page, Search, Refresh</p>${phoneBar()}</div><div class="stack"><p class="cap">Search: the palette, the whole screen; Copy link to this view first in Actions, pressed</p>${phonePalette()}</div></div>
+    <ul class="rules">
+      <li><b>A narrow bar has no ⋯</b>: a phone’s is Menu, the page’s name, Search and Refresh, and a tablet’s adds Create, port forwards and Activity. So where the bar is narrow, the page’s link is in the palette, which Search opens, as it already says what the ⋯ holds there.</li>
+      <li><b>In Actions</b>, after Pinned and the list’s views as the palette orders them: <b>Copy link to this view</b>, then “What Argo CD may do” on a plugin’s page. Rows 44 px, no fill on the chosen row, the pressed row filled, as the palette’s rows are under a finger. Keyboard shortcuts isn’t there: there are no keys to learn under a finger.</li>
+      <li><b>Pressed</b>, it copies the page’s https address (a phone reaches Lumovi on a server), the palette closes, and Lumovi’s toast says “Link copied.” <b>An object open</b> (its page inside the page): its Copy link heads Actions instead, with its name, as on the desktop, and its own ⋯ has it too.</li>
     </ul></section>`
+}
+
+/** An item of Lumovi's menus, as built: its icon, its name, and its key at the right. */
+function mi(
+  glyph: IconName,
+  label: string,
+  o: { hl?: boolean; keys?: string; danger?: boolean } = {},
+) {
+  return `<div class="mi${o.hl ? ' hl' : ''}${o.danger ? ' danger' : ''}">${icon(glyph, 16)}<span class="n">${label}</span>${o.keys ? `<span class="k">${kbd(o.keys)}</span>` : ''}</div>`
+}
+
+/** A cluster page's bar, the page cut under it, with the page's More (⋯) open at the bar's end. */
+function bar(o: {
+  title: string
+  glyph: IconName
+  ns: string
+  page: string
+  height?: number
+  menu: string
+}) {
+  return `<div class="mn" style="width:1180px;margin:0;flex:none;position:relative;overflow:visible"><header class="hd"><span class="ib">${icon('arrow-left', 16)}</span><span class="ib dim" style="margin-left:-6px">${icon('arrow-right', 16)}</span><h1>${icon(o.glyph, 16)}${o.title}</h1><span class="ns">${icon('layout-grid', 14)}${o.ns}${icon('chevron-down', 14)}</span><span class="find">${icon('search', 14)}<span>Search…</span><span class="kbd">⌘</span><span class="kbd">K</span></span><span class="ib">${icon('plus', 16)}</span><span class="ib">${icon('history', 16)}</span><span class="ib">${icon('rotate-cw', 16)}</span><span class="ib open">${icon('ellipsis', 16)}</span></header><div style="height:${o.height ?? 140}px;overflow:hidden">${o.page}</div><div class="pm" style="right:13px;top:49px">${o.menu}</div>${pointer(1132, 62)}</div>`
+}
+
+/** Argo CD's Applications, as LMV-305's frame has it: its tabs, its search and filters. */
+const ARGO_APPS = `<div class="ptabs"><span>Overview</span><span class="on">Applications</span><span>AppProjects<small>4</small></span><span>ApplicationSets<small>2</small></span></div>
+  <div class="tbar"><span class="fld" style="width:260px">${icon('search', 14)}Name or namespace</span>${['Health', 'Sync', 'Operation', 'Project', 'More filters'].map((f) => `<span class="chip">${f}${icon('chevron-down', 12)}</span>`).join('')}<span class="grow"></span><span class="count">38 applications</span></div>`
+
+/** A phone's narrow bar over a plugin's page: no ⋯ there. */
+function phoneBar(): string {
+  return `<div class="ph"><div class="pb"><span class="tap">${icon('menu', 20)}</span><h1>Applications</h1><span class="tap pr">${icon('search', 20)}</span><span class="tap">${icon('rotate-cw', 20)}</span></div><div class="ctx"><span class="cc"><span class="d"></span>production${icon('chevron-down', 14)}</span><span class="cc">${icon('layout-grid', 14)}All namespaces${icon('chevron-down', 14)}</span></div><div class="rest">Argo CD’s Applications, as cards</div></div>`
+}
+
+/** The palette on a phone, the whole screen: Actions first, with the page's own. */
+function phonePalette(): string {
+  const it = (glyph: IconName, label: string, pressed = false) =>
+    `<div class="it${pressed ? ' pr' : ''}">${icon(glyph, 16)}<span>${label}</span></div>`
+  return `<div class="ph pal"><div class="pf"><span class="in">Jump to a page, object, namespace or cluster…</span><span class="tap">${icon('x', 20)}</span></div><div class="pl"><div class="g">Actions</div>${it('link', 'Copy link to this view', true)}${it('shield-check', 'What Argo CD may do')}<div class="g">Go to</div>${it('layout-dashboard', 'Overview')}${it('boxes', 'Workloads')}${it('chart-spline', 'Metrics')}${it('bell', 'Alerts')}</div></div>`
 }
 
 // ─── Frame 2: every link asks ──────────────────────────────────────────────────────────────
@@ -198,6 +289,7 @@ function askFrame(): string {
     ns: 'shop',
     page: pods(),
     dock: dock([{ glyph: 'square-terminal', name: 'staging' }]),
+    more: true,
     extra: first,
   })
   // A terminal has the keyboard: the prompt shows and waits, with the key that goes to it.
@@ -217,6 +309,7 @@ function askFrame(): string {
         'kubectl rollout status deploy/che<span class="c"></span>',
       ),
     }),
+    more: true,
     extra: ask({
       at: true,
       waiting: true,
@@ -347,7 +440,7 @@ function unknownFrame(): string {
 export type LinksFrame = 'lk-copy' | 'lk-ask' | 'lk-unknown'
 
 export const LINKS_FRAMES: { id: LinksFrame; title: string; size: Size }[] = [
-  { id: 'lk-copy', title: 'Copy link', size: { width: 1504, height: 2300 } },
+  { id: 'lk-copy', title: 'Copy link', size: { width: 1504, height: 3330 } },
   { id: 'lk-ask', title: 'Every link asks first', size: { width: 1504, height: 2600 } },
   {
     id: 'lk-unknown',

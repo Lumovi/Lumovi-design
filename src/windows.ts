@@ -259,6 +259,8 @@ interface Win {
   dock: string
   /** Not the frontmost window: its lights are grey. */
   back?: boolean
+  /** The bar ends in the page's More (⋯), after Refresh, as it does since 1.22.1. */
+  more?: boolean
   extra?: string
 }
 
@@ -272,7 +274,7 @@ export function win(o: Win): string {
     <aside class="sb"><div class="sw"><span class="d"></span><span><b>${o.cluster}</b><small>Kubernetes ${o.version ?? 'v1.34.1'}</small></span>${icon('chevrons-up-down', 16)}</div>
       <nav class="nv">${nav}</nav>
       <div class="ft"><span>${icon('sun', 16)}</span><span>${icon('sparkles', 16)}</span><span>${icon('scroll-text', 16)}</span><small>v1.22.0</small></div></aside>
-    <div class="mn"><header class="hd"><span class="ib">${icon('arrow-left', 16)}</span><span class="ib dim" style="margin-left:-6px">${icon('arrow-right', 16)}</span><h1>${icon(o.glyph, 16)}${o.title}</h1><span class="ns">${icon('layout-grid', 14)}${o.ns ?? 'All namespaces'}${icon('chevron-down', 14)}</span><span class="find">${icon('search', 14)}<span>Search…</span><span class="kbd">⌘</span><span class="kbd">K</span></span><span class="ib">${icon('plus', 16)}</span><span class="ib">${icon('history', 16)}</span><span class="ib">${icon('rotate-cw', 16)}</span></header>
+    <div class="mn"><header class="hd"><span class="ib">${icon('arrow-left', 16)}</span><span class="ib dim" style="margin-left:-6px">${icon('arrow-right', 16)}</span><h1>${icon(o.glyph, 16)}${o.title}</h1><span class="ns">${icon('layout-grid', 14)}${o.ns ?? 'All namespaces'}${icon('chevron-down', 14)}</span><span class="find">${icon('search', 14)}<span>Search…</span><span class="kbd">⌘</span><span class="kbd">K</span></span><span class="ib">${icon('plus', 16)}</span><span class="ib">${icon('history', 16)}</span><span class="ib">${icon('rotate-cw', 16)}</span>${o.more ? `<span class="ib">${icon('ellipsis', 16)}</span>` : ''}</header>
       <div class="pgw"><div class="list">${o.page}</div>${o.panel ? `<div class="dp" style="width:${o.panel.width}px">${o.panel.html}</div>` : ''}</div>
       ${o.dock}</div>${o.extra ?? ''}</div>`
 }
