@@ -18,13 +18,10 @@ import {
   lead,
   ltab,
   only,
-  pageHead,
-  pgframe,
   phoneFrame,
   sideItem,
   table,
   tile,
-  whoseStrip,
   type Level,
 } from './kit.ts'
 import { icon } from './lucide.ts'
@@ -121,7 +118,16 @@ const CSS = `
 .ap .wins span { display: grid; width: 28px; height: 28px; place-items: center; }
 .ap .lts { padding: 0 12px 1px; }
 .ap .tb { display: flex; flex-direction: column; gap: 4px; padding: 16px; }
-.pgframe.flat { border: 0; border-top: 1px solid var(--line); border-radius: 0; box-shadow: none; }
+.pbody { border-top: 1px solid var(--line); }
+.phd .end { display: grid; width: 32px; height: 32px; margin-left: auto; place-items: center; border-radius: 8px; color: var(--text-2); }
+.phd .end.open { background: var(--surface-3); color: var(--text-1); }
+.pmain { position: relative; }
+.pm { position: absolute; z-index: 5; min-width: 224px; padding: 4px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.pm .mi { display: flex; height: 32px; align-items: center; gap: 10px; padding: 0 8px; border-radius: 8px; font-size: 13px; white-space: nowrap; }
+.pm .mi svg.i { flex: none; color: var(--text-3); }
+.pm .mi .k { margin-left: auto; padding-left: 16px; font-size: 12px; color: var(--text-3); }
+.pm .mi.hl { background: var(--surface-3); }
+.pm hr { height: 1px; margin: 4px; border: 0; background: var(--line); }
 .hrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; margin: 0 0 12px; font-size: 13px; color: var(--text-2); }
 .hrow b { font-weight: 500; color: var(--text-1); }
 
@@ -499,7 +505,7 @@ const WHERE = card(
       [
         ['batch', 36],
         ['payments', 30],
-        ['shop', 29],
+        ['shop', 30],
         ['ingress-nginx', 11],
       ],
       141,
@@ -687,8 +693,12 @@ const page = (mark = false) => `<div class="arr-stack ov" style="padding:16px">
   ${RBAC}
 </div>`
 
-const win = (body: string) =>
-  `<div class="pwin"><aside class="pside">${SIDE(true)}</aside><div class="pmain">${pageHead(PLUGIN, 'bug')}<nav class="lts">${TABS}</nav>${pgframe(PLUGIN, VERSION, body)}</div></div>`
+/** The bar's More (⋯), open: what the plugin may do, then Keyboard shortcuts, as on every plugin page. */
+const MORE_MENU = `<div class="pm" style="top:44px;right:16px"><span class="mi hl">${icon('shield-check', 16)}What ${PLUGIN} may do</span><hr><span class="mi">${icon('keyboard', 16)}Keyboard shortcuts<span class="k">?</span></span></div>`
+
+/** Lumovi's window: the plugin's page sits in it as Lumovi's own do, with no strip or frame of its own. */
+const win = (body: string, open = false) =>
+  `<div class="pwin"><aside class="pside">${SIDE(true)}</aside><div class="pmain"><div class="phd">${icon('bug', 16)}<b>${PLUGIN}</b><span class="end${open ? ' open' : ''}">${icon('ellipsis', 16)}</span></div><nav class="lts">${TABS}</nav><div class="pbody">${body}</div>${open ? MORE_MENU : ''}</div></div>`
 
 function securityFrame(): string {
   const filtered = win(
@@ -700,14 +710,16 @@ function securityFrame(): string {
       count: '5 of 42',
       rows: WORKLOADS.filter((w) => w.fix[0] > 0),
     })}</div>`,
+    true,
   )
   const toast = `<div class="toast">${icon('circle-check', 16)}<div><b>Saved trivy-vulnerabilities-by-workload-${CLUSTER}-2026-10-16.csv</b><div class="a">Show in Finder</div></div><span class="x">${icon('x', 14)}</span></div>`
   return `<section class="blk"><h2>The Security page<i>the plugin’s own page, first of its tabs: what to fix first, then everything else Trivy found</i></h2>${win(page(true))}</section>
-  <section class="blk"><h2>Filtered, and saved<i>the Critical tile opens it filtered; Download CSV saves what the table holds</i></h2><p class="cap"><b>From the Critical tile</b>, with Fixable set: the five to update first.</p>${filtered}<p class="cap" style="margin-top:8px"><b>Download CSV</b> saves the rows as filtered, every column, all 5, and says so in Lumovi’s own toast.</p>${toast}</section>`
+  <section class="blk"><h2>Filtered, and saved<i>the Critical tile opens it filtered; Download CSV saves what the table holds</i></h2><p class="cap"><b>From the Critical tile</b>, with Fixable set: the five to update first. The bar’s ⋯ is open: What Trivy may do, then Keyboard shortcuts.</p>${filtered}<p class="cap" style="margin-top:8px"><b>Download CSV</b> saves the rows as filtered, every column, all 5, and says so in Lumovi’s own toast.</p>${toast}</section>`
 }
 
 const SEC_RULES = [
   '<b>A Security page, Trivy’s own</b>, first of its tabs, then its kinds’ lists as today. The plugin is a code plugin now; its page is drawn from the kit’s parts only (Tiles, FilterBar, Table, Card, Pair, Counts), so it reads as Lumovi’s own. It reads the reports field by field, and never <code>report.secrets[].match</code>, which its file declares withheld (frame 2).',
+  '<b>Whose page it is</b> is said as on every plugin page since LMV-331: the plug on its tabs, and <b>What Trivy may do</b> in the bar’s More (⋯), before Keyboard shortcuts (and after Copy link to this view, with LMV-193); on a phone, in the palette’s Actions. There is no strip over the page and no frame around it: it sits in Lumovi’s window as Lumovi’s own pages do.',
   '<b>Four tiles, what needs me first:</b> Critical and High, each with how many have a fix and in how many workloads; Exposed secrets, with how many images; Misconfigured, of how many resources. Each opens the table below filtered to it (Critical: Severity Critical and Fixable Yes, the frame under).',
   '<b>Vulnerabilities by workload</b>, fixable first: by fixable critical, then fixable high, then the rest by severity, so a workload whose criticals have no fix yet (legacy-batch) comes after those you can fix today. Each severity’s count in its column, coloured only where it isn’t 0; Fixable as “27 of 30” (critical and high); Fix first, the worst one with a fix and the version that fixes it; when Trivy scanned it. A workload is its images’ reports added up; a row opens the workload, on its Objects that point here (frame 3).',
   '<b>By image</b>, each image once however many workloads run it, with who runs it and its OS; a row opens its report (frame 2). <b>By namespace</b> and <b>by package</b> are Counts: critical and high per namespace, and fixable ones per package, each row opening the table filtered to it.',
@@ -800,10 +812,10 @@ function reportFrame(): string {
     '150px 96px minmax(0,0.9fr) 92px 92px minmax(0,2fr)',
     [
       head('Vulnerability'),
-      head('Severity', { sorted: 'down' }),
+      head('Severity'),
       head('Package'),
       head('Installed'),
-      head('Fixed in'),
+      head('Fixed in', { sorted: 'down' }),
       head('Title'),
     ],
     CVES.map(([id, level, word, pkg, inst, fixed, title]) =>
@@ -826,10 +838,10 @@ function reportFrame(): string {
     `<div class="fbar"><span class="kfield ph">${icon('search', 16)}<span>Vulnerability, package or title</span></span>${fb('Severity')}${fb('Fixable')}<span class="fcount">76 vulnerabilities</span></div>${cveTable}<div class="kmore">Show all 76</div>`,
     {
       about:
-        'Fixable ones first, worst first. A row opens the vulnerability’s own page, outside Lumovi.',
+        'Those with a fix first, worst first in each. A row opens the vulnerability’s own page, outside Lumovi.',
     },
   )}`
-  const panel = `<div class="ap wide"><div class="hd"><span class="kt">${icon('bug', 18)}</span><div class="who"><small>VulnerabilityReport · payments · 12m old</small><b>replicaset-payments-api-5d8f7c9b6-api</b><div class="st2">${pill('critical', '9 critical')}<span class="abar"><span class="sq">${icon('pin', 14)}</span><span class="sq">${icon('ellipsis', 14)}</span></span></div></div><span class="wins"><span>${icon('panel-bottom', 16)}</span><span>${icon('maximize-2', 16)}</span><span>${icon('x', 16)}</span></span></div><nav class="lts">${ltab('Overview')}${ltab('Vulnerabilities', { plug: true, on: true })}${ltab('Events')}${ltab('Audit')}${ltab('YAML')}</nav>${pgframe(PLUGIN, VERSION, `<div class="ov" style="padding:16px">${tab}</div>`, true).replace('class="pgframe"', 'class="pgframe flat"')}</div>`
+  const panel = `<div class="ap wide"><div class="hd"><span class="kt">${icon('bug', 18)}</span><div class="who"><small>VulnerabilityReport · payments · 12m old</small><b>replicaset-payments-api-5d8f7c9b6-api</b><div class="st2">${pill('critical', '9 critical')}<span class="abar"><span class="sq">${icon('pin', 14)}</span><span class="sq">${icon('ellipsis', 14)}</span></span></div></div><span class="wins"><span>${icon('panel-bottom', 16)}</span><span>${icon('maximize-2', 16)}</span><span>${icon('x', 16)}</span></span></div><nav class="lts">${ltab('Overview')}${ltab('Vulnerabilities', { plug: true, on: true })}${ltab('Events')}${ltab('Audit')}${ltab('YAML')}</nav><div class="pbody"><div class="ov" style="padding:16px">${tab}</div></div></div>`
 
   const yaml = `<pre class="yml"><span class="k">report</span>:
   <span class="k">scanner</span>:
@@ -847,16 +859,16 @@ function reportFrame(): string {
     <span class="k">severity</span>: <span class="s">HIGH</span>
     <span class="k">target</span>: <span class="s">/root/.ssh/id_rsa</span>
     <span class="k">title</span>: <span class="s">Asymmetric Private Key</span></pre>`
-  const yamlPanel = `<div class="ap"><div class="hd"><span class="kt">${icon('key-round', 18)}</span><div class="who"><small>ExposedSecretReport · batch · 2h old</small><b>cronjob-legacy-batch-worker</b><div class="st2">${pill('critical', '1 critical')}<span class="abar"><span class="sq">${icon('pin', 14)}</span><span class="sq">${icon('ellipsis', 14)}</span></span></div></div></div><nav class="lts">${ltab('Overview')}${ltab('Events')}${ltab('Audit')}${ltab('YAML', { on: true })}</nav><div class="tb">${xm(2, yaml, { block: true })}<p class="whnote">${icon('lock', 14)}<span>Withheld by the plugin Trivy’s file: Lumovi drops what matched as it reads the report, so it isn’t here, in the details, in a CSV or in the plugin’s code.</span></p></div></div>`
+  const yamlPanel = `<div class="ap"><div class="hd"><span class="kt">${icon('key-round', 18)}</span><div class="who"><small>ExposedSecretReport · batch · 2h old</small><b>cronjob-legacy-batch-worker</b><div class="st2">${pill('critical', '1 critical')}<span class="abar"><span class="sq">${icon('pin', 14)}</span><span class="sq">${icon('ellipsis', 14)}</span></span></div></div></div><nav class="lts">${ltab('Overview')}${ltab('Events')}${ltab('Audit')}${ltab('YAML', { on: true })}</nav><div class="tb">${xm(2, yaml, { block: true })}<p class="whnote">${icon('lock', 14)}<span>Withheld by the plugin Trivy’s file: Lumovi drops what matched as it reads the report, so it isn’t here, in the details, in a CSV, in the plugin’s code or in what its assistant tools read.</span></p></div></div>`
 
   return `<section class="blk"><h2>A report’s findings<i>the plugin’s own tab, on its own kind: every vulnerability in an image, fixable first</i></h2>${panel}</section>
   <section class="blk"><h2>A withheld field<i>new in the kit (2): what a file declares withheld, Lumovi never shows, and never hands to the plugin’s code</i></h2><div class="duo"><div class="col"><p class="cap"><b>An ExposedSecretReport’s YAML tab</b>, Lumovi’s own: each <code>match</code> withheld, its key kept so the shape still reads.</p>${yamlPanel}</div></div></section>`
 }
 
 const REPORT_RULES = [
-  '<b>A report’s own tab</b>, the plugin’s, on its own kind (as the kit allows today): the image, its OS, the container and when it was scanned, then every vulnerability in it, fixable first and worst first: its ID, severity, package, the version installed and the one that fixes it (“No fix yet” where there’s none), and Trivy’s title. Search and the Severity and Fixable filters; Download CSV.',
+  '<b>A report’s own tab</b>, the plugin’s, on its own kind (as the kit allows today): the image, its OS, the container and when it was scanned, then every vulnerability in it, sorted by Fixed in: those with a fix first, worst first in each, so an unfixed critical comes after the fixable highs: its ID, severity, package, the version installed and the one that fixes it (“No fix yet” where there’s none), and Trivy’s title. Search and the Severity and Fixable filters; Download CSV.',
   '<b>A row opens the vulnerability’s own page</b>, the link Trivy gives it, in the browser, as Lumovi’s links out do. Nothing else leaves: Lumovi doesn’t look a vulnerability up anywhere.',
-  '<b>Withheld fields</b>, new in the kit (2) and first of the four: the plugin’s file names fields (<code>withheld: [report.secrets[].match]</code>) that Lumovi drops as it reads the object, before anything else sees it. Not in the plugin’s code, not in details, not in the YAML tab, not in a CSV, not in a copy. The YAML tab keeps the key with a quiet <b>Withheld</b> where its value was, so the object’s shape still reads; a line under it says whose file withholds it.',
+  '<b>Withheld fields</b>, new in the kit (2) and first of the four: the plugin’s file names fields (<code>withheld: [report.secrets[].match]</code>) that Lumovi drops as it reads the object, before anything else sees it. Not in the plugin’s code, not in details, not in the YAML tab, not in a CSV, not in a copy, and not in what Lumovi’s assistant tools read (their get and list of these kinds). It’s withheld from what Lumovi shows and hands on, not from the cluster: <code>kubectl get exposedsecretreport -o yaml</code> in a terminal still shows it, and docs say so. The YAML tab keeps the key with a quiet <b>Withheld</b> where its value was, so the object’s shape still reads; a line under it says whose file withholds it.',
   '<b>A kind with a withheld field has no Edit YAML or Apply</b>, refused by Lumovi’s backend as well as its page: what Lumovi doesn’t show, it can’t send back. Its labels and annotations can still be edited, as those patches carry nothing withheld. Trivy’s reports are written by Trivy, so nothing is lost.',
 ]
 
@@ -957,13 +969,13 @@ function phones(): string {
     `<li><div class="top">${lead({ level: w.level, name: w.name, beside: w.ns, under: `${w.kind} · ${w.images} ${w.images === 1 ? 'image' : 'images'}` })}</div><dl class="wfix">${fact('Critical', `${w.sev[0]}`)}${fact('High', `${w.sev[1]}`)}${fact('Fixable', `${w.fix[0] + w.fix[1]} of ${w.sev[0] + w.sev[1]}`)}${fact('Fix first', w.first ? `<span class="mono">${w.first[0]}</span> · ${escape(w.first[1])} ${escape(w.first[2])} → ${escape(w.first[3])}` : 'No fix yet').replace('<div>', '<div class="whole">')}</dl></li>`
   const sec = phoneFrame(
     PLUGIN,
-    `<nav class="lts">${TABS}</nav><div class="pgframe" style="border:0;border-radius:0;box-shadow:none">${whoseStrip(PLUGIN, VERSION, true)}</div><div class="ptiles">${TILES()}</div><div class="sec"><h3>Vulnerabilities by workload<small>42</small><span class="tapb">${icon('download', 18)}</span></h3></div><div class="pfil"><span class="kfield ph">${icon('search', 16)}<span>Workload, image or CVE</span></span><span class="fb">${icon('sliders-horizontal', 16)}Filters</span></div><div class="sec" style="padding-top:0"><ul class="cards">${WORKLOADS.slice(0, 2).map(wcard).join('')}</ul><div class="pmore">Show all 42</div></div>`,
+    `<nav class="lts">${TABS}</nav><div class="ptiles">${TILES()}</div><div class="sec"><h3>Vulnerabilities by workload<small>42</small><span class="tapb">${icon('download', 18)}</span></h3></div><div class="pfil"><span class="kfield ph">${icon('search', 16)}<span>Workload, image or CVE</span></span><span class="fb">${icon('sliders-horizontal', 16)}Filters</span></div><div class="sec" style="padding-top:0"><ul class="cards">${WORKLOADS.slice(0, 2).map(wcard).join('')}</ul><div class="pmore">Show all 42</div></div>`,
   )
   const lcard = (d: Dep) =>
     `<div class="lcard"><div class="top">${lead({ level: d[2][0], name: d[0], beside: d[1] })}</div><dl>${fact('Status', d[2][1])}${fact('Ready', d[3])}${fact('Findings', d[5] ? pill(...d[5]) : '—')}</dl></div>`
   const list = phoneFrame(
     'Deployments',
-    `<div class="pcount">14 deployments</div>${DEPLOYMENTS.slice(0, 3).map(lcard).join('')}<div class="sec"><h3>payments-api<small>Objects that point here</small></h3>${POINT_ROWS(false, 20)}</div>`,
+    `<div class="pcount">14 deployments</div>${DEPLOYMENTS.slice(0, 3).map(lcard).join('')}<div class="sec"><h3>payments-api<small>Objects that point here</small></h3>${POINT_ROWS(false, 16)}</div>`,
   )
   return `<section class="blk"><h2>On a phone<i>read, as the kit draws every page there</i></h2><div style="display:flex;gap:24px;align-items:flex-start">${sec}${list}</div><p class="cap" style="max-width:820px">Left: the Security page, tiles two across, each table as cards, every column a fact, the long ones each on a line; its Download CSV a 44 px button at the table’s heading. Right: Lumovi’s own Deployments with Findings as a fact on each card, and a workload’s Objects that point here, the same rows at 52 px, each report’s name cut in its middle, as reports differ in their last part.</p></section>`
 }
@@ -975,14 +987,14 @@ const KEYS = `<dl class="keys"><dt>1</dt><dd><b>Download CSV on the kit’s Tabl
 export type TrivyFrame = 'trivy-security' | 'trivy-report' | 'trivy-lumovi' | 'trivy-phone'
 
 export const TRIVY_FRAMES: { id: TrivyFrame; title: string; size: Size }[] = [
-  { id: 'trivy-security', title: 'Trivy: the Security page', size: { width: 1440, height: 4340 } },
+  { id: 'trivy-security', title: 'Trivy: the Security page', size: { width: 1440, height: 4330 } },
   {
     id: 'trivy-report',
     title: 'Trivy: a report, and a withheld field',
-    size: { width: 1440, height: 1975 },
+    size: { width: 1440, height: 2010 },
   },
   { id: 'trivy-lumovi', title: 'Trivy on Lumovi’s own pages', size: { width: 1440, height: 1200 } },
-  { id: 'trivy-phone', title: 'Trivy on a phone', size: { width: 920, height: 1110 } },
+  { id: 'trivy-phone', title: 'Trivy on a phone', size: { width: 920, height: 1065 } },
 ]
 
 const sheet = (
