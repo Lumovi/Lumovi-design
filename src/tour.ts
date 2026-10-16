@@ -7,7 +7,8 @@
  *
  * Two layouts for Péter to choose from: `beside`, the chapters at the film's right as tall as it
  * is, and `under`, the film as wide as the site's other films with the chapters in three columns
- * beneath. On a phone both stack, and the chapters fold after five.
+ * beneath. On a phone both stack, and the chapters fold after five; while the film plays past
+ * them, the chapter it's in shows as a sixth row, lit.
  */
 import { escape } from './svg.ts'
 
@@ -45,6 +46,12 @@ const seconds = (time: string) => {
   return m! * 60 + s!
 }
 
+/** A chapter's start as a duration into the film, for <time datetime>: "3:07" is "PT3M7S". */
+const duration = (time: string) => {
+  const [m, s] = time.split(':').map(Number)
+  return `PT${m}M${s}S`
+}
+
 /**
  * The section's words, its film and its chapters. `current` lights a chapter, as playing does;
  * `open` unfolds a phone's list.
@@ -55,7 +62,7 @@ export function tourSection(
 ): string {
   const rows = CHAPTERS.map(
     (c, i) =>
-      `<li${i >= SHOWN_ON_A_PHONE ? ' class="later"' : ''}${i === o.current ? ' aria-current="true"' : ''}><button type="button" data-at="${seconds(c.time)}"><time>${c.time}</time><span>${escape(c.title)}</span></button></li>`,
+      `<li${i >= SHOWN_ON_A_PHONE ? ' class="later"' : ''}><button type="button" data-at="${seconds(c.time)}"${i === o.current ? ' aria-current="true"' : ''}><time datetime="${duration(c.time)}">${c.time}</time><span>${escape(c.title)}</span></button></li>`,
   ).join('')
   return `<section class="tour ${layout}" id="tour" aria-labelledby="tour-title">
   <div class="wrap">
@@ -64,7 +71,7 @@ export function tourSection(
         <span class="eyebrow">The tour</span>
         <h2 class="h2" id="tour-title">See it in 10 minutes. <span class="dim">Every part of Lumovi, in order.</span></h2>
       </div>
-      <p class="lead t-lead">Twenty chapters, one for each part of the app. Start at the top, or jump to the part you came for.</p>
+      <p class="lead t-lead">Twenty short chapters. Start at the top, or jump to the part you came for.</p>
     </div>
     <div class="t-body">
       <figure class="t-film">
@@ -101,14 +108,14 @@ export const CSS = `
 .t-film .length { color: var(--text-3); }
 
 /* The chapters, a quiet table of contents: a press jumps the film there and plays it, and the
-   chapter it's in is lit. */
+   chapter it's in is lit, its button aria-current so a screen reader says so too. */
 .t-chapters ol { margin: 0; padding: 0; list-style: none; }
 .t-chapters li button { display: grid; grid-template-columns: 3.4em 1fr; align-items: center; width: 100%; padding: 0 10px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 0.875rem; text-align: left; color: var(--text-2); cursor: pointer; }
 .t-chapters li button:hover { background: var(--tint); color: var(--text-1); }
 .t-chapters time { font-variant-numeric: tabular-nums; color: var(--text-3); }
-.t-chapters li[aria-current] button { position: relative; color: var(--text-1); background: var(--tint); }
-.t-chapters li[aria-current] time { color: var(--accent-strong); }
-.t-chapters li[aria-current] button::before { content: ''; position: absolute; left: 0; top: 7px; bottom: 7px; width: 2px; border-radius: 2px; background: var(--accent-strong); }
+.t-chapters li button[aria-current] { position: relative; color: var(--text-1); background: var(--tint); }
+.t-chapters li button[aria-current] time { color: var(--accent-strong); }
+.t-chapters li button[aria-current]::before { content: ''; position: absolute; left: 0; top: 7px; bottom: 7px; width: 2px; border-radius: 2px; background: var(--accent-strong); }
 .t-more { display: none; }
 
 /* Beside: twenty rows as tall as the film (800 × 450 at 1440, so 22.5 px each). */
@@ -132,6 +139,8 @@ export const CSS = `
   .t-chapters ol { border-top: 1px solid var(--line); }
   .t-chapters li { border-bottom: 1px solid var(--line); }
   .t-chapters[data-folded] li.later { display: none; }
+  /* Folded, the chapter it's playing stays in view: a sixth row, after the first five. */
+  .t-chapters[data-folded] li.later:has(> button[aria-current]) { display: block; }
   .t-more { display: inline-flex; align-items: center; gap: 6px; height: 44px; margin-top: 4px; padding: 0 12px; border: 0; background: none; font: inherit; font-size: 0.9375rem; font-weight: 500; color: var(--text-1); cursor: pointer; }
   .t-chapters:not([data-folded]) .t-more svg { transform: rotate(180deg); }
 }`
