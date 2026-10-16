@@ -43,6 +43,7 @@ ${only(HELM, /^(\.ad|\.prodm)/)}
 .pk .o .cword b { font-weight: 500; }
 .pk .o .cword small { display: block; font-size: 12px; line-height: 16px; color: var(--text-3); }
 .pk .o .tag { flex: none; font-size: 12px; color: var(--text-3); }
+.pk .o .btn { flex: none; height: 26px; padding: 0 8px; font-size: 12px; }
 .pk .o .mono { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
 .pk .empty { display: flex; gap: 10px; padding: 14px 12px; font-size: 13px; line-height: 1.55; color: var(--text-2); }
 .pk .empty svg.i { flex: none; margin-top: 3px; color: var(--text-3); }
@@ -95,6 +96,7 @@ ${only(HELM, /^(\.ad|\.prodm)/)}
 .diff .sg { display: inline-block; width: 12px; margin-right: 12px; color: var(--text-3); }
 .diff .mk { padding: 0 3px; border-radius: 3px; background: color-mix(in srgb, var(--surface-3) 80%, transparent); }
 .diff .wh { display: inline-flex; align-items: center; gap: 4px; padding: 0 6px; border-radius: 5px; background: var(--surface-3); font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: var(--text-2); }
+.diff .nc { font-family: 'Inter', sans-serif; font-size: 11px; font-style: italic; color: var(--text-3); }
 .diff .so { font-family: 'Inter', sans-serif; font-style: italic; opacity: 0.85; }
 .diff.plain > div { padding-left: 16px; }
 
@@ -219,29 +221,35 @@ const cbar = (
   `<div class="cbar">${o.unread ? `<span class="q3">Nothing to compare until ${o.unread} is read</span>` : o.none ? '<span class="q3">No differences</span>' : `<span><span class="minus">−${o.minus}</span> <span class="plus">+${o.plus}</span> lines</span>`}${o.hidden ? `<span class="q3">· ${o.hidden} lines of status and cluster-set fields left out</span>` : ''}<span class="grow"></span><span class="tg${o.on ? ' on' : ''}"><span class="sw"></span>Show status and cluster-set fields</span><span class="btn">Change…</span><span class="btn">${icon('rotate-cw', 14)}Refresh</span></div>`
 
 /** The config a workload references, paired by where it's referenced. */
-function pairs(
-  o: { reveal?: 'both' | 'left-only'; revealed?: boolean } = { reveal: 'both' },
-): string {
-  const v = (t: string) =>
-    o.revealed ? `<span class="so">${t}</span>` : `<span class="mk">${MASK}</span>`
-  const secret = lines([
-    ['s', 'data:'],
-    ['s', `  host: <span class="mk">${MASK}</span>`],
-    ['r', `  password: ${v('‹its value on production-eu›')}`],
-    ['a', `  password: ${v('‹its value on staging›')}`],
-    ['s', `  user: <span class="mk">${MASK}</span>`],
-  ])
-  const bar =
-    o.reveal === 'left-only'
-      ? `<div class="bar2"><span>Secrets’ values hidden</span><span class="grow"></span><span class="btn ghost">${icon('eye', 14)}Reveal production-eu’s values</span></div>`
-      : `<div class="bar2"><span>Secrets’ values hidden</span><span class="grow"></span><span class="btn ghost">${icon('eye', 14)}Reveal values</span></div>`
-  const note =
-    o.reveal === 'left-only'
-      ? `<p class="note">${icon('lock', 14)}<span>staging’s stay hidden: your access there shows only their keys.</span></p>`
-      : ''
+function pairs(o: { keysOnly?: boolean } = {}): string {
+  const nc = '<span class="nc">not compared</span>'
+  const secret = o.keysOnly
+    ? lines([
+        ['s', 'data:'],
+        ['s', `  host: ${nc}`],
+        ['s', `  password: ${nc}`],
+        ['a', `  readonly-password: ${nc}`],
+        ['s', `  user: ${nc}`],
+      ])
+    : lines([
+        ['s', 'data:'],
+        ['s', `  host: <span class="mk">${MASK}</span>`],
+        ['r', `  password: <span class="mk">${MASK}</span>`],
+        ['a', `  password: <span class="mk">${MASK}</span>`],
+        ['s', `  user: <span class="mk">${MASK}</span>`],
+      ])
+  const bar = o.keysOnly
+    ? `<div class="bar2"><span>Keys only</span></div>`
+    : `<div class="bar2"><span>Secrets’ values hidden</span><span class="grow"></span><span class="btn ghost">${icon('eye', 14)}Reveal values</span></div>`
+  const note = o.keysOnly
+    ? `<p class="note">${icon('lock', 14)}<span>Values not compared: your access on staging shows only Secrets’ keys. Each side’s Secret opens on its own.</span></p>`
+    : ''
+  const st = o.keysOnly
+    ? '<span class="st">Keys only · <span style="color:var(--good-text);font-weight:500">+1 key</span></span>'
+    : '<span class="st d"><span class="minus">−1</span> <span class="plus">+1</span></span>'
   return `<p class="sec">Config it references<small>3 pairs</small></p><div class="pairs">
     <div class="pr">${icon('chevron-right', 16)}${icon('file-code-2', 16)}<span class="cword"><b>checkout-config</b><small>ConfigMap · envFrom, container api</small></span><span class="st">${icon('check', 12)} The same</span></div>
-    <div><div class="pr">${icon('chevron-down', 16)}${icon('key-round', 16)}<span class="cword"><b>checkout-db</b><small>Secret · env DB_PASSWORD, container api</small></span><span class="st d"><span class="minus">−1</span> <span class="plus">+1</span></span></div><div class="pin">${bar}${secret}${note}</div></div>
+    <div><div class="pr">${icon('chevron-down', 16)}${icon('key-round', 16)}<span class="cword"><b>checkout-db</b><small>Secret · env DB_PASSWORD, container api</small></span>${st}</div><div class="pin">${bar}${secret}${note}</div></div>
     <div class="pr">${icon('chevron-right', 16)}${icon('file-code-2', 16)}<span class="cword"><b>checkout-flags</b><small>ConfigMap · volume flags, container api</small></span><span class="st only">Only on staging</span></div>
   </div>`
 }
@@ -270,23 +278,18 @@ const mi = (
 
 const MORE = `<div class="pm"><div class="lbl">Actions</div>${mi('link', 'Copy link')}${mi('git-compare', 'Compare with…', { hl: true })}<hr>${mi('tag', 'Edit labels…')}${mi('pencil', 'Edit YAML')}<hr>${mi('trash-2', 'Delete…', { k: '⌘ ⌫', danger: true })}</div>`
 
-type Objects = 'list' | 'not-served' | 'none' | 'forbidden'
+type Objects = 'list' | 'not-served' | 'none' | 'forbidden' | 'unopened'
 
-function picker(o: { cluster: string; objects: Objects; kind?: string }): string {
-  const clusters: [string, string, boolean, boolean, string][] = [
-    ['production-eu', 'This one', true, true, ''],
-    ['staging', '', false, true, ''],
-    ['prod-us', '', true, true, ''],
-    [
-      'dev-anna',
-      '',
-      false,
-      false,
-      'Not open yet: picking it opens it, and it may ask you to sign in.',
-    ],
+function picker(o: { cluster: string; objects: Objects; kind?: string; opened?: boolean }): string {
+  const clusters: [string, string, boolean, boolean][] = [
+    ['production-eu', 'This one', true, true],
+    ['staging', '', false, true],
+    ['prod-us', '', true, true],
+    ['dev-anna', '', false, !!o.opened],
   ]
-  const crow = ([name, tag, prod, open, note]: (typeof clusters)[number]) =>
-    `<div class="o${name === o.cluster ? ' on' : ''}"><span class="rd"></span><span class="dot${open ? '' : ' off'}"></span><span class="cword"><b>${name}</b> ${prod ? prodm : ''}${note ? `<small>${note}</small>` : ''}</span><span class="tag">${tag}</span></div>`
+  const crow = ([name, tag, prod, open]: (typeof clusters)[number]) =>
+    `<div class="o${name === o.cluster ? ' on' : ''}"><span class="rd"></span><span class="dot${open ? '' : ' off'}"></span><span class="cword"><b>${name}</b> ${prod ? prodm : ''}${open ? '' : '<small>Not open yet. Opening it may ask you to sign in.</small>'}</span>${open ? `<span class="tag">${tag}</span>` : `<span class="btn">Open ${name}</span>`}</div>`
+  const cert = o.kind === 'Certificates'
   const kind = o.kind ?? 'Deployments'
   const objs = {
     list: `<div class="pk">${[
@@ -303,12 +306,17 @@ function picker(o: { cluster: string; objects: Objects; kind?: string }): string
     'not-served': `<div class="pk"><div class="empty">${icon('info', 16)}<span>dev-anna doesn’t serve Certificates (cert-manager.io/v1), so there’s nothing to compare with there.</span></div></div>`,
     none: `<div class="pk"><div class="empty">${icon('info', 16)}<span>No Deployments in shop on staging. Pick another namespace, or another cluster.</span></div></div>`,
     forbidden: `<div class="pk"><div class="empty">${icon('lock', 16)}<span>Your access on prod-us doesn’t list Deployments in shop.</span></div></div>`,
+    unopened: `<div class="pk"><div class="empty">${icon('info', 16)}<span>dev-anna isn’t open. Open it, with the button on its row, to see its namespaces and Deployments.</span></div></div>`,
   }[o.objects]
   const ready = o.objects === 'list'
-  return `<div class="ad"><header><span class="g">${icon('git-compare', 18)}</span><div class="t"><h3>Compare checkout with…</h3><p class="sub2">Deployment · shop · <b>production-eu</b>${prodm}</p></div></header><div class="body">
+  const ns =
+    o.objects === 'unopened'
+      ? `<span class="sel" style="color:var(--text-3)">—${icon('chevron-down', 14)}</span>`
+      : `<span class="sel">shop${icon('chevron-down', 14)}</span>`
+  return `<div class="ad"><header><span class="g">${icon('git-compare', 18)}</span><div class="t"><h3>Compare ${cert ? 'shop-tls' : 'checkout'} with…</h3><p class="sub2">${cert ? 'Certificate' : 'Deployment'} · shop · <b>production-eu</b>${prodm}</p></div></header><div class="body">
     <div class="fl"><span>Cluster</span><div class="pk">${clusters.map(crow).join('')}</div></div>
-    <div class="fl"><span>Namespace</span><span class="sel">shop${icon('chevron-down', 14)}</span></div>
-    <div class="fl"><span>${o.kind ? 'Certificate' : 'Deployment'}</span>${ready ? `<span class="in">${icon('search', 14)}Filter ${kind.toLowerCase()}</span>` : ''}${objs}</div>
+    <div class="fl"><span>Namespace</span>${ns}</div>
+    <div class="fl"><span>${cert ? 'Certificate' : 'Deployment'}</span>${ready ? `<span class="in">${icon('search', 14)}Filter ${kind.toLowerCase()}</span>` : ''}${objs}</div>
   </div><footer><span class="btn ghost">Cancel</span><span class="btn primary${ready ? '' : ' off'}">Compare</span></footer></div>`
 }
 
@@ -318,13 +326,14 @@ function pickerFrame(): string {
     <div class="row"><div class="col"><p class="cap"><b>As it opens</b> from checkout on production-eu, staging picked: shop, and checkout there, picked as it has the same name.</p>${picker({ cluster: 'staging', objects: 'list' })}</div>
     <div class="col"><p class="cap"><b>Nothing of it there</b>: Compare waits for an object.</p>${picker({ cluster: 'staging', objects: 'none' })}</div></div>
     <div class="row"><div class="col"><p class="cap"><b>Your access doesn’t list it there.</b></p>${picker({ cluster: 'prod-us', objects: 'forbidden' })}</div>
-    <div class="col"><p class="cap"><b>The kind isn’t served there</b>, comparing a Certificate; dev-anna, not open before, was opened by picking it.</p>${picker({ cluster: 'dev-anna', objects: 'not-served', kind: 'Certificates' })}</div></div></section>`
+    <div class="col"><p class="cap"><b>The kind isn’t served there</b>, comparing a Certificate, on dev-anna once opened with its button.</p>${picker({ cluster: 'dev-anna', objects: 'not-served', kind: 'Certificates', opened: true })}</div></div>
+    <div class="row"><div class="col"><p class="cap"><b>A cluster that isn’t open</b>, picked (with a click or the arrow keys): nothing opens or reads until its Open button is pressed.</p>${picker({ cluster: 'dev-anna', objects: 'unopened' })}</div></div></section>`
 }
 
 const PICK_RULES = [
   '<b>“Compare with…”</b> is in every object’s More actions, after Copy link (both read, neither changes anything), and in the palette’s Actions while an object is open. It has no key. It’s read-only throughout: nothing it shows can be changed from it.',
   '<b>The picker</b>, titled “Compare checkout with…”, under it the object’s kind, namespace and cluster: <b>Cluster</b>, this one first (“This one”), then every cluster the person has, with their Production marks; <b>Namespace</b> for a namespaced kind, the same one to start; then the <b>objects of the same kind</b> there, filtered by a field, the same-named one picked (“Same name”). Compare opens the page. Esc and Cancel leave.',
-  '<b>A cluster that isn’t open</b> is listed without being read, its dot quiet, and its row says “Not open yet: picking it opens it, and it may ask you to sign in.” Picking it opens it, as the cluster switcher does, sign-in included; nothing is read from it before.',
+  '<b>A cluster that isn’t open</b> is listed without being read, its dot quiet, its row saying “Not open yet. Opening it may ask you to sign in.”, with an <b>Open dev-anna</b> button. Picking the row, with a click or by arrowing through the list, opens nothing: its namespace and objects wait (“dev-anna isn’t open. Open it, with the button on its row, to see its namespaces and Deployments.”), and Compare waits. Only the button opens it, as the cluster switcher does, sign-in included; nothing is read from it before.',
   '<b>Where there’s nothing to pick</b>, the list says why in one line, and Compare waits: the kind isn’t served there (“dev-anna doesn’t serve Certificates (cert-manager.io/v1), so there’s nothing to compare with there.”); none of it there (“No Deployments in shop on staging. Pick another namespace, or another cluster.”); access doesn’t list it (“Your access on prod-us doesn’t list Deployments in shop.”).',
 ]
 
@@ -338,12 +347,12 @@ function pageFrame(): string {
 }
 
 const PAGE_RULES = [
-  '<b>A page of its own</b>, “Compare” in the bar with Lumovi’s compare mark, as a table of differences needs the width. It has an address of its own, so Back returns to the object, and Copy link copies the comparison (both sides, by cluster, namespace and name).',
+  '<b>A page of its own</b>, “Compare” in the bar with Lumovi’s compare mark, as a table of differences needs the width. Back returns to the object. There’s no link to a comparison in this ticket: the bar’s ⋯ has no Copy link to this view here (a later ticket, if wanted).',
   '<b>The two sides</b>, left and right, each as its cluster (with its Production mark), namespace, name and kind. The left is marked <b>−</b> in red and the right <b>+</b> in green, as the diff’s lines are, so which line is whose is never in doubt. <b>Swap</b> turns them round; <b>Change…</b> opens the picker for the right side; <b>Refresh</b> reads both again.',
   '<b>The diff</b> is Lumovi’s DiffView, unified: the left’s lines that differ in red, the right’s in green, the rest folded (“14 unchanged lines”). Unified, not side by side: it’s what Lumovi’s other diffs are, it folds what’s the same, and it reads in a panel’s width as well as a page’s. The counts head it: “−4 +6 lines”.',
   '<b>Status and cluster-set fields are left out by default</b> (status; metadata’s uid, resourceVersion, generation, creationTimestamp, managedFields; the last-applied annotation; a Service’s clusterIP and the like: app-2’s list), and the bar says how many lines: “64 lines of status and cluster-set fields left out”. <b>Show status and cluster-set fields</b> puts them back, counted too. It’s remembered for the next comparison.',
   '<b>For a workload, the config it references</b>, under the diff: each ConfigMap and Secret, paired by where it’s referenced (envFrom, an env’s secretKeyRef, a volume), named with its kind and where. A pair that’s the same is folded, “The same”; one that differs shows its counts and opens to its own diff; one referenced on only one side says “Only on staging” (or the other side), in amber.',
-  '<b>Secrets</b> are masked line for line, on both sides, as the YAML tab masks them: a changed value still shows as a changed line. <b>Reveal values</b> shows them where that side’s access shows Secrets’ values; where only one side’s does, the button names it (“Reveal production-eu’s values”) and the other side’s stay masked, with why (frame 3).',
+  '<b>Secrets</b> are masked line for line, on both sides, as the YAML tab masks them: a changed value still shows as a changed line. <b>Reveal values</b> shows them where both sides’ access shows Secrets’ values. <b>Where either side’s access shows only keys</b>, only keys are compared (frame 3).',
 ]
 
 // ─── 3. States ──────────────────────────────────────────────────────────────────────────────
@@ -363,7 +372,7 @@ function statesFrame(): string {
     ],
     true,
   )}</div>`
-  const secrets = `${sides()}${cbar({ minus: 4, plus: 6, hidden: 64 })}<div class="cbody">${pairs({ reveal: 'left-only' })}</div>`
+  const secrets = `${sides()}${cbar({ minus: 4, plus: 6, hidden: 64 })}<div class="cbody">${pairs({ keysOnly: true })}</div>`
   const withheld = `<div class="cbody" style="padding-top:16px">${lines([
     ['s', 'report:'],
     ['s', '  secrets:'],
@@ -375,16 +384,16 @@ function statesFrame(): string {
   return `<section class="blk"><h2>States</h2>
     <p class="cap"><b>No differences</b>, said once, with what was left out.</p>${cmpWin(none, 520)}
     <p class="cap" style="margin-top:8px"><b>A side that can’t be read</b>: why, on that side; the other shown as it is.</p>${cmpWin(unread, 560)}
-    <p class="cap" style="margin-top:8px"><b>Secrets, where only one side’s access shows values</b>: Reveal names that side; the other stays masked, and why.</p>${cmpWin(secrets, 600)}
+    <p class="cap" style="margin-top:8px"><b>A Secret where one side’s access shows only keys</b>: its keys compared, its values not, on either side.</p>${cmpWin(secrets, 600)}
     <div class="row" style="margin-top:8px"><div class="col"><p class="cap"><b>A field a plugin’s file withholds</b>, comparing two ExposedSecretReports: noted, as the YAML tab notes it.</p><div class="ad" style="width:600px">${withheld}</div></div></div></section>`
 }
 
 const STATE_RULES = [
   '<b>No differences</b>: a check, “No differences”, and “checkout is the same on both sides.” With the fields left out counted, and <b>Show them</b>, as they may differ. With them shown and still none: “checkout is the same on both sides, status included.”',
   '<b>A side that can’t be read</b> says why on its own card, in Lumovi’s words for the error (“Couldn’t read it: staging didn’t answer in time.”; “Your access on prod-us doesn’t let you read Deployments in shop.”; “It’s gone: checkout no longer exists on staging.”). The other side shows as it is, plain, under “Only production-eu’s side, as it is. Refresh reads staging again.” No counts, no diff.',
-  '<b>Secrets, one side’s access showing only keys</b>: both sides stay masked; Reveal names the side it can show; the other’s line says “staging’s stay hidden: your access there shows only their keys.” A value is never shown for a side whose access doesn’t show it.',
+  '<b>A Secret where either side’s access shows only keys</b> (on a server; the desktop always has values) is compared by its keys alone: a key on both sides is drawn plain, its value “not compared”; a key on one side only is added or removed; no value is ever counted, drawn as changed or unchanged, or said to be “The same”. The pair says “Keys only”, with its key counts (“+1 key”), and a line says why: “Values not compared: your access on staging shows only Secrets’ keys. Each side’s Secret opens on its own.” There’s no Reveal on such a pair. Saying whether a hidden value matches a visible one would tell what the person may not read, as for a withheld field.',
   '<b>Withheld fields</b> (a plugin’s file, as LMV-349 has it) show as <b>Withheld</b> on both sides, never compared, with a line saying whose file withholds them.',
-  '<b>On a phone it isn’t there at first</b>: Compare with… isn’t in More actions or the palette under 640 px. A comparison’s link opened on a phone says “Compare needs a larger screen.” with Back.',
+  '<b>On a phone it isn’t there at first</b>: Compare with… isn’t in More actions or the palette under 640 px.',
 ]
 
 // ─── The frames ─────────────────────────────────────────────────────────────────────────────
@@ -392,9 +401,9 @@ const STATE_RULES = [
 export type CompareFrame = 'cmp-picker' | 'cmp-page' | 'cmp-states'
 
 export const COMPARE_FRAMES: { id: CompareFrame; title: string; size: Size }[] = [
-  { id: 'cmp-picker', title: 'Compare: the picker', size: { width: 1440, height: 2140 } },
+  { id: 'cmp-picker', title: 'Compare: the picker', size: { width: 1440, height: 2735 } },
   { id: 'cmp-page', title: 'Compare: the comparison', size: { width: 1440, height: 2795 } },
-  { id: 'cmp-states', title: 'Compare: its states', size: { width: 1440, height: 2545 } },
+  { id: 'cmp-states', title: 'Compare: its states', size: { width: 1440, height: 2600 } },
 ]
 
 const sheet = (
