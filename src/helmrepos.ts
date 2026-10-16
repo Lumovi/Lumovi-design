@@ -337,6 +337,30 @@ function editRepo(): string {
   })
 }
 
+/** The address changed to another host: the saved sign-in goes, fail-closed. */
+function editMoved(): string {
+  return adlg({
+    glyph: 'pencil',
+    title: 'Edit acme-charts',
+    subject: 'Helm repositories · kept on this computer, for every cluster',
+    body: `<div class="two"><label class="fl"><span>Name</span><span class="in mono">acme-charts</span></label><label class="fl"><span>Address</span><span class="in mono focus">https://charts.acme-mirror.example</span><small>Changing the host removes its sign-in. Enter it again for the new address.</small></label></div><div class="signin"><span class="hd2"><span class="cb on">${icon('check', 12, 3)}</span>It needs a sign-in</span><div class="two"><label class="fl"><span>Username</span><span class="in mono">anna</span></label><label class="fl"><span>Password</span><span class="in mono ph">Enter it for the new address</span></label></div></div>`,
+    confirm: 'Save',
+  })
+}
+
+/** An http address: no sign-in is sent over it. */
+function plainHttp(): string {
+  return adlg({
+    glyph: 'plus',
+    title: 'Add a repository',
+    subject: 'Helm repositories · kept on this computer, for every cluster',
+    body: `<span class="seg"><span class="on">HTTP repository</span><span>OCI registry</span></span><div class="two"><label class="fl"><span>Name</span><span class="in mono">lab-charts</span></label><label class="fl"><span>Address</span><span class="in mono">http://charts.lab.example</span></label></div><div class="signin"><span class="hd2 off"><span class="cb off"></span>It needs a sign-in</span><p class="kept">${icon('lock', 14)}<span>A sign-in is only sent over https. Use the repository’s https address to add one.</span></p></div>`,
+    command: 'helm repo add lab-charts http://charts.lab.example',
+    note: 'Lumovi keeps repositories itself, not in Helm’s own list: this is how Helm would add it.',
+    confirm: 'Add repository',
+  })
+}
+
 function noKeychain(): string {
   return adlg({
     glyph: 'plus',
@@ -377,6 +401,7 @@ function reposFrame(): string {
     <section class="blk"><h2>Adding, editing, removing<i>Lumovi’s ActionDialog; a repository is Lumovi’s, so it names where it’s kept, not a cluster</i></h2>
     <div class="row"><div class="col"><p class="cap"><b>An HTTP repository</b>, with a sign-in, after Test connection.</p>${addHttp()}</div><div class="col"><p class="cap"><b>An OCI registry</b>: no index, so it’s added with the charts to look for.</p>${addOci()}</div></div>
     <div class="row"><div class="col"><p class="cap"><b>Editing</b>: the saved password is never shown; Replace asks for a new one. Here its test failed.</p>${editRepo()}</div><div class="col"><p class="cap"><b>On Linux with no keychain</b>: no password is kept, and why.</p>${noKeychain()}</div></div>
+    <div class="row"><div class="col"><p class="cap"><b>The address moved to another host</b>: the saved sign-in is gone, and it has to be entered again.</p>${editMoved()}</div><div class="col"><p class="cap"><b>An http address</b>: no sign-in can be added, and why.</p>${plainHttp()}</div></div>
     <div class="row"><div class="col"><p class="cap"><b>On a server, for one of Lumovi’s admins</b>: sealed on the server, and audited.</p>${serverAdd()}</div><div class="col"><p class="cap"><b>Remove</b>, from the row’s ⋯.</p>${removeRepo()}</div></div></section>`
 }
 
@@ -386,6 +411,7 @@ const REPO_RULES = [
   '<b>Lumovi reads each index every 30 minutes and when the Helm page opens</b>, only from repositories added here, and says so under the list. Nothing is read from anywhere else, and nothing is added for the person.',
   '<b>Add repository</b> asks HTTP or OCI, a name and the address. <b>An OCI registry has no index</b>, so it’s added with the charts to look for, as chips; their versions are the registry’s tags. <b>Test connection</b>, in the dialog and a row’s menu, reads it once and says what it found (“Connected: its index lists 42 charts.”) or why not (“Couldn’t sign in: 401 Unauthorized.”). Adding doesn’t wait for a test: a repository that can’t be read is listed, and says so.',
   '<b>A sign-in</b> (username and password, or a token for a registry) is never shown again once saved: not in the dialog, a copy, a CSV or a command (which uses <code>--password-stdin</code>). Editing shows “Saved” with <b>Replace…</b>, which asks for a new one, typed in full; clearing It needs a sign-in removes it. <b>Helm never sees it</b>: Lumovi fetches charts with it and hands Helm the chart, and the dialog says so.',
+  '<b>A sign-in goes only where it was given.</b> Changing the address’s host, scheme or port removes the saved sign-in, at once and fail-closed, and the dialog says so under the address (“Changing the host removes its sign-in. Enter it again for the new address.”): the password field is empty, to be typed for the new one. Otherwise anyone who may edit a repository (on a server, any of Lumovi’s admins) could point it at a host of their own and be sent its sealed password. A redirect to another host is followed without the sign-in. <b>A sign-in is only sent over https</b>: with an http address, It needs a sign-in stays off, its line saying why (localhost is the one exception, for a repository on this computer).',
   '<b>Where it’s kept.</b> On the desktop, in the computer’s keychain, encrypted; with none (Linux without a Secret Service), nothing is kept, and the dialog says “Lumovi can’t keep a password here.”, why, and what to do. On a server, sealed in its state, write-only and in the audit log; and only Lumovi’s admins add, edit or remove repositories, as Access is theirs: others see the list, with who to ask, in Access’s words.',
   '<b>Remove</b> forgets the repository and its sign-in; its charts leave the Charts tab; releases installed from it stay as they are and lose Update available from it. The dialog is Lumovi’s danger one, with no typing to confirm, as nothing in a cluster changes.',
   '<b>A repository isn’t a cluster’s</b>, so these dialogs name where it’s kept (“kept on this computer, for every cluster”; “kept on this server, for everyone who uses it”) in place of a cluster and its Production mark. Their command is how Helm would do the same, with a line saying Lumovi keeps its own list.',
@@ -481,9 +507,9 @@ function chartsFrame(): string {
 
 const CHART_RULES = [
   '<b>Charts</b> lists every chart in the repositories added, one row each: its icon, name, repository beside it and description under it; its latest version, its app’s, and when it was released. Search matches name, keywords and description; a menu picks one repository. Sorted by name. A chart in two repositories is two rows, each saying where.',
-  '<b>Its icon</b> is the one its index names, fetched by Lumovi’s backend (never the page), over https only, as an image of at most 256 KB, and never with the repository’s sign-in unless it’s on the repository’s own host. Until it comes, or if it can’t, the chart’s initial in a tile; the page never loads an address a chart names.',
-  '<b>A chart opened</b> shows in the panel, as an object does: its icon, name and repository, its description, links to its home and source (opening in the browser), and its versions, newest first, each with its app version and when it was released, the latest marked. Picking one sets the button: <b>Install 2.5.0…</b>. An OCI chart lists its tags.',
-  '<b>Install</b> opens today’s Install a chart with the chart filled in: a new first choice, <b>From a saved repository</b>, its repository, chart and version as menus, then today’s two (another repository or registry, a chart on this computer). The release name is the chart’s, selected to change; the values start empty, as today. The command shows Helm installing the fetched chart, and a line under it says Lumovi fetched it with the saved sign-in.',
+  '<b>Its icon</b> is the one its index names, fetched by Lumovi’s backend (never the page), over https only, as an image of at most 256 KB, only from the repository’s own host or a public address (never a private, link-local or cluster-local one: on a server the backend is inside the cluster’s network), and never with the repository’s sign-in unless it’s on the repository’s own host. Until it comes, or if it can’t, the chart’s initial in a tile.',
+  '<b>A chart opened</b> shows in the panel, as an object does: its icon, name and repository, its description, links to its home and source (only http and https ones, opened through Lumovi’s usual link-out), and its versions, newest first, each with its app version and when it was released, the latest marked. Picking one sets the button: <b>Install 2.5.0…</b>. An OCI chart lists its tags.',
+  '<b>Install</b> opens today’s Install a chart with the chart filled in: a new first choice, <b>From a saved repository</b>, its repository, chart and version as menus, then today’s two (another repository or registry, a chart on this computer). The release name is the chart’s, selected to change; the values start empty, as today. The command shows Helm installing the fetched chart, and a line under it says Lumovi fetched it with the saved sign-in. <b>The fetched chart is checked</b> before Helm gets it: against the index’s <code>digest</code> (sha256), or an OCI chart’s manifest digest; a mismatch stops it (“The chart Lumovi fetched isn’t the one its repository lists.”). Lumovi records that it installed the release from that repository, for Update available.',
   '<b>Empty</b>: no repositories added: “Add a repository to browse its charts.”, with Add repository (for those who may). Nothing matches: “No charts match.”',
 ]
 
@@ -515,6 +541,7 @@ const RELEASES: Rel[] = [
     '41d',
   ],
   ['healthy', 'orders', 'shop', 'Deployed', 'orders 1.2.0', null, '1.2.0', '5', '4d'],
+  ['healthy', 'logging', 'monitoring', 'Deployed', 'fluent-bit 0.46.0', null, '3.0.7', '6', '12d'],
   ['healthy', 'redis', 'data', 'Deployed', 'redis 19.0.1', null, '7.2.4', '2', '88d'],
   ['critical', 'legacy-batch', 'batch', 'Failed', 'legacy-batch 0.9.1', null, '0.9.1', '4', '3h'],
 ]
@@ -546,7 +573,7 @@ function releasesPage(sel = ''): string {
   const heads = narrow
     ? '<span>Name</span><span>Status</span><span>Chart</span>'
     : '<span>Name</span><span>Status</span><span>Chart</span><span>Update</span><span>App version</span><span class="r">Revision</span><span class="r">Updated</span>'
-  const tip = `<div class="tip3" style="top:420px;left:870px">redis is in acme-charts and prometheus-community: Lumovi can’t tell which it came from, so it says nothing.</div>`
+  const tip = `<div class="tip3" style="top:390px;left:870px">acme-charts has a fluent-bit, but nothing says logging came from there: Lumovi didn’t install it, and their sources differ. So it says nothing.</div>`
   return `${TABS('Releases')}<div class="tbar"><span class="count">12 releases</span><span class="chip" style="--d:var(--critical)"><i></i>Failed <b>1</b></span><span class="chip" style="--d:var(--good)"><i></i>Deployed <b>11</b></span><span class="chip upd">${icon('circle-arrow-up', 13)}Update available <b>2</b></span><span class="btn">${icon('package-plus', 14)}Install chart</span><span class="grow"></span>${narrow ? `<span class="ib">${icon('search', 16)}</span>` : `<span class="fld" style="width:220px">${icon('search', 14)}Filter releases</span>`}</div><div class="th" style="grid-template-columns:${cols}">${heads}</div>${rows}${narrow ? '' : tip}`
 }
 
@@ -572,17 +599,17 @@ function upgradeFromRepo(): string {
 
 function updateFrame(): string {
   return `<section class="blk"><h2>Update available<i>on a release whose chart is in exactly one repository added, with a newer version there</i></h2>
-    <p class="cap"><b>Releases</b>, with an Update column and a chip for it; redis’s dash under the pointer.</p>${helmWin(releasesPage())}
+    <p class="cap"><b>Releases</b>, with an Update column and a chip for it; logging’s dash under the pointer.</p>${helmWin(releasesPage())}
     <p class="cap" style="margin-top:8px"><b>payments-api’s panel</b>: Update available beside its status, a button that opens Upgrade with 2.5.0. The list beside it has given way, as LMV-113 has it, to Name, Status and Chart.</p>${helmWin(releasesPage('payments-api'), { html: releasePanel(), width: 520 })}</section>
     <section class="blk"><h2>Upgrade, to the newer version<i>today’s Upgrade, with the newer chart chosen</i></h2><div class="row"><div class="col">${upgradeFromRepo()}</div></div></section>`
 }
 
 const UPD_RULES = [
-  '<b>“Update available: 2.5.0”</b>, in Lumovi’s accent with the upgrade arrow, where a release’s chart is in <b>exactly one</b> repository added and that one has a newer version. The version compared is the chart’s, never the app’s, as Semantic Versioning orders them; a pre-release counts only when the release runs one.',
-  '<b>It says nothing</b> where it can’t be sure: a chart in more than one repository (Lumovi can’t tell which it came from; the dash’s tooltip says why), a chart in none, or a repository it couldn’t read. Never a guess, and never “up to date”: no news is a dash.',
+  '<b>“Update available: 2.5.0”</b>, in Lumovi’s accent with the upgrade arrow, only where Lumovi knows the release came from that repository: it installed or upgraded it from there (and recorded so), or the chart’s name and its source (<code>home</code> or <code>sources</code>, as the release’s own chart records them) match that repository’s chart. And there must be a newer version there. The version compared is the chart’s, never the app’s, as Semantic Versioning orders them; a pre-release counts only when the release runs one.',
+  '<b>It says nothing</b> where it can’t be sure, a dash whose tooltip says why: a chart of that name whose source differs, from a release Lumovi didn’t install (logging, under the pointer); a chart in more than one repository with nothing to tell them apart; a chart in none; a repository it couldn’t read. Never a guess, and never “up to date”: no news is a dash.',
   '<b>In Releases</b> it’s a column of its own, Update, after Chart, giving way early when there’s no room (LMV-113’s order, priority 3), and a chip, “Update available 2”, that filters to them. It sorts newest-first by what’s available.',
   '<b>In a release’s panel</b> it stands beside the status, as a button: pressing it opens Upgrade with the newer version chosen. The Overview’s Chart says where it is (“2.5.0 in acme-charts”). Upgrade… itself is as today.',
-  '<b>Upgrade, with a newer version</b>, gains a first choice, <b>A newer version from acme-charts</b>, its repository, chart and version as menus (to pick another); then today’s three. Its values are the release’s own, as today, and its review step is today’s diff.',
+  '<b>Upgrade, with a newer version</b>, gains a first choice, <b>A newer version from acme-charts</b>, its repository, chart and version as menus (to pick another); then today’s three. Its values are the release’s own, as today, and its review step is today’s diff. The fetched chart is checked against its digest before Helm gets it, as on Install, and Lumovi records the repository it came from.',
   '<b>Read when the indexes are</b>: every 30 minutes and when the Helm page opens; a release’s Update available changes with them, without the page reloading.',
 ]
 
@@ -608,7 +635,7 @@ function phones(): string {
         `<div class="pc"><div class="top">${dot(level)}<b>${name}</b><i>${kind}</i></div><dl class="one"><div><dt>Address</dt><dd class="mono">${addr}</dd></div><div><dt>Index</dt><dd${read === 'Read' ? '' : ' style="color:var(--critical-text)"'}>${read === 'Read' ? `Read ${when} ago · ${n} charts` : escape(read)}</dd></div></dl></div>`,
     )
     .join('')}</div>`
-  return `<section class="blk"><h2>On a phone<i>read: what’s there and what’s newer; changes wait for a larger screen</i></h2><div class="row">${rel}${page}${repos}</div><p class="cap" style="max-width:1200px">Left: Releases as cards, Update available a fact on those that have one. Middle: a release’s page, Update available beside its status, not a button there, as Upgrade waits for a larger screen (main’s phone gate refuses Helm’s changes). Right: Repositories, read: no Add, Edit, Remove or Test on a phone, as a sign-in is typed and kept from a larger screen. Charts reads the same way, with no Install.</p></section>`
+  return `<section class="blk"><h2>On a phone<i>read: what’s there and what’s newer; changes wait for a larger screen</i></h2><div class="row">${rel}${page}${repos}</div><p class="cap" style="max-width:1200px">Left: Releases as cards, Update available a fact on those that have one. Middle: a release’s page, Update available beside its status, not a button there, as Upgrade waits for a larger screen (main’s phone gate refuses Helm’s changes). Right: Repositories, read: no Add, Edit, Remove or Test on a phone, as adding one means typing a sign-in, and on a server changes what everyone installs from (the PM’s ruling). Charts reads the same way, with no Install.</p></section>`
 }
 
 // ─── The frames ─────────────────────────────────────────────────────────────────────────────
@@ -617,13 +644,13 @@ export type HelmReposFrame =
   'helmrepo-repos' | 'helmrepo-charts' | 'helmrepo-update' | 'helmrepo-phone'
 
 export const HELM_REPOS_FRAMES: { id: HelmReposFrame; title: string; size: Size }[] = [
-  { id: 'helmrepo-repos', title: 'Helm: repositories', size: { width: 1440, height: 3510 } },
-  { id: 'helmrepo-charts', title: 'Helm: the chart browser', size: { width: 1440, height: 1825 } },
-  { id: 'helmrepo-update', title: 'Helm: Update available', size: { width: 1440, height: 2485 } },
+  { id: 'helmrepo-repos', title: 'Helm: repositories', size: { width: 1440, height: 4100 } },
+  { id: 'helmrepo-charts', title: 'Helm: the chart browser', size: { width: 1440, height: 1940 } },
+  { id: 'helmrepo-update', title: 'Helm: Update available', size: { width: 1440, height: 2560 } },
   {
     id: 'helmrepo-phone',
     title: 'Helm repositories on a phone',
-    size: { width: 1440, height: 855 },
+    size: { width: 1440, height: 875 },
   },
 ]
 
