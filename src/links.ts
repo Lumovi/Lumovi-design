@@ -217,7 +217,7 @@ function copyFrame(): string {
     <p class="cap">On a plugin’s page, Argo CD’s Applications: the plugin’s line between, as the ⋯ has it today</p>${plugin}
     <ul class="rules">
       <li><b>In an object’s More actions</b>, first, in a group of its own above what changes the object: <b>Copy link</b>, Lucide’s link (Link2 is the plugins’ “It links to …” line), with no key: ⇧⌘C is All clusters, and Ctrl+Alt on Windows is AltGr on many keyboards. It copies this page with this object open, on the tab it’s showing, cut to what a link may carry. In a kept object’s ⋯ below too, where it’s the object on its tab.</li>
-      <li><b>The page’s own</b> is in the bar’s More (⋯), at its end after Refresh, on every cluster page (lists, Overview, Metrics, Alerts, a plugin’s pages): <b>Copy link to this view</b>, first, in a group of its own, the same icon, no key. Then, as today, a plugin’s page’s “What Argo CD may do”, and “Keyboard shortcuts” (not under a finger), each in its group. It copies the page as it stands, its filters, sort and namespace, and the panel’s object on its tab if one is open: so with a panel open, it and the panel’s item copy the same link. The bar has no link button: it keeps the buttons it had.</li>
+      <li><b>The page’s own</b> is in the bar’s More (⋯), at its end after Refresh, on every cluster page (lists, Overview, Metrics, Alerts, a plugin’s pages): <b>Copy link to this view</b>, first, in a group of its own, the same icon, no key. Then, as today, a plugin’s page’s “What Argo CD may do”, and “Keyboard shortcuts” (not under a finger), each in its group. It copies the page as it stands, its filters, sort and namespace, and the panel’s object on its tab if one is open: so with a panel open, it and the panel’s item copy the same link. The bar has no link button: it keeps the buttons it had. <b>A wide bar under a finger</b> (a touch laptop, a large tablet) has had no ⋯ off a plugin’s page, since Keyboard shortcuts isn’t offered there: now it has one on every page, holding Copy link to this view alone, and none still where links are off.</li>
       <li><b>The palette</b> has it in <b>Actions</b>, with the page’s own: Copy link to this view, then a plugin page’s “What Argo CD may do”. While an object is open, its Copy link heads Actions instead, its name at the right, and the page’s isn’t listed: it’s the same link, said once. <b>The toast</b> is docs’: “Link copied. It names the cluster, not how to reach it.” It goes after Lumovi’s usual time. <b>On a server</b> the same items copy the page’s own https address, which already works there, and the toast is “Link copied.” alone. Where the organization’s policy turns links off (<code>"links": "off"</code>), none is drawn, and the ⋯ keeps its other lines.</li>
     </ul></section>
     <section class="blk"><h2>On a phone<i>no ⋯ in a narrow bar: the palette’s Actions</i></h2>
@@ -440,7 +440,7 @@ function unknownFrame(): string {
 export type LinksFrame = 'lk-copy' | 'lk-ask' | 'lk-unknown'
 
 export const LINKS_FRAMES: { id: LinksFrame; title: string; size: Size }[] = [
-  { id: 'lk-copy', title: 'Copy link', size: { width: 1504, height: 3330 } },
+  { id: 'lk-copy', title: 'Copy link', size: { width: 1504, height: 3385 } },
   { id: 'lk-ask', title: 'Every link asks first', size: { width: 1504, height: 2600 } },
   {
     id: 'lk-unknown',
