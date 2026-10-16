@@ -56,6 +56,17 @@ const CSS = `${WINDOW_CSS}
 .cards .stack { gap: 8px; }
 .lkw { display: inline-flex; width: max-content; height: 34px; align-items: center; gap: 8px; padding: 0 14px 0 12px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); box-shadow: var(--shadow-pop); font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
 .lkw svg.i { color: var(--text-3); }
+.lkw.at { position: absolute; z-index: 5; top: 64px; left: 50%; transform: translateX(-50%); }
+.w .lights { z-index: 6; }
+/* A modal dialog's overlay, and the palette over it, as built. */
+.ov { position: absolute; z-index: 3; inset: 0; background: rgb(0 0 0 / 0.25); backdrop-filter: blur(2px); }
+.pal { position: absolute; z-index: 4; top: 14%; left: 50%; width: 640px; overflow: hidden; transform: translateX(-50%); border: 1px solid var(--line-strong); border-radius: 16px; background: var(--surface-2); box-shadow: var(--shadow-pop); }
+.pal .in { height: 48px; padding: 0 16px; border-bottom: 1px solid var(--line); font-size: 15px; line-height: 48px; color: var(--text-3); }
+.pal .pl { padding: 8px; }
+.pal .g { padding: 8px 8px 4px; font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.pal .it { display: flex; height: 40px; align-items: center; gap: 12px; padding: 0 10px; border-radius: 8px; font-size: 13.5px; }
+.pal .it svg.i { color: var(--text-3); }
+.pal .it.on { background: var(--surface-3); }
 .ring2 { outline: 2px solid var(--accent); outline-offset: 2px; }
 .btn.primary .kbd,
 .menu .mi.hl .kbd { border-color: rgb(255 255 255 / 0.45); background: transparent; color: #fff; }
@@ -323,6 +334,22 @@ function askFrame(): string {
       ],
     }),
   })
+  // A dialog is open (here the palette): the link waits, and its line is above the overlay.
+  const row = (glyph: IconName, label: string, on = false) =>
+    `<div class="it${on ? ' on' : ''}">${icon(glyph, 16)}<span>${label}</span></div>`
+  const palette = `<div class="ov"></div><div class="pal"><div class="in">Jump to a page, object, namespace or cluster…</div><div class="pl"><div class="g">Actions</div>${row('link', 'Copy link to this view', true)}<div class="g">Go to</div>${row('layout-dashboard', 'Overview')}${row('boxes', 'Workloads')}${row('chart-spline', 'Metrics')}${row('bell', 'Alerts')}</div></div>`
+  const behind = win({
+    w: W,
+    h: H,
+    cluster: 'production',
+    nav: 'Workloads',
+    title: 'Deployments',
+    glyph: 'layers',
+    page: deployments({ narrow: true }),
+    dock: dock([T_PROD]),
+    more: true,
+    extra: `${palette}<span class="lkw at">${icon('link', 14)}A link is waiting. Lumovi asks about it when this dialog closes.</span>`,
+  })
   const card = (cap: string, a: Ask) =>
     `<div class="stack"><p class="cap">${cap}</p>${ask(a)}</div>`
   const cards = `<div class="cards">
@@ -381,15 +408,15 @@ function askFrame(): string {
       what: `Pod in billing · <span class="q">the link calls it <bdi>prod</bdi><span class="mark">U+202E</span><bdi>-eu</bdi></span>`,
       buttons: OPEN,
     })}
-    <div class="stack"><p class="cap">A dialog is open in that window (a form, the palette): the link waits, and says so where its card will be</p><span class="lkw">${icon('link', 14)}A link is waiting. Lumovi asks about it when this dialog closes.</span></div>
   </div>`
   return `<section class="blk"><h2>Every link asks first<i>at the top of the front window; Cancel focused; nothing connects, reads or signs in before a press</i></h2>
     <p class="cap">A link to production, which no window shows, arrives while the front window is on staging: it asks there, Cancel focused</p>${front}
     <p class="cap">One arrives while a terminal has the keyboard: the prompt shows without taking it; keys go on to the terminal; ⌘L goes to the prompt</p>${typing}
+    <p class="cap">One arrives while a dialog is open, here the palette: the link waits; its line is above the overlay, where the card will be, and the card comes as the palette closes</p>${behind}
     ${cards}
     <ul class="rules">
-      <li><b>Where</b>: a card at the top of the front window, 460 px, over the page and centred on the window, with the shadow of Lumovi’s menus. The page behind isn’t dimmed and still works: a link is a question, not a stop. A window that already shows the cluster comes forward and asks there, “<b>Go to</b> … ?”, with Go and Cancel. <b>One at a time</b>: a newer link replaces the card in place (it doesn’t stack); after one’s answered or replaced, links that come within 2 s are dropped, not queued; so a person who cancels by mistake and opens the link again at once isn’t met with nothing, the first one dropped after an answered card brings a toast, once per card (a page firing links in a loop gets one, not a stream): “Lumovi skipped a link that came right after the last one. Open it again if you meant to.” A window comes forward once per card. <b>A dialog open</b> in that window (a form, the palette): the link <b>waits</b>, since a dialog holds the keyboard and a screen reader, and a press outside it would close it and lose the form. The window comes forward; where the card goes, a quiet line, not a button (a press there is outside the dialog, as anywhere), says “A link is waiting. Lumovi asks about it when this dialog closes.”, heard once as a status; the card shows as the dialog closes, finished or cancelled. Nothing in the dialog changes, and a newer link replaces the waiting one. <b>The desktop app’s alone</b>: on a server a link is the page’s https address, which opens as a page does, with no card. An unanswered card stays until it’s answered, another link replaces it, or its window closes, and doing nothing does nothing.</li>
-      <li><b>The keyboard</b>: <b>Cancel is focused</b>, with its ring, and Enter does nothing for the first 500 ms. While a terminal or a text field has the keyboard (being typed in), the card shows without taking it, and its first line says <b>⌘L to answer</b>; on Windows and Linux, where Ctrl+L is the shell’s (it clears the screen), <b>Ctrl+⇧L to answer</b>, as the dock’s keys add ⇧ there. The card draws the key for the platform it’s on. That key, only while a card waits, goes to the card’s Cancel, from anywhere: terminals leave it to Lumovi as they leave the dock’s keys, and the YAML editor’s own ⌘L (select line) gives way while a card waits. Esc on the card is Cancel. A screen reader hears the card as an alert dialog that isn’t modal, its title first.</li>
+      <li><b>Where</b>: a card at the top of the front window, 460 px, over the page and centred on the window, with the shadow of Lumovi’s menus. The page behind isn’t dimmed and still works: a link is a question, not a stop. A window that already shows the cluster comes forward and asks there, “<b>Go to</b> … ?”, with Go and Cancel. <b>One at a time</b>: a newer link replaces the card in place (it doesn’t stack); after one’s answered or replaced, links that come within 2 s are dropped, not queued; so a person who cancels by mistake and opens the link again at once isn’t met with nothing, the first one dropped after an answered card brings a toast, once per card (a page firing links in a loop gets one, not a stream): “Lumovi skipped a link that came right after the last one. Open it again if you meant to.” A window comes forward once per card. <b>A dialog open</b> in that window (a form, the palette, a drawer or a sheet such as Keyboard shortcuts: Lumovi’s modal ones): the link <b>waits</b>, since a dialog holds the keyboard and a screen reader, and a press outside it would close it and lose the form. The window comes forward; where the card goes, above the dialog’s overlay (not dimmed or blurred by it), a quiet line, not a button (a press there is outside the dialog, as anywhere), says “A link is waiting. Lumovi asks about it when this dialog closes.” A screen reader hears it once, as a status in a portal of its own, added after the dialog opened, so the dialog’s hiding of what’s outside it doesn’t silence it (a test checks it has no aria-hidden ancestor). The card shows as the dialog closes, finished or cancelled, once the key that closed it is up. Nothing in the dialog changes, and a newer link replaces the waiting one. <b>The desktop app’s alone</b>: on a server a link is the page’s https address, which opens as a page does, with no card. An unanswered card stays until it’s answered, another link replaces it, or its window closes, and doing nothing does nothing.</li>
+      <li><b>The keyboard</b>: <b>Cancel is focused</b>, with its ring, and Enter, Space and Esc do nothing for the first 500 ms, so a key held or repeated (the Esc that closed a dialog, say) can’t answer it. While a terminal or a text field has the keyboard (being typed in), the card shows without taking it, and its first line says <b>⌘L to answer</b>; on Windows and Linux, where Ctrl+L is the shell’s (it clears the screen), <b>Ctrl+⇧L to answer</b>, as the dock’s keys add ⇧ there. The card draws the key for the platform it’s on. That key, only while a card is shown, goes to the card’s Cancel, from anywhere: terminals leave it to Lumovi as they leave the dock’s keys, and the YAML editor’s own ⌘L (select line) gives way while a card is shown. While a link waits behind a dialog the key is the dialog’s: a form’s YAML editor keeps its ⌘L. Esc on the card is Cancel. A screen reader hears the card as an alert dialog that isn’t modal, its title first.</li>
       <li><b>What it says</b>: “A link”, quiet, with the link’s icon; the title names the object and <b>the context here</b> that matched, as their text: bidi and zero-width characters shown, long names cut in the middle, never markup. Under it, what opens: kind, namespace, tab (or the page: “Alerts, filtered to warning”). <b>“the link calls it …”</b>, quiet, only when the link’s name differs. Then, each on its line with its icon: “Opening it signs in with aws.” (exec or auth provider, named as on the start screen); “Some of the link was left out: the Shell tab.” (named as the page calls them). <b>Unsaved work</b> (an edit open in the panel, such as YAML; a form is a dialog, which a link waits for) puts New window first and filled, and says why. <b>Several contexts</b> at the cluster’s address and none by the link’s name: the person picks, user and namespace under each; Open and New window wait for a pick. Titles are 2 lines at most.</li>
     </ul></section>`
 }
@@ -433,7 +460,7 @@ function unknownFrame(): string {
     </div>
     <ul class="rules">
       <li><b>Same name, another address</b>: the warning line is docs’, in the warning’s text colour, and <b>Open production anyway</b> is not filled: a team can reach one cluster by two addresses, but it’s for the person to say. Cancel is focused. Two people whose kubeconfigs name the same server with another certificate authority land here too.</li>
-      <li><b>Not here</b>: docs’ sentence, with <b>Add a cluster</b>, filled (its key on the button, ⌘N, not in the sentence), and <b>Close</b>, focused. Over a cluster’s page ⌘N is Create…, so ⌘N is Add a cluster only while the card has the keyboard, as Esc is its Close; while it waits without it, ⌘N is the page’s, as ever, and the button doesn’t show it. Add a cluster opens Lumovi’s own Add a cluster; the link isn’t kept for after, since nothing says the cluster added is the link’s.</li>
+      <li><b>Not here</b>: docs’ sentence, with <b>Add a cluster</b>, filled (its key on the button, ⌘N, not in the sentence), and <b>Close</b>, focused. Over a cluster’s page ⌘N is Create…, so ⌘N is Add a cluster only while the card has the keyboard, as Esc is its Close; while it’s shown without it, ⌘N is the page’s, as ever, and the button doesn’t show it. Add a cluster opens Lumovi’s own Add a cluster; the link isn’t kept for after, since nothing says the cluster added is the link’s.</li>
       <li><b>Can’t be opened</b>: docs’ sentence, the reason in plain words: “it names a port, and a link never does”, “it’s longer than 4 KB”, “it names a user or a password”, “it isn’t a link to a cluster”, “it isn’t written as a link is”, “its page isn’t one a link can open”, “its cluster isn’t named as Lumovi names one”, “an object’s name in it isn’t one Kubernetes allows” (docs’). One button, Close. Nothing reaches a cluster.</li>
     </ul></section>`
 }
@@ -444,7 +471,7 @@ export type LinksFrame = 'lk-copy' | 'lk-ask' | 'lk-unknown'
 
 export const LINKS_FRAMES: { id: LinksFrame; title: string; size: Size }[] = [
   { id: 'lk-copy', title: 'Copy link', size: { width: 1504, height: 3385 } },
-  { id: 'lk-ask', title: 'Every link asks first', size: { width: 1504, height: 3045 } },
+  { id: 'lk-ask', title: 'Every link asks first', size: { width: 1504, height: 3975 } },
   {
     id: 'lk-unknown',
     title: 'Cluster not here, link unreadable',
