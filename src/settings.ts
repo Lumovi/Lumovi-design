@@ -212,7 +212,7 @@ function appearance(): string {
       { line: `System follows macOS: ${NOW} now.` },
     )}
     ${setting('Accent', 'Buttons, links and what’s picked.', `${swatches(14)}`, { line: 'Blue. Statuses keep their own colours: no accent is red, amber or green.' })}
-    ${setting('Density', 'How much fits in a list.', seg(['Comfortable', 'Compact'], 0), { line: 'Compact rows are 36 px, from 48.' })}
+    ${setting('Density', 'How much fits in a list.', seg(['Comfortable', 'Compact'], 0), { line: 'Compact rows are 36 px, from 46.' })}
     ${setting('Text size', '', `<span class="stepper"><span>${icon('minus', 14)}</span><span class="val">100%</span><span>${icon('plus', 14)}</span></span>`, { line: '90% to 125%. ⌘+ and ⌘− change it too, and ⌘0 puts it back.' })}`
 }
 
@@ -224,7 +224,7 @@ function time(): string {
 
 function terminal(desktop = true): string {
   return `<h2>Terminal</h2><p class="lead2">For every terminal in the dock. Open ones change at once.</p>
-    ${setting('Font', '', `<div class="rowx" style="gap:8px"><span class="sel3 mono" style="min-width:200px">JetBrains Mono${icon('chevron-down', 14)}</span><span class="stepper"><span>${icon('minus', 14)}</span><span class="val">13 px</span><span>${icon('plus', 14)}</span></span></div><div class="preview"><span><span class="p">~ ›</span> kubectl get pods -n shop</span><span>NAME                      READY   STATUS</span><span>checkout-7d9f6c5b8-hqnnn  0/1     CrashLoopBackOff</span></div>`)}
+    ${setting('Font', '', `<div class="rowx" style="gap:8px"><span class="sel3 mono" style="min-width:200px">JetBrains Mono${icon('chevron-down', 14)}</span><span class="stepper"><span>${icon('minus', 14)}</span><span class="val">12 px</span><span>${icon('plus', 14)}</span></span></div><div class="preview"><span><span class="p">~ ›</span> kubectl get pods -n shop</span><span>NAME                      READY   STATUS</span><span>checkout-7d9f6c5b8-hqnnn  0/1     CrashLoopBackOff</span></div>`)}
     ${setting('Copy on select', '', `<span class="tg2">${sw(false)}<span class="tw2"><b>Copy what I select</b><small>Off: select, then ⌘C, as a terminal does by default.</small></span></span>`)}
     ${desktop ? setting('Shell', 'The program a terminal starts.', `<span class="sel3 mono">/bin/zsh <small>your login shell</small>${icon('chevron-down', 14)}</span>`, { line: 'Or another shell this computer has, or a path. It starts with kubectl pointed at the terminal’s cluster, whichever shell it is.' }) : ''}`
 }
@@ -316,10 +316,10 @@ function settingsFrame(): string {
 }
 
 const SETTINGS_RULES = [
-  '<b>Settings is a page</b>, in the window it was asked from, its sections at the left: Appearance, Time, Terminal, Namespaces, Keyboard shortcuts, and Updates on the desktop. On the desktop it’s <b>⌘,</b> (Ctrl+, elsewhere) and the app menu’s Settings…; on a server, the sidebar’s footer and the palette. Back returns to where it was asked from.',
+  '<b>Settings is a page</b>, in the window it was asked from, its sections at the left: Appearance, Time, Terminal, Namespaces, Keyboard shortcuts, and Updates on the desktop. On the desktop it’s <b>⌘,</b> (Ctrl+, elsewhere) and the app menu’s Settings…; on a server, the sidebar’s footer and the palette. Back returns to where it was asked from. Settings belong to no namespace and no page of the cluster’s: its top bar has no namespace picker, and nothing in the sidebar’s nav is current while it’s open.',
   '<b>Every setting applies at once</b>, in every window, and survives a restart: no Save. Each section has <b>Restore this section’s defaults</b>. The desktop keeps them in its settings file; a server keeps them per person, so every device they sign in from shows the same.',
-  '<b>Appearance</b>: Theme (System, Light, Dark; System says which it is now); <b>Accent</b>: Blue, Cyan, Violet, Graphite. Each is Blue’s pair, per theme: a fill for buttons and what’s picked, its label 4.5:1 or more on it (Graphite’s dark fill takes a dark label), and a strong shade for links, “Changed” and words, 4.5:1 or more on the surfaces; its soft tint as Blue’s is made. None sits near a status’s hue, so no accent reads as red, amber or green. Density (Comfortable, Compact: rows 48 px or 36 px). <b>Text size</b>, 90% to 125%: it is the View menu’s Actual Size, Zoom In and Zoom Out (⌘0, ⌘+, ⌘−), one setting, not two.',
-  '<b>Time</b>: the zone (this computer’s, UTC, or any) in which events, logs and the audit read; the clock (System, 12-hour, 24-hour). Ages stay as they are. <b>Terminal</b>: font and size with a live preview; Copy on select; on the desktop, the Shell (the login shell, another one, or a path), started with kubectl pointed at the terminal’s cluster whichever shell it is.',
+  '<b>Appearance</b>: Theme (System, Light, Dark; System says which it is now); <b>Accent</b>: Blue, Cyan, Violet, Graphite. Each is Blue’s pair, per theme: a fill for buttons and what’s picked, its label 4.5:1 or more on it (Graphite’s dark fill takes a dark label), and a strong shade for links, “Changed” and words, 4.5:1 or more on the surfaces; its soft tint as Blue’s is made. None sits near a status’s hue, so no accent reads as red, amber or green. Density (Comfortable, Compact: rows 46 px, as today, or 36 px). <b>Text size</b>, 90% to 125%: it is the View menu’s Actual Size, Zoom In and Zoom Out (⌘0, ⌘+, ⌘−), one setting, not two.',
+  '<b>Time</b>: the zone (this computer’s, UTC, or any) in which events, logs and the audit read; the clock (System, 12-hour, 24-hour). The zone’s field shows its value whole (“This computer’s (Europe/Budapest, UTC+2)”); where it can’t, the zone’s name is cut in its middle, never its offset. Ages stay as they are. <b>Terminal</b>: font and size (12 px by default, as today) with a live preview; Copy on select; on the desktop, the Shell (the login shell, another one, or a path), started with kubectl pointed at the terminal’s cluster whichever shell it is.',
   '<b>Namespaces</b>: when a cluster opens, All namespaces, the one last picked there (today’s, and the default), or a named one. A cluster’s own settings’ namespace wins over it.',
   '<b>Set by your organization</b>: a value policy sets (the desktop’s policy file, or the chart’s <code>settings:</code>) shows the policy’s value, its control off, and the line with a lock “Set by your organization”, as a cluster’s Read-only does today. The section’s entry carries the lock too. Restore skips it, and isn’t shown where nothing’s left to restore. Under a policy that turns the automatic check off, <b>Check now</b> stays: the person can still look.',
 ]
@@ -344,7 +344,7 @@ function phones(): string {
   )
     .map(
       ([s, g], i) =>
-        `<div class="li">${icon(g, 18)}${s}<small>${['System · Blue', 'This phone’s · 24-hour', 'JetBrains Mono · 13 px', 'Last picked'][i]}</small><span class="chev">${icon('chevron-right', 18)}</span></div>`,
+        `<div class="li">${icon(g, 18)}${s}<small>${['System · Blue', 'This phone’s · 24-hour', 'JetBrains Mono · 12 px', 'Last picked'][i]}</small><span class="chev">${icon('chevron-right', 18)}</span></div>`,
     )
     .join(
       '',
