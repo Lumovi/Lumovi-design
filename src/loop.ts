@@ -50,8 +50,8 @@ const mix = (a: string, b: string, k: number) => {
 export function loopFrame(t: number, size = 240): string {
   const L = lightAt(t)
   const s = size / 240
-  // The mark, a multiple of 8 at 1×, standing a little above the middle so the floor shows.
-  const mark = { x: 56 * s, y: 30 * s, size: 128 * s }
+  // The mark, a multiple of 8 at 1×, in the middle both ways: the floor shows under it.
+  const mark = { x: 56 * s, y: 56 * s, size: 128 * s }
   const html = scene({ width: size, height: size, theme: 'dark', mark })
   // A second floor over the first: the dots the light falls on, brighter, in a pool that spreads
   // out from the mark's foot as the light comes on.
