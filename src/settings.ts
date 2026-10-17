@@ -365,7 +365,7 @@ export type SettingsFrame = 'set-page' | 'set-keys' | 'set-phone'
 
 export const SETTINGS_FRAMES: { id: SettingsFrame; title: string; size: Size }[] = [
   { id: 'set-page', title: 'Settings', size: { width: 1440, height: 3555 } },
-  { id: 'set-keys', title: 'Settings: keyboard shortcuts', size: { width: 1440, height: 1915 } },
+  { id: 'set-keys', title: 'Settings: keyboard shortcuts', size: { width: 1440, height: 2025 } },
   { id: 'set-phone', title: 'Settings on a phone', size: { width: 920, height: 950 } },
 ]
 
