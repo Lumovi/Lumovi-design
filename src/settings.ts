@@ -151,6 +151,9 @@ const setting = (
  * 5.36 (Cyan), 5.62 (Violet), 10.37 and 13.36 (Graphite); strong on surface 6.16 to 12.64. None is
  * near a status's hue: critical 0°, warning 38°, good 120°; Cyan is 193°, Violet 253°.
  */
+/** The theme the frame is drawn in, which System is now. */
+let NOW: Scheme = 'dark'
+
 const ACCENTS: { name: string; light: [string, string, string]; dark: [string, string, string] }[] =
   [
     {
@@ -206,7 +209,7 @@ function appearance(): string {
         ],
         0,
       ),
-      { line: 'System follows macOS: dark now.' },
+      { line: `System follows macOS: ${NOW} now.` },
     )}
     ${setting('Accent', 'Buttons, links and what’s picked.', `${swatches(14)}`, { line: 'Blue. Statuses keep their own colours: no accent is red, amber or green.' })}
     ${setting('Density', 'How much fits in a list.', seg(['Comfortable', 'Compact'], 0), { line: 'Compact rows are 36 px, from 48.' })}
@@ -327,7 +330,7 @@ function shortcutsFrame(): string {
 
 const KEY_RULES = [
   '<b>Every command with keys</b>, grouped as the Keyboard shortcuts sheet groups them, with a search for a command or a key. A row’s pencil (or Enter on it) asks for the new keys: “Press the new keys · Esc to cancel”. Esc cancels, so it can’t be recorded: a command whose default is Esc (Close the detail panel) gets it back with its <b>↺</b>. A changed row says <b>Changed</b> and its ↺ puts its default back; <b>Reset all…</b> asks once, then puts every default back.',
-  '<b>Keys another command has, in the same place</b>, are said before they’re taken: “⌘ [ is Back’s. Use it here, and Back has no keys until you give it some.”, with <b>Use it here</b> and Cancel. A place is where a key works: everywhere, a list, an open object, the Clusters page, or a terminal. Commands in places that never meet share keys today and keep doing so (⌘⌫ is Delete in an open object and Remove on the Clusters page; ⌘N is Create… and, in a Mac terminal, a new terminal; “.” is Actions in both). Within a place, no key ever does two things; a command left without keys is still in the menus and the palette.',
+  '<b>Keys another command has, in the same place</b>, are said before they’re taken: “⌘ [ is Back’s. Use it here, and Back has no keys until you give it some.”, with <b>Use it here</b> and Cancel. A place is where a key works: everywhere, a list, an open object, the Clusters page, or a terminal. Places that never meet share keys today and keep doing so (⌘⌫ is Delete in an open object and Remove on the Clusters page; “.” is Actions in both). Everywhere meets every place, and there <b>the narrower place’s key wins while it has the keyboard</b>: ⌘N is Create… everywhere, and a new terminal while a terminal has the keyboard, as today. Giving a command for everywhere a key a narrower place uses asks first: “In a terminal, ⌘N opens a new terminal instead. Use it anyway?”; and giving a place’s command a key an everywhere command uses asks the same way round (“Everywhere else, ⌘ T is Open in a new tab. Use it anyway?”). Within a place, no key ever does two things; a command left without keys is still in the menus and the palette.',
   '<b>Putting a default back</b> (↺, Restore this section’s defaults) asks the same question when another command in its place holds it now: “⌘ [ is Close the detail panel’s now. Give it back to Back, and Close the detail panel has no keys?”, Give it back and Cancel. <b>Reset all…</b> puts every default back at once, so nothing clashes, except with a key policy holds: its confirmation names what that leaves without keys.',
   '<b>Keys that can’t be taken</b> are refused, in red, with why: the system’s own (on a Mac ⌘C, ⌘V, ⌘X, ⌘Z, ⌘⇧Z, ⌘Q, ⌘W, ⌘H, ⌥⌘H, ⌘M and ⌘`; on Windows and Linux Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+Y and Alt+F4); a terminal’s keys while it has the keyboard; and a key a policy set for another command (“⌘ ⌫ is Delete’s, which your organization set. Press other keys, or Esc.”). A command whose key a policy sets carries the lock and can’t be changed; ↺, Restore and Reset all… skip it.',
   '<b>Yours are shown everywhere</b> a key is: the menus, the palette, the ? sheet and tooltips. On a server they’re kept per person, as the rest of Settings is. On a phone there are no keys: the section isn’t there.',
@@ -347,7 +350,7 @@ function phones(): string {
       '',
     )}<p class="note3">Kept for you on this server: every device you sign in from shows them. Keyboard shortcuts are changed from a computer.</p></div>`
   const section = `<div class="phx"><div class="pb"><span class="tap">${icon('arrow-left', 20)}</span><b>Appearance</b></div><div class="pin">
-    <div class="set" style="border-top:0"><div class="k"><b>Theme</b></div><div class="v">${seg(['System', 'Light', 'Dark'], 0)}<span class="line">System follows this phone: dark now.</span></div></div>
+    <div class="set" style="border-top:0"><div class="k"><b>Theme</b></div><div class="v">${seg(['System', 'Light', 'Dark'], 0)}<span class="line">System follows this phone: ${NOW} now.</span></div></div>
     <div class="set"><div class="k"><b>Accent</b></div><div class="v">${swatches(16)}</div></div>
     <div class="set"><div class="k"><b>Density</b></div><div class="v">${seg(['Comfortable', 'Compact'], 0)}<span class="line">On a phone, rows stay large enough for a finger.</span></div></div>
     <div class="set"><div class="k"><b>Text size</b></div><div class="v"><span class="stepper"><span style="min-width:44px;height:44px">${icon('minus', 16)}</span><span class="val" style="height:44px">100%</span><span style="min-width:44px;height:44px">${icon('plus', 16)}</span></span></div></div>
@@ -371,6 +374,7 @@ const rules = (list: string[]) =>
 
 /** One of the frames, in one theme. */
 export function settingsFrameHtml(id: SettingsFrame, scheme: Scheme): string {
+  NOW = scheme
   const f = SETTINGS_FRAMES.find((x) => x.id === id)!
   const intro = (t: string, p: string) => `<header><h1>${t}</h1><p>${p}</p></header>`
   const body = {
