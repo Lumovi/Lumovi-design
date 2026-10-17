@@ -45,8 +45,9 @@ const CSS = `${WINDOW}
 .qlist { display: flex; flex-direction: column; gap: 14px; }
 /* The list's Fullest cell. */
 .fullest { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
-.fullest .t { display: flex; align-items: center; gap: 5px; font-size: 12.5px; white-space: nowrap; }
-.fullest .t .k { overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-2); text-overflow: ellipsis; }
+.fullest .t { display: flex; min-width: 0; align-items: center; gap: 5px; font-size: 12.5px; white-space: nowrap; }
+.fullest .t > svg.i, .fullest .t > b { flex: none; }
+.fullest .t .k { min-width: 0; flex: 0 1 auto; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-2); text-overflow: ellipsis; }
 .fullest .t b { font-weight: 600; font-variant-numeric: tabular-nums; }
 .fullest .t.warn b, .fullest .t.warn svg.i { color: var(--warn-text); }
 .fullest .t.bad b, .fullest .t.bad svg.i { color: var(--critical-text); }
@@ -69,8 +70,8 @@ const CSS = `${WINDOW}
 .empty3 { display: flex; gap: 8px; font-size: 13px; color: var(--text-3); }
 .empty3 svg.i { flex: none; margin-top: 2px; }
 .lr { overflow: hidden; border: 1px solid var(--line); border-radius: 10px; }
-.lr .lh, .lr .lrr { display: grid; grid-template-columns: minmax(0, 1fr) 84px 84px 108px 108px 92px; gap: 10px; align-items: center; padding: 0 12px; }
-.lr .lh { height: 32px; border-bottom: 1px solid var(--line); font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
+.lr .lh, .lr .lrr { display: grid; grid-template-columns: minmax(64px, 1fr) 60px 60px 88px 80px 72px; gap: 10px; align-items: center; padding: 0 12px; }
+.lr .lh { min-height: 32px; padding-top: 6px; padding-bottom: 6px; line-height: 14px; border-bottom: 1px solid var(--line); font-size: 11px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-3); }
 .lr .lrr { min-height: 36px; font-size: 13px; }
 .lr .lrr + .lrr { border-top: 1px solid var(--line); }
 .lr .lrr .mono { font-size: 12.5px; }
@@ -132,10 +133,11 @@ const STATUS: Record<Level, [WLevel, string]> = {
 
 const meter = (r: number) => {
   const l = levelOf(r)
-  return `<span class="qm" style="--f:${FILL[l]}" role="meter"><i style="width:${Math.min(100, Math.round(r * 100))}%"></i></span>`
+  return `<span class="qm" style="--f:${FILL[l]}" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.floor(r * 100 + 1e-9)}" aria-valuetext="${pct(r)}"><i style="width:${Math.min(100, Math.round(r * 100))}%"></i></span>`
 }
 
-const pct = (r: number) => `${Math.round(r * 100)}%`
+/** Floored: 99.6% reads 99% under Nearly full, never 100%. */
+const pct = (r: number) => `${Math.floor(r * 100 + 1e-9)}%`
 
 /** A resource's line and meter: the % first, as the Node's usage has it, then used of hard. */
 function qrow(label: string, key: string, used: string, hard: string, r: number): string {
@@ -230,8 +232,10 @@ function listsFrame(): string {
 
 const LIST_RULES = [
   '<b>Resource Quotas and Limit Ranges</b> become built-in lists under Configuration, after Secrets, as Lumovi’s other kinds are: search, namespace, columns, CSV, and the panel. Their icons: a gauge and a ruler.',
-  '<b>Fullest</b>, on Resource Quotas: the resource nearest its hard limit, as its key (<code>requests.memory</code>), its % and its meter. Status follows it: <b>Within quota</b> under 90%, <b>Nearly full</b> from 90%, <b>Full</b> at 100% (nothing more of it can be made). Sorted worst first, and the chips filter by status.',
-  '<b>Never by colour alone</b>: the % is always written, beside the meter, and from 90% an icon stands before it (amber ⚠ Nearly full, red ⊗ Full); the status word says it again. A quota’s meter is blue to 90%, amber to full and red at full, so its colour and its status agree. (Main’s Meter turns amber at 75% for a node’s usage; a quota at 75% needs nothing, so it gets its own level.)',
+  '<b>Fullest</b>, on Resource Quotas: the resource nearest its hard limit, as its key (<code>requests.memory</code>), its % and its meter. Where the cell is narrow, the key is cut at its end; the % never is. Status follows it: <b>Within quota</b> under 90%, <b>Nearly full</b> from 90%, <b>Full</b> at 100% (nothing more of it can be made). Sorted worst first, and the chips filter by status.',
+  '<b>The % is floored</b>, never rounded up past a level: 99.6% reads 99% under Nearly full, and 89.6% reads 89% under Within quota, so the number, the colour and the word always agree. The meter’s width may round. <b>Used over hard</b> (a quota lowered below what’s there) writes the real %, 125% say, its meter full, and is Full. <b>Not counted yet</b> (a new quota the controller hasn’t counted): “Not counted yet”, no meter and no status colour.',
+  '<b>A hard of 0</b> forbids a thing (<code>services.loadbalancers: 0</code>): it reads “Not allowed · 0 of 0”, with no meter and no %, and doesn’t count toward Fullest or the status, so a quota that only forbids is Within quota and never in Needs attention. If one is there anyway (used over 0), it’s Full.',
+  '<b>Never by colour alone</b>: the % is always written, beside the meter, and from 90% an icon stands before it (amber ⚠ Nearly full, red ⊗ Full); the status word says it again. A quota’s meter is main’s Meter with the quota’s levels (blue to 90%, amber to full, red at full), as a prop, so it keeps Meter’s role, value and spoken text (“94%”). Main’s usage levels turn amber at 75% for a node; a quota at 75% needs nothing, so its levels are its own.',
   '<b>Limit Ranges’ Types</b>: Container, Pod, PersistentVolumeClaim, as its limits name them.',
 ]
 
@@ -245,6 +249,7 @@ function quotaPanel(): string {
       ${qrow('CPU limits', 'limits.cpu', '3.2 cores', '4 cores', 0.8)}
       ${qrow('Memory limits', 'limits.memory', '6 Gi', '8 Gi', 0.75)}
       ${qrow('Pods', 'pods', '9', '20', 0.45)}
+      <div class="qrow"><div class="top"><span class="lab">Load balancers</span><span class="key">services.loadbalancers</span><span class="val">Not allowed · 0 of 0</span></div></div>
     </div></div>
     <div class="sec2"><h4>Applies to</h4><dl class="kv2"><dt>Scopes</dt><dd>NotBestEffort</dd><dt>Scope selector</dt><dd><code>priorityClass In (high, default)</code></dd></dl></div>`
 }
@@ -279,7 +284,7 @@ function detailFrame(): string {
 }
 
 const DETAIL_RULES = [
-  '<b>A quota’s Usage</b>, first on its Overview: one meter for every resource in its <code>hard</code>, worst first, each as a Node’s usage reads: its name in words (“Memory requests”) with its key quiet beside it, then the % in bold, then “3.75 Gi of 4 Gi”, then the meter. Units are the resource’s own: cores (or m under 1), Gi and Mi, and plain counts for pods, services and <code>count/…</code>. The card’s heading names the fullest (“requests.memory is 94% used”).',
+  '<b>A quota’s Usage</b>, first on its Overview: one meter for every resource in its <code>hard</code>, worst first, each as a Node’s usage reads: its name in words (“Memory requests”) with its key quiet beside it, then the % in bold, then “3.75 Gi of 4 Gi”, then the meter. Units are the resource’s own: cores (“1 core”, “2 cores”; m under 1), Gi and Mi, and plain counts for pods, services and <code>count/…</code>. A key with no words of its own (<code>requests.nvidia.com/gpu</code>, a storage class’s) is its own label, cut at its end where it must be, whole in its title. The card’s heading names the fullest (“requests.memory is 94% used”).',
   '<b>Applies to</b>: its Scopes and Scope selector, as the API has them; a quota with neither says “Every pod in shop”.',
   '<b>A LimitRange</b>: a table per type it sets (Container, Pod, PersistentVolumeClaim), a row per resource: Min, Max, Default request, Default limit, and Limit ÷ request (maxLimitRequestRatio). What it doesn’t set is a quiet dash.',
 ]
@@ -336,7 +341,7 @@ function attentionCard(): string {
 
 function stuckPanel(): string {
   return `<div class="dph"><span class="ktile">${icon('layers', 18)}</span><div class="t"><p>Deployment · shop · 6d old</p><h2>checkout${icon('copy', 14)}</h2><div class="acts">${pill('critical', 'Quota exceeded')}<span class="btn">${icon('arrow-up-down', 14)}Scale</span><span class="btn">${icon('rotate-cw', 14)}Restart</span></div></div><span class="ib" style="margin-top:2px">${icon('x', 16)}</span></div><div class="itabs"><span class="on">Overview</span><span>Pods</span><span>Logs</span><span>Events</span><span>YAML</span></div>
-    <div class="sec2" style="border-top:0"><dl class="kv2"><dt>Replicas</dt><dd>2 ready of 3</dd></dl><div class="why2">${icon('circle-x', 14)}<span>Its third pod can’t be made: the namespace’s quota <b>compute</b> has no room for its memory request.<code>pods "checkout-7d9f6c5b8-x2kqp" is forbidden: exceeded quota: compute, requested: requests.memory=512Mi, used: requests.memory=3.75Gi, limited: requests.memory=4Gi</code><span class="lnk">Open quota compute</span></span></div></div>`
+    <div class="sec2" style="border-top:0"><dl class="kv2"><dt>Replicas</dt><dd>2 ready of 3</dd></dl><div class="why2">${icon('circle-x', 14)}<span>1 of its 3 pods can’t be made: the namespace’s quota <b>compute</b> has no room for its memory request.<code>pods "checkout-7d9f6c5b8-x2kqp" is forbidden: exceeded quota: compute, requested: requests.memory=512Mi, used: requests.memory=3.75Gi, limited: requests.memory=4Gi</code><span class="lnk">Open quota compute</span></span></div></div>`
 }
 
 function attentionFrame(): string {
@@ -360,7 +365,7 @@ const NS_RULES = [
   '<b>A namespace’s Overview</b> gains <b>Quotas</b> and <b>Limit ranges</b>, after Details. Quotas: a card per quota, its status, its resources from 90% as meters, “and 3 more under 90%” for the rest; it opens the quota. Limit ranges: each one’s defaults in a line (“A container’s default request 100m CPU, 128Mi memory; its default limit 500m, 512Mi”).',
   '<b>Empty and refused</b>, each in its section: “No quotas in shop.”, “No limit ranges in shop.”; where access doesn’t list them, “Your access doesn’t list ResourceQuotas in shop.” with a lock. Neither hides the other.',
   '<b>Needs attention</b> lists a quota from 90%: Nearly full (warning) and Full (critical), sorted with the rest, its line its fullest resource (“requests.memory 94% · 3.75 Gi of 4 Gi”; “persistentvolumeclaims 10 of 10”). A row opens the quota.',
-  '<b>A workload a quota stops</b>: where a ReplicaSet’s FailedCreate says “exceeded quota”, its Deployment’s status is <b>Quota exceeded</b> (critical), its reason in Lumovi’s words (“Its third pod can’t be made: the namespace’s quota compute has no room for its memory request.”), then the API’s own message, in mono, and <b>Open quota compute</b>. In Needs attention: “2 of 3 ready: exceeded quota compute (requests.memory)”.',
+  '<b>A workload a quota stops</b>: where a ReplicaSet’s FailedCreate says “exceeded quota”, its Deployment’s status is <b>Quota exceeded</b> (critical), its reason in Lumovi’s words (“1 of its 3 pods can’t be made: the namespace’s quota compute has no room for its memory request.”, the count from its replicas less the pods there are), then the API’s own message, in mono, and <b>Open quota compute</b>. In Needs attention: “2 of 3 ready: exceeded quota compute (requests.memory)”.',
 ]
 
 // ─── 4. On a phone ──────────────────────────────────────────────────────────────────────────
@@ -375,7 +380,7 @@ function phones(): string {
       return `<div class="card2"><div class="t2"><b>${n}</b><i>${ns}</i>${pill(lv, word)}</div>${fullest(key, r)}</div>`
     })
     .join('')}</div>`
-  const detail = `<div class="phq"><div class="pb"><span class="tap">${icon('arrow-left', 20)}</span><b>compute</b></div><div class="pin"><small>ResourceQuota · shop</small><h3>compute</h3>${pill('warning', 'Nearly full')}</div><div class="ptabs2"><span class="on">Overview</span><span>Events</span><span>YAML</span></div><div class="pin"><div class="qlist">${qrow('Memory requests', '', '3.75 Gi', '4 Gi', 0.94)}${qrow('CPU requests', '', '1.8 cores', '2 cores', 0.9)}${qrow('CPU limits', '', '3.2 cores', '4 cores', 0.8)}${qrow('Memory limits', '', '6 Gi', '8 Gi', 0.75)}${qrow('Pods', '', '9', '20', 0.45)}</div></div></div>`
+  const detail = `<div class="phq"><div class="pb"><span class="tap">${icon('arrow-left', 20)}</span><b>compute</b></div><div class="pin"><small>ResourceQuota · shop</small><h3>compute</h3>${pill('warning', 'Nearly full')}</div><div class="ptabs2"><span class="on">Overview</span><span>Events</span><span>Audit</span><span>YAML</span></div><div class="pin"><div class="qlist">${qrow('Memory requests', '', '3.75 Gi', '4 Gi', 0.94)}${qrow('CPU requests', '', '1.8 cores', '2 cores', 0.9)}${qrow('CPU limits', '', '3.2 cores', '4 cores', 0.8)}${qrow('Memory limits', '', '6 Gi', '8 Gi', 0.75)}${qrow('Pods', '', '9', '20', 0.45)}</div></div><div class="pin" style="padding-top:0"><dl class="kv2" style="grid-template-columns:1fr"><dt>Scopes</dt><dd>NotBestEffort</dd><dt>Scope selector</dt><dd><code>priorityClass In (high, default)</code></dd></dl></div></div>`
   return `<section class="blk"><h2>On a phone<i>read: the list as cards, a quota’s meters at full width</i></h2><div class="rowx">${list}${detail}</div><p class="cap" style="max-width:820px">Left: each quota a card, its status and its fullest resource. Right: a quota’s Usage, a meter a line, the key left out where the words say it.</p></section>`
 }
 
@@ -384,17 +389,17 @@ function phones(): string {
 export type QuotaFrame = 'q-lists' | 'q-detail' | 'q-ns' | 'q-attention' | 'q-phone'
 
 export const QUOTA_FRAMES: { id: QuotaFrame; title: string; size: Size }[] = [
-  { id: 'q-lists', title: 'Quotas: the lists', size: { width: 1440, height: 2040 } },
+  { id: 'q-lists', title: 'Quotas: the lists', size: { width: 1440, height: 2135 } },
   {
     id: 'q-detail',
     title: 'Quotas: a quota and a LimitRange',
-    size: { width: 1440, height: 1625 },
+    size: { width: 1440, height: 1680 },
   },
   { id: 'q-ns', title: 'Quotas: a namespace', size: { width: 1440, height: 1600 } },
   {
     id: 'q-attention',
     title: 'Quotas: Needs attention and a stuck rollout',
-    size: { width: 1440, height: 1310 },
+    size: { width: 1440, height: 1330 },
   },
   { id: 'q-phone', title: 'Quotas on a phone', size: { width: 920, height: 980 } },
 ]
