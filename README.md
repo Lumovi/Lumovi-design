@@ -180,6 +180,7 @@ Black, white and true neutral grays carry the brand. Blue is only for what you c
 | `social/youtube/thumbnails/<video>-*.png`        | Each video's thumbnail, 1280 × 720: `hero-v2`, `incident` ("It's 2 a.m."), `approval` ("It asked first"), `platform` ("Monday"), `map` ("Where's the 503?") and `tour-v2` ("A tour of the whole app", from 1.22.1) |
 | `social/square/<video>-*.png`                    | Each video's square still, 1080 × 1080, for social posts: the same title, over its moment                                                                                                                          |
 | `social/product-hunt/thumbnail.png`              | The Product Hunt thumbnail, 240 × 240: the app icon                                                                                                                                                                |
+| `social/product-hunt/thumbnail.gif`              | Its animated thumbnail, 240 × 240, dark: the mark's light coming on over its floor of dots, a 2.4 s loop; the PNG is its fallback                                                                                  |
 | `social/product-hunt/gallery-<n>-<screen>-*.png` | The Product Hunt gallery, 1270 × 760, in its order, from the app's screens as the videos show them                                                                                                                 |
 
 The launch art comes in dark and light (`-dark`, `-light`): pick one for each account, or one

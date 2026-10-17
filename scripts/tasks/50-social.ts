@@ -14,8 +14,10 @@ import {
   videos,
 } from '../../src/launch.ts'
 import { document, horizontal, VARIANTS } from '../../src/logo.ts'
+import { LOOP, loopFrame } from '../../src/loop.ts'
 import { headline, palette, scene, type Theme } from '../../src/scene.ts'
 import { escape } from '../../src/svg.ts'
+import sharp from 'sharp'
 import { renderHtml, renderSvg } from '../lib/render.ts'
 import type { Task } from '../lib/task.ts'
 
@@ -318,5 +320,16 @@ export default {
     }
     // Product Hunt's thumbnail: the app icon, as small as it gets shown.
     await ctx.png('social/product-hunt/thumbnail.png', await renderSvg(filled(240, 0.6), 240))
+    // And its animated one, where Product Hunt shows a GIF: the mark's light coming on over its
+    // floor of dots, 2.4 s and seamless. Frames that are the same are kept as one, held longer.
+    const frames: Buffer[] = []
+    for (let i = 0; i < LOOP.frames; i++)
+      frames.push(await render(loopFrame(i / LOOP.frames), 240, 240))
+    ctx.file(
+      'social/product-hunt/thumbnail.gif',
+      await sharp(frames, { join: { animated: true } })
+        .gif({ delay: frames.map(() => LOOP.delay), loop: 0, effort: 10, dither: 1 })
+        .toBuffer(),
+    )
   },
 } satisfies Task
