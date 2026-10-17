@@ -152,6 +152,8 @@ ${only(HELM, /^(\.ad|\.prodm)/)}
 .pm .mi svg.i { color: var(--text-3); }
 .pm .mi.hl { background: var(--surface-3); }
 .pm .mi.danger, .pm .mi.danger svg.i { color: var(--critical-text); }
+.pm .mi .k { margin-left: auto; font-size: 12px; color: var(--text-3); }
+.pm .mi .sqm { width: 8px; height: 8px; flex: none; border-radius: 2px; background: var(--c); }
 .pm hr { height: 1px; margin: 4px; border: 0; background: var(--line); }
 .dph .t p b { font-weight: 500; color: var(--text-2); }
 .dph .t p i { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 2px; background: var(--c); }
@@ -386,7 +388,15 @@ function actionsFrame(): string {
     <p class="cap"><b>A row’s menu</b> (its ⋯, or a right-click), headed by the cluster it acts on.</p>${setWin({ page: withMenu, extra: menu })}
     <p class="cap" style="margin-top:8px"><b>A row opened</b>: its panel says the cluster beside its kind and namespace, and reads from that cluster alone. The list beside it gives way to Name, Cluster and Status.</p>${setWin({ page: narrow, panel: { html: panel, width: 560 } })}
     <p class="cap" style="margin-top:8px"><b>Rows ticked on two clusters</b>: the selection bar’s actions are off, and it says why. Ticking rows on one cluster turns them on, as in its own list.</p>${setWin({ page: picked, extra: selbar })}
+    <p class="cap" style="margin-top:8px"><b>The terminal’s +</b>: it asks which cluster, the one in the panel first, never choosing for the person.</p>${setWin({ page: narrow, panel: { html: panel, width: 560 }, extra: termMenu() })}
     <div class="row2" style="margin-top:8px"><div class="col"><p class="cap"><b>Its dialog</b>, as Lumovi’s: the cluster and its Production mark in the subject, as always.</p>${restartDialog()}</div></div></section>`
+}
+
+/** The dock's +: which cluster the new terminal points at, the open panel's first. */
+function termMenu(): string {
+  const item = (m: Member, o: { hl?: boolean; note?: string; tag?: string } = {}) =>
+    `<span class="mi${o.hl ? ' hl' : ''}"><i class="sqm" ${sq(m.color)}></i>${escape(m.name)}${m.prod ? '<span class="prodm">Production</span>' : ''}${o.tag ? `<span class="k">${o.tag}</span>` : ''}${o.note ? `<span class="k">${o.note}</span>` : ''}</span>`
+  return `<div class="pm" style="bottom:52px;left:268px;width:300px"><div class="lbl">Open a terminal on</div>${item(SET[2]!, { hl: true, tag: 'In the panel' })}<hr>${item(SET[0]!)}${item(SET[1]!)}${item(SET[3]!, { note: 'Signs in when opened' })}</div>`
 }
 
 function restartDialog(): string {
@@ -396,6 +406,7 @@ function restartDialog(): string {
 const ACT_RULES = [
   '<b>Every action stays on the object’s own cluster</b> and names it. A row’s ⋯ is headed “Actions on Payments staging”, with the cluster’s colour; the panel’s line says “on Payments staging” beside the kind and namespace; a dialog’s subject names it, with its Production mark, as Lumovi’s dialogs always do. A shell, logs or a port forward open on that cluster, and the dock’s tab says which.',
   '<b>No action spans clusters.</b> Rows can be ticked across the set, to copy them say, but the selection bar’s actions work only while every ticked row is on one cluster: with rows on two, they’re off, and the bar says “They’re on 2 clusters: pick rows on one to act on them together.” Their keys are refused the same way (⌘⌫, and . for a selection’s menu), with the same words in a toast.',
+  '<b>A terminal</b> points kubectl at one cluster, and this page has several, so the dock’s <b>+</b> asks: “Open a terminal on”, the set’s clusters with their colours and Production marks, the open panel’s cluster first (“In the panel”) and picked, so Enter takes it. It never chooses for the person. A cluster that signs in when opened says so in its row, and picking it signs in. The terminal’s tab names its cluster, as the dock’s tabs do; kept objects keep their own cluster.',
   '<b>Opening a row</b> opens its panel beside the list, read from its own cluster alone; the list gives way, Cluster staying after Name. Back and the panel’s links stay inside the set’s page; “Open in Payments staging” in the panel’s ⋯ leaves for that cluster’s own page.',
 ]
 
@@ -429,7 +440,7 @@ export const MERGED_FRAMES: { id: MergedFrame; title: string; size: Size }[] = [
   {
     id: 'mc-actions',
     title: 'Several clusters: acting on a row',
-    size: { width: 1440, height: 3005 },
+    size: { width: 1440, height: 3885 },
   },
   {
     id: 'mc-large',
