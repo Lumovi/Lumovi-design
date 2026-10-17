@@ -22,6 +22,8 @@ interface Member {
   /** How its read went: answered with a count, still reading, or why not. */
   state: 'ok' | 'reading' | 'timeout' | 'refused' | 'signs-in'
   pods: number
+  /** Its list stopped at Lumovi's cap: how many there are. */
+  of?: number
 }
 
 const SET: Member[] = [
@@ -99,7 +101,7 @@ function pickSeveral(): string {
 
 const PICK_RULES = [
   '<b>Several clusters</b>, a button in the Clusters page’s bar beside Group by, puts a box on every row: a click or Space ticks it, Enter opens the ticked ones together (not the one under the cursor), and Recent steps aside for the groups. Ticking any brings up the bar: “4 clusters”, how many of them sign in when opened, and <b>Open together</b>. × or Esc leaves it.',
-  '<b>A group’s Open together</b>, at the right of its heading, opens its clusters at once, without ticking (Payments’ three; Platform’s two). On a server, the Fleet page’s cards offer the same, over the clusters the person may see.',
+  '<b>A group’s Open together</b>, at the right of its heading, opens its clusters at once, without ticking (Payments’ three; Platform’s two). A press is a choice: it starts the sign-ins that need it, which the bar counted before. On a server, the Fleet page’s cards offer the same, over the clusters the person may see.',
   '<b>A cluster that signs in when opened</b> can be in the set; ticking it opens nothing. On the page it’s listed unread, with its Open button, until it’s pressed (frame 3), so picking a set never starts a sign-in. That holds for the set remembered from last time too.',
   '<b>The set is in the page’s address</b>, and the last one is remembered on this computer: the sidebar’s Several clusters opens it again. There’s no lumovi:// link to a set for now.',
 ]
@@ -156,6 +158,8 @@ ${only(HELM, /^(\.ad|\.prodm)/)}
 .empty2 { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 56px 0; text-align: center; }
 .empty2 h3 { margin: 0; font-size: 15px; font-weight: 600; }
 .empty2 p { margin: 0; max-width: 440px; font-size: 13px; line-height: 1.55; color: var(--text-2); }
+.capn { display: flex; flex: none; align-items: center; gap: 8px; margin: 0; padding: 8px 20px; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: 12px; color: var(--text-2); }
+.capn svg.i { color: var(--text-3); }
 .vtip { display: flex; flex: none; align-items: center; gap: 8px; padding: 8px 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--text-3); }
 .fbtn { display: inline-flex; height: 32px; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; color: var(--text-1); white-space: nowrap; }
 .fbtn svg.i { color: var(--text-3); }
@@ -175,7 +179,7 @@ function strip(set: Member[], on?: string): string {
     const head = `<i></i>${escape(m.name)}`
     switch (m.state) {
       case 'ok':
-        return `<span class="cc${m.name === on ? ' on' : ''}" ${sq(m.color)}>${head}<span class="n">${fmt(m.pods)}</span></span>`
+        return `<span class="cc${m.name === on ? ' on' : ''}" ${sq(m.color)}>${head}<span class="n">${fmt(m.pods)}${m.of ? ` of ${fmt(m.of)}` : ''}</span></span>`
       case 'reading':
         return `<span class="cc wait" ${sq(m.color)}>${head}<span class="spin">${icon('loader-circle', 13)}</span><span class="why">Reading…</span></span>`
       case 'timeout':
@@ -327,13 +331,31 @@ function statesFrame(): string {
     { ...SET[3]!, state: 'signs-in' },
   ]
   const reading: Member[] = [SET[0]!, SET[1]!, { ...SET[2]!, state: 'reading' }, SET[3]!]
-  const page = (set: Member[], rows: string, count: string) =>
-    `${strip(set)}${TOOLBAR(`${count} pods`)}${rows}`
+  const page = (set: Member[], rows: string, count: string, chips: [string, string, string][]) =>
+    `${strip(set)}${TOOLBAR(`${count} pods`, chips)}${rows}`
   const firstOnly = podRows({ only: 'Payments EU' })
+  const answered = podRows({ pods: PODS.filter(([, , c]) => c !== 2) })
   const none: Member[] = SET.map((m) => ({ ...m, state: 'timeout' as const }))
   return `<section class="blk"><h2>When a cluster doesn’t answer<i>said once, in its chip; the others are listed, and nothing waits for it</i></h2>
-    <p class="cap"><b>Still reading</b>: Payments staging’s chip turns until it answers; the rows that have come are listed, and its own arrive in place.</p>${setWin({ page: page(reading, podRows(), '12,068'), set: reading })}
-    <p class="cap" style="margin-top:8px"><b>Each way it can go</b>: access refuses Pods on Payments US, Payments staging didn’t answer in time, and Platform tools signs in when opened, waiting for its Open. Payments EU’s pods are listed alone.</p>${setWin({ page: page(mixed, firstOnly, '3,214'), set: mixed, h: 520 })}
+    <p class="cap"><b>Still reading</b>: Payments staging’s chip turns until it answers; the rows that have come are listed, and its own arrive in place.</p>${setWin(
+      {
+        page: page(reading, answered, '12,068', [
+          ['critical', 'Failing', '1'],
+          ['good', 'Running', '12,067'],
+        ]),
+        set: reading,
+      },
+    )}
+    <p class="cap" style="margin-top:8px"><b>Each way it can go</b>: access refuses Pods on Payments US, Payments staging didn’t answer in time, and Platform tools signs in when opened, waiting for its Open. Payments EU’s pods are listed alone.</p>${setWin(
+      {
+        page: page(mixed, firstOnly, '3,214', [
+          ['critical', 'Failing', '1'],
+          ['good', 'Running', '3,213'],
+        ]),
+        set: mixed,
+        h: 520,
+      },
+    )}
     <p class="cap" style="margin-top:8px"><b>None answered</b>: one line, and Retry for them all.</p>${setWin({ page: `${strip(none)}<div class="empty2"><h3>None of the 4 clusters answered</h3><p>Lumovi couldn’t reach Payments EU, Payments US, Payments staging or Platform tools in time. Retry, or open one of them alone from the sidebar.</p><span class="btn primary" style="margin-top:8px">${icon('rotate-cw', 14)}Retry all</span></div>`, set: none, h: 520 })}</section>`
 }
 
@@ -373,20 +395,26 @@ function restartDialog(): string {
 
 const ACT_RULES = [
   '<b>Every action stays on the object’s own cluster</b> and names it. A row’s ⋯ is headed “Actions on Payments staging”, with the cluster’s colour; the panel’s line says “on Payments staging” beside the kind and namespace; a dialog’s subject names it, with its Production mark, as Lumovi’s dialogs always do. A shell, logs or a port forward open on that cluster, and the dock’s tab says which.',
-  '<b>No action spans clusters.</b> Rows can be ticked across the set, to copy them say, but the selection bar’s actions work only while every ticked row is on one cluster: with rows on two, they’re off, and the bar says “They’re on 2 clusters: pick rows on one to act on them together.”',
+  '<b>No action spans clusters.</b> Rows can be ticked across the set, to copy them say, but the selection bar’s actions work only while every ticked row is on one cluster: with rows on two, they’re off, and the bar says “They’re on 2 clusters: pick rows on one to act on them together.” Their keys are refused the same way (⌘⌫, and . for a selection’s menu), with the same words in a toast.',
   '<b>Opening a row</b> opens its panel beside the list, read from its own cluster alone; the list gives way, Cluster staying after Name. Back and the panel’s links stay inside the set’s page; “Open in Payments staging” in the panel’s ⋯ leaves for that cluster’s own page.',
 ]
 
 // ─── Large: thousands of rows ───────────────────────────────────────────────────────────────
 
 function largeFrame(): string {
-  const big: Member[] = SET.map((m, i) => ({ ...m, pods: [3214, 2880, 412, 5974][i]! }))
-  const page = `${strip(big, 'Platform tools')}${TOOLBAR('5,974 of 12,480 pods', [['good', 'Running', '5,974']])}${podRows({ pods: PLATFORM })})}<div class="grow"></div><div class="vtip">${icon('info', 14)}<span>12,480 pods across 4 clusters: the list shows them all, drawn as they scroll by, as Lumovi’s own lists do.</span></div>`
-  return `<section class="blk"><h2>Thousands of rows<i>counts per cluster in the strip; one pressed to see it alone</i></h2>${setWin({ page })}</section>`
+  const big: Member[] = SET.map((m, i) => ({
+    ...m,
+    pods: [3214, 2880, 412, 5000][i]!,
+    ...(i === 3 ? { of: 6200 } : {}),
+  }))
+  const capped = `<p class="capn">${icon('info', 14)}<span>Platform tools shows the first 5,000 of 6,200 pods. Choose a namespace or use a label selector to see the rest.</span></p>`
+  const page = `${strip(big, 'Platform tools')}${capped}${TOOLBAR('5,000 of 11,506 pods', [['good', 'Running', '5,000']])}${podRows({ pods: PLATFORM })}<div class="grow"></div><div class="vtip">${icon('info', 14)}<span>11,506 pods across 4 clusters: the list shows them all, drawn as they scroll by, as Lumovi’s own lists do.</span></div>`
+  return `<section class="blk"><h2>Thousands of rows<i>counts per cluster in the strip; one cut at Lumovi’s cap says so; one pressed to see it alone</i></h2>${setWin({ page })}</section>`
 }
 
 const LARGE_RULES = [
-  '<b>Thousands of rows</b> are one list, drawn as they scroll by (Lumovi’s own lists’ way), with every row there to sort, filter and search. The strip’s chips carry each cluster’s count, so where the rows come from reads at a glance; one pressed narrows the list to it (“5,974 of 12,480 pods”).',
+  '<b>Thousands of rows</b> are one list, drawn as they scroll by (Lumovi’s own lists’ way), with every row there to sort, filter and search. The strip’s chips carry each cluster’s count, so where the rows come from reads at a glance; one pressed narrows the list to it (“5,000 of 11,506 pods”).',
+  '<b>A cluster cut at Lumovi’s cap</b> says so, as one cluster’s list does, and per cluster: its chip reads “5,000 of 6,200”, and a line under the strip says it in Lumovi’s words (“Platform tools shows the first 5,000 of 6,200 pods. Choose a namespace or use a label selector to see the rest.”). So the page’s count is never read as everything.',
   '<b>Reading stays each cluster’s own</b>: a large cluster reads in pages, as Lumovi’s lists do, and its chip counts up while it comes; the others are listed meanwhile. Watching for changes is per cluster too.',
 ]
 
@@ -406,7 +434,7 @@ export const MERGED_FRAMES: { id: MergedFrame; title: string; size: Size }[] = [
   {
     id: 'mc-large',
     title: 'Several clusters: thousands of rows',
-    size: { width: 1440, height: 1070 },
+    size: { width: 1440, height: 1090 },
   },
 ]
 
