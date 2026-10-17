@@ -100,10 +100,10 @@ function pickSeveral(): string {
 }
 
 const PICK_RULES = [
-  '<b>Several clusters</b>, a button in the Clusters page’s bar beside Group by, puts a box on every row: a click or Space ticks it, Enter opens the ticked ones together (not the one under the cursor), and Recent steps aside for the groups. Ticking any brings up the bar: “4 clusters”, how many of them sign in when opened, and <b>Open together</b>. × or Esc leaves it.',
+  '<b>Several clusters</b>, a button in the Clusters page’s bar beside Group by, puts a box on every row: a click ticks it, and Space while the search is empty (with words in it, Space types a space: Tab moves into the list, where Space ticks, and typing goes back to the search), Enter opens the ticked ones together (not the one under the cursor), and Recent steps aside for the groups. Ticking any brings up the bar: “4 clusters”, how many of them sign in when opened, and <b>Open together</b>. × or Esc leaves it.',
   '<b>A group’s Open together</b>, at the right of its heading, opens its clusters at once, without ticking (Payments’ three; Platform’s two). A press is a choice: it starts the sign-ins that need it, which the bar counted before. On a server, the Fleet page’s cards offer the same, over the clusters the person may see.',
   '<b>A cluster that signs in when opened</b> can be in the set; ticking it opens nothing. On the page it’s listed unread, with its Open button, until it’s pressed (frame 3), so picking a set never starts a sign-in. That holds for the set remembered from last time too.',
-  '<b>The set is in the page’s address</b>, and the last one is remembered on this computer: the sidebar’s Several clusters opens it again. There’s no lumovi:// link to a set for now.',
+  '<b>The set is in the page’s address</b>, and the last one is remembered on this computer: the Clusters page offers it again at its top, above Recent, as one row: “Last opened together” with the set’s names and <b>Open together</b>; the palette has “Open the last several clusters”. A cluster’s own sidebar gets no entry for it. There’s no lumovi:// link to a set for now.',
 ]
 
 // ─── The merged page ────────────────────────────────────────────────────────────────────────
