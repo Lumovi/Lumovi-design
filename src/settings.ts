@@ -63,7 +63,7 @@ const CSS = `${WINDOW}
 .sw3 { display: flex; gap: 8px; }
 .sw3 span { position: relative; display: grid; width: 26px; height: 26px; place-items: center; border-radius: 50%; background: var(--c); }
 .sw3 span.on { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--c); }
-.sw3 span.on svg.i { color: #fff; }
+.sw3 span.on svg.i { color: inherit; }
 .radios { display: flex; flex-direction: column; gap: 8px; }
 .radios .r { display: flex; align-items: center; gap: 10px; font-size: 13px; }
 .radios .r .rd { width: 14px; height: 14px; flex: none; border: 1.5px solid var(--line-strong); border-radius: 50%; background: var(--surface); }
@@ -123,6 +123,7 @@ const CSS = `${WINDOW}
 .phx .pin .set { grid-template-columns: 1fr; gap: 8px; }
 .phx .seg2 span { padding: 10px 14px; font-size: 15px; }
 .phx .sw3 span { width: 36px; height: 36px; }
+.phx .phr2 { display: flex; height: 44px; align-items: center; margin: 8px 0 0; font-size: 15px; font-weight: 500; color: var(--accent-strong); }
 .phx .note3 { margin: 12px 16px; font-size: 13px; line-height: 1.5; color: var(--text-3); }
 `
 
@@ -144,14 +145,42 @@ const setting = (
 ) =>
   `<div class="set${o.locked ? ' locked' : ''}"><div class="k"><b>${key}</b>${sub ? `<small>${sub}</small>` : ''}</div><div class="v">${o.locked ? LOCK() : ''}${value}${o.line ? `<span class="line">${o.line}</span>` : ''}</div></div>`
 
-const ACCENTS: [string, string][] = [
-  ['Blue', 'var(--accent)'],
-  ['Teal', 'var(--series-3)'],
-  ['Violet', 'var(--series-7)'],
-  ['Orange', 'var(--series-2)'],
-  ['Pink', 'var(--series-5)'],
-  ['Graphite', 'var(--text-2)'],
-]
+/**
+ * The accents, each as Blue is: a fill its label reads on (4.5:1 or more) and a strong shade for
+ * links and words on a surface (4.5:1 or more), per theme. Measured: label on fill 4.60 (Blue),
+ * 5.36 (Cyan), 5.62 (Violet), 10.37 and 13.36 (Graphite); strong on surface 6.16 to 12.64. None is
+ * near a status's hue: critical 0°, warning 38°, good 120°; Cyan is 193°, Violet 253°.
+ */
+const ACCENTS: { name: string; light: [string, string, string]; dark: [string, string, string] }[] =
+  [
+    {
+      name: 'Blue',
+      light: ['#2675d3', '#1c5cab', '#ffffff'],
+      dark: ['#2675d3', '#5ea2f0', '#ffffff'],
+    },
+    {
+      name: 'Cyan',
+      light: ['#0e7490', '#0e6a83', '#ffffff'],
+      dark: ['#0e7490', '#3cc4dd', '#ffffff'],
+    },
+    {
+      name: 'Violet',
+      light: ['#6d4fd6', '#5b3fc4', '#ffffff'],
+      dark: ['#6d4fd6', '#a99bf5', '#ffffff'],
+    },
+    {
+      name: 'Graphite',
+      light: ['#404040', '#404040', '#ffffff'],
+      dark: ['#d4d4d4', '#d4d4d4', '#0a0a0a'],
+    },
+  ]
+
+/** Each accent's fill and label as variables, for the scheme the frame is drawn in. */
+const accentVars = (scheme: Scheme) =>
+  ACCENTS.map((a, i) => `--acc${i}: ${a[scheme][0]}; --acc${i}-on: ${a[scheme][2]};`).join(' ')
+
+const swatches = (size: number) =>
+  `<span class="sw3">${ACCENTS.map((a, i) => `<span style="--c:var(--acc${i});color:var(--acc${i}-on)" title="${a.name}" class="${i === 0 ? 'on' : ''}">${i === 0 ? icon('check', size, 3) : ''}</span>`).join('')}</span>`
 
 type Section = 'Appearance' | 'Time' | 'Terminal' | 'Namespaces' | 'Updates' | 'Keyboard shortcuts'
 
@@ -179,7 +208,7 @@ function appearance(): string {
       ),
       { line: 'System follows macOS: dark now.' },
     )}
-    ${setting('Accent', 'Buttons, links and what’s picked.', `<span class="sw3">${ACCENTS.map(([n, c], i) => `<span style="--c:${c}" title="${n}" class="${i === 0 ? 'on' : ''}">${i === 0 ? icon('check', 14, 3) : ''}</span>`).join('')}</span>`, { line: 'Blue. Statuses keep their own colours: red, amber and green never change.' })}
+    ${setting('Accent', 'Buttons, links and what’s picked.', `${swatches(14)}`, { line: 'Blue. Statuses keep their own colours: no accent is red, amber or green.' })}
     ${setting('Density', 'How much fits in a list.', seg(['Comfortable', 'Compact'], 0), { line: 'Compact rows are 36 px, from 48.' })}
     ${setting('Text size', '', `<span class="stepper"><span>${icon('minus', 14)}</span><span class="val">100%</span><span>${icon('plus', 14)}</span></span>`, { line: '90% to 125%. ⌘+ and ⌘− change it too, and ⌘0 puts it back.' })}`
 }
@@ -210,7 +239,7 @@ function namespaces(locked = false): string {
 function updates(locked: boolean): string {
   return `<h2>Updates</h2><p class="lead2">On this computer.</p>
     ${setting('Check automatically', '', `<span class="tg2">${sw(!locked)}<span class="tw2"><b>Check for updates</b><small>Once a day, from lumovi.dev. An update asks before it installs.</small></span></span>`, { locked })}
-    ${setting('This version', '', `<span class="upd">Lumovi 1.22.1 · checked 2h ago<span class="btn">Check now</span></span>`)}`
+    ${setting('This version', '', `<span class="upd">Lumovi 1.22.0 · checked 2h ago<span class="btn">Check now</span></span>`)}`
 }
 
 // ─── The shortcuts editor ───────────────────────────────────────────────────────────────────
@@ -232,11 +261,11 @@ const krow = (r: KRow) =>
 
 function shortcuts(attempt: 'taken' | 'refused'): string {
   const taken = `<div class="cf warn">${icon('triangle-alert', 14)}<span><b style="font-weight:500">⌘ [</b> is Back’s. Use it here, and Back has no keys until you give it some.</span><span class="sp2"></span><span class="btn primary">Use it here</span><span class="btn ghost">Cancel</span></div>`
-  const refused = `<div class="cf bad">${icon('circle-alert', 14)}<span><b style="font-weight:500">⌘ W</b> stays the system’s: it closes the window. Lumovi leaves ⌘C, ⌘V, ⌘X, ⌘Z, ⌘Q and ⌘W alone, and a terminal’s keys while it has the keyboard. Press other keys, or Esc.</span></div>`
+  const refused = `<div class="cf bad">${icon('circle-alert', 14)}<span><b style="font-weight:500">⌘ W</b> stays the system’s: it closes the window. The system’s own keys, and a terminal’s while it has the keyboard, aren’t Lumovi’s to take. Press other keys, or Esc.</span></div>`
   const general =
     attempt === 'taken'
-      ? `${krow({ label: 'Command palette', keys: ['⌘', 'K'] })}${krow({ label: 'Filter the list', keys: ['/'] })}${krow({ label: 'Refresh', keys: ['⌘', '⇧', 'R'], changed: true, hov: true })}${krow({ label: 'Back', keys: ['⌘', '['] })}${krow({ label: 'Close the panel', keys: [], rec: true, cf: taken })}`
-      : `${krow({ label: 'Command palette', keys: ['⌘', 'K'] })}${krow({ label: 'Close the panel', keys: [], rec: true, cf: refused })}`
+      ? `${krow({ label: 'Command palette', keys: ['⌘', 'K'] })}${krow({ label: 'Filter the list', keys: ['/'] })}${krow({ label: 'Refresh', keys: ['⌘', '⇧', 'R'], changed: true, hov: true })}${krow({ label: 'Back', keys: ['⌘', '['] })}${krow({ label: 'Close the detail panel', keys: [], rec: true, cf: taken })}`
+      : `${krow({ label: 'Command palette', keys: ['⌘', 'K'] })}${krow({ label: 'Close the detail panel', keys: [], rec: true, cf: refused })}`
   return `<h2>Keyboard shortcuts</h2><p class="lead2">Change a command’s keys, or put them back. The menus, the palette and ? show yours.</p>
     <div class="ktop"><span class="fld">${icon('search', 14)}Search commands or keys</span><span class="grow"></span><span class="btn">${icon('rotate-ccw', 14)}Reset all…</span></div>
     <div class="kgrp">General</div><div class="kl">${general}</div>
@@ -245,14 +274,18 @@ function shortcuts(attempt: 'taken' | 'refused'): string {
 
 // ─── The page ───────────────────────────────────────────────────────────────────────────────
 
-function page(on: Section, body: string, o: { server?: boolean; locks?: Section[] } = {}): string {
+function page(
+  on: Section,
+  body: string,
+  o: { server?: boolean; locks?: Section[]; nothingToRestore?: boolean } = {},
+): string {
   const nav = SECTIONS.filter(([s]) => !(o.server && s === 'Updates'))
     .map(
       ([s, g]) =>
         `<div class="s${s === on ? ' on' : ''}">${icon(g, 16)}${s}${o.locks?.includes(s) ? `<span class="lk">${icon('lock', 12)}</span>` : ''}</div>`,
     )
     .join('')
-  return `<div class="sp"><nav class="snav">${nav}</nav><div class="sbody">${body}<p class="sfoot">${o.server ? 'Kept for you on this server: every device you sign in from shows them.' : 'Kept on this computer, in its settings file.'}<span class="lnk">Restore this section’s defaults</span></p></div></div>`
+  return `<div class="sp"><nav class="snav">${nav}</nav><div class="sbody">${body}<p class="sfoot">${o.server ? 'Kept for you on this server: every device you sign in from shows them.' : 'Kept on this computer, in its settings file.'}${o.nothingToRestore ? '' : '<span class="lnk">Restore this section’s defaults</span>'}</p></div></div>`
 }
 
 const setWin = (body: string, h = 720, title = 'Settings') =>
@@ -276,26 +309,27 @@ function settingsFrame(): string {
     <p class="cap" style="margin-top:8px"><b>Terminal</b>, with the shell on the desktop.</p>${setWin(page('Terminal', terminal()), 640)}
     <p class="cap" style="margin-top:8px"><b>Namespaces</b>, as it is today unless changed.</p>${setWin(page('Namespaces', namespaces()), 420)}</section>
   <section class="blk"><h2>Set by your organization<i>what policy sets, said where it is, the control off</i></h2>
-    <p class="cap"><b>Updates</b>, its check turned off by the organization’s policy; the section’s entry carries the lock.</p>${setWin(page('Updates', updates(true), { locks: ['Updates'] }), 420)}</section>`
+    <p class="cap"><b>Updates</b>, its check turned off by the organization’s policy; the section’s entry carries the lock.</p>${setWin(page('Updates', updates(true), { locks: ['Updates'], nothingToRestore: true }), 420)}</section>`
 }
 
 const SETTINGS_RULES = [
   '<b>Settings is a page</b>, in the window it was asked from, its sections at the left: Appearance, Time, Terminal, Namespaces, Keyboard shortcuts, and Updates on the desktop. On the desktop it’s <b>⌘,</b> (Ctrl+, elsewhere) and the app menu’s Settings…; on a server, the sidebar’s footer and the palette. Back returns to where it was asked from.',
   '<b>Every setting applies at once</b>, in every window, and survives a restart: no Save. Each section has <b>Restore this section’s defaults</b>. The desktop keeps them in its settings file; a server keeps them per person, so every device they sign in from shows the same.',
-  '<b>Appearance</b>: Theme (System, Light, Dark; System says which it is now); Accent, six, each passing contrast on both themes, with the line saying statuses keep their colours (an accent is never red, amber or green); Density (Comfortable, Compact: rows 48 px or 36 px); Text size, 90% to 125% in steps, also ⌘+, ⌘− and ⌘0.',
+  '<b>Appearance</b>: Theme (System, Light, Dark; System says which it is now); <b>Accent</b>: Blue, Cyan, Violet, Graphite. Each is Blue’s pair, per theme: a fill for buttons and what’s picked, its label 4.5:1 or more on it (Graphite’s dark fill takes a dark label), and a strong shade for links, “Changed” and words, 4.5:1 or more on the surfaces; its soft tint as Blue’s is made. None sits near a status’s hue, so no accent reads as red, amber or green. Density (Comfortable, Compact: rows 48 px or 36 px). <b>Text size</b>, 90% to 125%: it is the View menu’s Actual Size, Zoom In and Zoom Out (⌘0, ⌘+, ⌘−), one setting, not two.',
   '<b>Time</b>: the zone (this computer’s, UTC, or any) in which events, logs and the audit read; the clock (System, 12-hour, 24-hour). Ages stay as they are. <b>Terminal</b>: font and size with a live preview; Copy on select; on the desktop, the Shell (the login shell, another one, or a path), started with kubectl pointed at the terminal’s cluster whichever shell it is.',
   '<b>Namespaces</b>: when a cluster opens, All namespaces, the one last picked there (today’s, and the default), or a named one. A cluster’s own settings’ namespace wins over it.',
-  '<b>Set by your organization</b>: a value policy sets (the desktop’s policy file, or the chart’s <code>settings:</code>) shows the policy’s value, its control off, and the line with a lock “Set by your organization”, as a cluster’s Read-only does today. The section’s entry carries the lock too. Restore skips it.',
+  '<b>Set by your organization</b>: a value policy sets (the desktop’s policy file, or the chart’s <code>settings:</code>) shows the policy’s value, its control off, and the line with a lock “Set by your organization”, as a cluster’s Read-only does today. The section’s entry carries the lock too. Restore skips it, and isn’t shown where nothing’s left to restore. Under a policy that turns the automatic check off, <b>Check now</b> stays: the person can still look.',
 ]
 
 function shortcutsFrame(): string {
-  return `<section class="blk"><h2>Keyboard shortcuts<i>a section of Settings: change a command’s keys, put them back, and conflicts said before they happen</i></h2><p class="cap"><b>Keys another command has</b>, pressed for Close the panel; Refresh changed, under the pointer; Delete locked by policy.</p>${setWin(page('Keyboard shortcuts', shortcuts('taken')), 760)}<p class="cap" style="margin-top:8px"><b>Keys Lumovi leaves alone</b>, pressed for Close the panel.</p>${setWin(page('Keyboard shortcuts', shortcuts('refused')), 480)}</section>`
+  return `<section class="blk"><h2>Keyboard shortcuts<i>a section of Settings: change a command’s keys, put them back, and conflicts said before they happen</i></h2><p class="cap"><b>Keys another command has</b>, pressed for Close the detail panel; Refresh changed, under the pointer; Delete locked by policy.</p>${setWin(page('Keyboard shortcuts', shortcuts('taken')), 760)}<p class="cap" style="margin-top:8px"><b>Keys that can’t be taken</b>, pressed for Close the detail panel.</p>${setWin(page('Keyboard shortcuts', shortcuts('refused')), 480)}</section>`
 }
 
 const KEY_RULES = [
-  '<b>Every command with keys</b>, grouped as the Keyboard shortcuts sheet groups them, with a search for a command or a key. A row’s pencil (or Enter on it) asks for the new keys: “Press the new keys · Esc to cancel”. A changed row says <b>Changed</b> and its ↺ puts its default back; <b>Reset all…</b> asks once, then puts every default back.',
-  '<b>Keys another command has</b> are said before they’re taken: “⌘ [ is Back’s. Use it here, and Back has no keys until you give it some.”, with <b>Use it here</b> and Cancel. Nothing is ever left with two commands on one key; a command left without keys is still in the menus and the palette.',
-  '<b>Keys Lumovi leaves alone</b> are refused, in red, with why: ⌘C, ⌘V, ⌘X, ⌘Z, ⌘Q and ⌘W (the system’s), and a terminal’s keys while it has the keyboard. A key a policy sets carries the lock, as other settings do, and can’t be changed.',
+  '<b>Every command with keys</b>, grouped as the Keyboard shortcuts sheet groups them, with a search for a command or a key. A row’s pencil (or Enter on it) asks for the new keys: “Press the new keys · Esc to cancel”. Esc cancels, so it can’t be recorded: a command whose default is Esc (Close the detail panel) gets it back with its <b>↺</b>. A changed row says <b>Changed</b> and its ↺ puts its default back; <b>Reset all…</b> asks once, then puts every default back.',
+  '<b>Keys another command has, in the same place</b>, are said before they’re taken: “⌘ [ is Back’s. Use it here, and Back has no keys until you give it some.”, with <b>Use it here</b> and Cancel. A place is where a key works: everywhere, a list, an open object, the Clusters page, or a terminal. Commands in places that never meet share keys today and keep doing so (⌘⌫ is Delete in an open object and Remove on the Clusters page; ⌘N is Create… and, in a Mac terminal, a new terminal; “.” is Actions in both). Within a place, no key ever does two things; a command left without keys is still in the menus and the palette.',
+  '<b>Putting a default back</b> (↺, Restore this section’s defaults) asks the same question when another command in its place holds it now: “⌘ [ is Close the detail panel’s now. Give it back to Back, and Close the detail panel has no keys?”, Give it back and Cancel. <b>Reset all…</b> puts every default back at once, so nothing clashes, except with a key policy holds: its confirmation names what that leaves without keys.',
+  '<b>Keys that can’t be taken</b> are refused, in red, with why: the system’s own (on a Mac ⌘C, ⌘V, ⌘X, ⌘Z, ⌘⇧Z, ⌘Q, ⌘W, ⌘H, ⌥⌘H, ⌘M and ⌘`; on Windows and Linux Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+Y and Alt+F4); a terminal’s keys while it has the keyboard; and a key a policy set for another command (“⌘ ⌫ is Delete’s, which your organization set. Press other keys, or Esc.”). A command whose key a policy sets carries the lock and can’t be changed; ↺, Restore and Reset all… skip it.',
   '<b>Yours are shown everywhere</b> a key is: the menus, the palette, the ? sheet and tooltips. On a server they’re kept per person, as the rest of Settings is. On a phone there are no keys: the section isn’t there.',
 ]
 
@@ -307,16 +341,17 @@ function phones(): string {
   )
     .map(
       ([s, g], i) =>
-        `<div class="li">${icon(g, 18)}${s}<small>${['System · Blue', 'This computer’s · 24-hour', 'JetBrains Mono · 13 px', 'Last picked'][i]}</small><span class="chev">${icon('chevron-right', 18)}</span></div>`,
+        `<div class="li">${icon(g, 18)}${s}<small>${['System · Blue', 'This phone’s · 24-hour', 'JetBrains Mono · 13 px', 'Last picked'][i]}</small><span class="chev">${icon('chevron-right', 18)}</span></div>`,
     )
     .join(
       '',
     )}<p class="note3">Kept for you on this server: every device you sign in from shows them. Keyboard shortcuts are changed from a computer.</p></div>`
   const section = `<div class="phx"><div class="pb"><span class="tap">${icon('arrow-left', 20)}</span><b>Appearance</b></div><div class="pin">
     <div class="set" style="border-top:0"><div class="k"><b>Theme</b></div><div class="v">${seg(['System', 'Light', 'Dark'], 0)}<span class="line">System follows this phone: dark now.</span></div></div>
-    <div class="set"><div class="k"><b>Accent</b></div><div class="v"><span class="sw3">${ACCENTS.map(([n, c], i) => `<span style="--c:${c}" title="${n}" class="${i === 0 ? 'on' : ''}">${i === 0 ? icon('check', 16, 3) : ''}</span>`).join('')}</span></div></div>
+    <div class="set"><div class="k"><b>Accent</b></div><div class="v">${swatches(16)}</div></div>
     <div class="set"><div class="k"><b>Density</b></div><div class="v">${seg(['Comfortable', 'Compact'], 0)}<span class="line">On a phone, rows stay large enough for a finger.</span></div></div>
     <div class="set"><div class="k"><b>Text size</b></div><div class="v"><span class="stepper"><span style="min-width:44px;height:44px">${icon('minus', 16)}</span><span class="val" style="height:44px">100%</span><span style="min-width:44px;height:44px">${icon('plus', 16)}</span></span></div></div>
+    <p class="phr2">Restore this section’s defaults</p>
   </div></div>`
   return `<section class="blk"><h2>On a phone<i>the server’s Settings: a list of sections, each a page</i></h2><div class="rowx">${list}${section}</div></section>`
 }
@@ -326,8 +361,8 @@ function phones(): string {
 export type SettingsFrame = 'set-page' | 'set-keys' | 'set-phone'
 
 export const SETTINGS_FRAMES: { id: SettingsFrame; title: string; size: Size }[] = [
-  { id: 'set-page', title: 'Settings', size: { width: 1440, height: 3460 } },
-  { id: 'set-keys', title: 'Settings: keyboard shortcuts', size: { width: 1440, height: 1760 } },
+  { id: 'set-page', title: 'Settings', size: { width: 1440, height: 3555 } },
+  { id: 'set-keys', title: 'Settings: keyboard shortcuts', size: { width: 1440, height: 1915 } },
   { id: 'set-phone', title: 'Settings on a phone', size: { width: 920, height: 950 } },
 ]
 
@@ -347,7 +382,7 @@ export function settingsFrameHtml(id: SettingsFrame, scheme: Scheme): string {
   }[id]()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
-:root { ${tokens(scheme)} }
+:root { ${tokens(scheme)} ${accentVars(scheme)} }
 ${CSS}
 html, body { width: ${f.size.width}px; }
 body { margin: 0; background: var(--app-bg); font-family: 'Inter', sans-serif; font-size: 13px; line-height: 20px; color: var(--text-1); -webkit-font-smoothing: antialiased; }
