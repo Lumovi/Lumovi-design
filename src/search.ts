@@ -187,7 +187,7 @@ const savedStrip = (current = '') =>
       `<span class="sv${q === current ? ' on' : ''}">${label ? `<code>${q}</code>` : q}${kbd('⌥', '⇧', String(i + 1))}<span class="x">${icon('x', 12)}</span></span>`,
   ).join(
     '',
-  )}<span class="hint">Labels: <code>app=web</code> <code>tier!=db</code> <code>team</code> <code>!canary</code></span></div>`
+  )}<span class="hint">Labels: <code>app=web</code> <code>tier!=db</code> <code>team=*</code> <code>!canary</code></span></div>`
 
 type Row = {
   name: string
@@ -315,7 +315,7 @@ function pageFrame(): string {
 
 const PAGE_RULES = [
   '<b>Search</b> is a page of the cluster, in the sidebar after Helm releases, from the palette (its last row, or ⌘↵), and <b>⌘⇧F</b> (Ctrl+Shift+F elsewhere) from anywhere: it opens with the field focused and its text selected. ⌘⇧F is in the shortcuts sheet and editor under Everywhere as “Search the cluster”, and can be changed there. On Windows and Linux, while a terminal has the keyboard, Ctrl+Shift+F is the terminal’s, as its Ctrl+Shift+C and V are: it’s on the editor’s list of keys a terminal keeps.',
-  '<b>What’s typed</b>: words are parts of names (“checkout” finds checkout-jzhdh6j29h-hqnnn), any case; <code>key=value</code>, <code>key!=value</code>, <code>key</code> and <code>!key</code> are labels. Every term must match: <code>checkout app=web</code> is a name with “checkout” and the label app=web. <b>What’s read</b>: each kind is read once, when the page opens or its namespaces change, and kept current as Lumovi’s lists are (watched while the page is shown, read again on Refresh); typing matches names and labels against what’s read, 300 ms after the last key or at once on ↵, and reads nothing more. Only a kind cut short at 5,000 is asked again, for a search with a label, by that label, so the label reaches every object of it.',
+  '<b>What’s typed</b>: words are parts of names (“checkout” finds checkout-jzhdh6j29h-hqnnn), any case; <code>key=value</code>, <code>key!=value</code>, <code>key=*</code> (has it, any value) and <code>!key</code> are labels. A word with no = and no ! before it is always part of a name, even one that could be a label’s key. Every term must match: <code>checkout app=web</code> is a name with “checkout” and the label app=web. <b>What’s read</b>: each kind is read once, when the page opens or its namespaces change, and kept current as Lumovi’s lists are (watched while the page is shown, read again on Refresh); typing matches names and labels against what’s read, 300 ms after the last key or at once on ↵, and reads nothing more. Only a kind cut short at 5,000 is asked again, for a search with a label, by that label, so the label reaches every object of it.',
   '<b>Where</b>: every kind the person may list, Lumovi’s and the cluster’s own (CRDs, their API group beside the kind), in the namespaces chosen in the header. Kinds outside namespaces (Nodes, ClusterRoles, PersistentVolumes) are searched only with All namespaces, and the foot line says so otherwise. Secrets and ConfigMaps are found by name and label, never by what they hold.',
   '<b>The results</b>: a group a kind, in the sidebar’s order, then the cluster’s own kinds by name; in a group, a name that is what was typed first, then by name. Each row is as its kind’s list has it: name with the match marked, namespace, status (or —), its list’s second fact (ready, restarts, an address), age. Searched by label, the fourth column shows the labels that matched instead. A row opens beside, as in a list, and the list gives way as LMV-113 has it.',
   '<b>While it searches</b>, the field’s end says “Searching · 18 of 31 kinds · 9 so far” and <b>Stop</b>, and groups join as their kinds answer, in their place. What’s under the pointer or the keyboard doesn’t move: the list keeps it where it is as groups join above. A line at the end names the kinds still being searched. A kind that hasn’t answered in 10 seconds is given up on, and the foot line says “Pods didn’t answer in time · Retry”.',
@@ -370,7 +370,7 @@ function emptyPage(): string {
     ([q, label], i) =>
       `<div class="r">${icon('search', 14)}${label ? `<code>${q}</code>` : q}<span class="keys">${kbd('⌥', '⇧', String(i + 1))}</span><span class="x">${icon('x', 14)}</span></div>`,
   ).join('')}</div></div>
-    <div><h3>What you can type</h3><dl class="how"><dt>checkout</dt><dd>Any part of a name, in any case</dd><dt>app=checkout</dt><dd>A label with this value</dd><dt>tier!=db</dt><dd>Not this value, or no such label</dd><dt>team</dt><dd>Has this label, any value</dd><dt>!canary</dt><dd>Doesn’t have this label</dd><dt>checkout app=web</dt><dd>Both: every term must match</dd></dl></div></div>`
+    <div><h3>What you can type</h3><dl class="how"><dt>checkout</dt><dd>Any part of a name, in any case</dd><dt>app=checkout</dt><dd>A label with this value</dd><dt>tier!=db</dt><dd>Not this value, or no such label</dd><dt>team=*</dt><dd>Has this label, any value</dd><dt>!canary</dt><dd>Doesn’t have this label</dd><dt>checkout app=web</dt><dd>Both: every term must match</dd></dl></div></div>`
 }
 
 function nothingFound(): string {
