@@ -184,8 +184,8 @@ interface Geo {
 const G5: Geo = { cw: 186, gap: 38 }
 /** Four, with pods counted on their workloads. */
 const G4: Geo = { cw: 240, gap: 40 }
-/** Four at 1024: 738 px of map. */
-const G1024: Geo = { cw: 166, gap: 24 }
+/** Four at 1024: 730 px of map. */
+const G1024: Geo = { cw: 164, gap: 24 }
 const CH = 56
 const ROW = CH + 12
 
@@ -656,13 +656,81 @@ const KS_HEAD = {
   counts: '6 workloads · 14 pods · 3 services',
 }
 
+/** The bar's count: the namespaces with a band, their workloads, and their pods once each. */
+const COUNT = '3 namespaces · 13 workloads · 26 pods'
+
+/** kube-system's first rows, cut by the window. */
+function kubeSystem(): BandBody {
+  const cards: Card[] = [
+    svc('s1', 0, 'kube-dns', '53', ['healthy', '2/2 ready']),
+    {
+      id: 'd1',
+      col: 2,
+      row: 0,
+      kind: 'Deployment',
+      glyph: 'layers',
+      name: 'coredns',
+      st: ['healthy', 'Ready'],
+    },
+    {
+      id: 'p1',
+      col: 3,
+      row: 0,
+      kind: 'Pods',
+      glyph: 'box',
+      name: 'coredns-5d78c9869d',
+      st: ['healthy', '2/2 ready'],
+      bar: [2, 0, 0],
+    },
+    {
+      id: 'c1',
+      col: 4,
+      row: 0,
+      kind: 'ConfigMap',
+      glyph: 'file-code-2',
+      name: 'coredns',
+      meta: '1 key',
+    },
+    svc('s2', 1, 'metrics-server', '443', ['healthy', '1/1 ready']),
+    {
+      id: 'd2',
+      col: 2,
+      row: 1,
+      kind: 'Deployment',
+      glyph: 'layers',
+      name: 'metrics-server',
+      st: ['healthy', 'Ready'],
+    },
+    {
+      id: 'p2',
+      col: 3,
+      row: 1,
+      kind: 'Pods',
+      glyph: 'box',
+      name: 'metrics-server-6d94bc8694',
+      st: ['healthy', '1/1 ready'],
+      bar: [1, 0, 0],
+    },
+  ]
+  return {
+    cards,
+    edges: [
+      ['s1', 'd1'],
+      ['d1', 'p1'],
+      ['p1', 'c1', true],
+      ['s2', 'd2'],
+      ['d2', 'p2'],
+    ],
+  }
+}
+
 // ─── The frames ────────────────────────────────────────────────────────────────────────────
 
 function pageFrame(): string {
-  const page = `${toolbar({ count: '3 namespaces · 52 objects' })}<div class="mz">${colHeads(COLS5, G5)}
+  const page = `${toolbar({ count: COUNT })}<div class="mz">${colHeads(COLS5, G5)}
     <section class="mb">${head({ ...SHOP_HEAD, health: health(2, 1) })}${body(shop(), G5)}</section>
     <section class="mb">${head({ ...MON_HEAD, health: health() })}${body(monitoring(), G5)}</section>
-    <section class="mb">${head({ ...KS_HEAD, health: health() })}</section></div>`
+    <section class="mb">${head({ ...KS_HEAD, health: health() })}${body(kubeSystem(), G5)}</section></div>`
   return `<section class="blk"><h2>The page<i>grouped by namespace, at 1440, a small cluster: everything drawn</i></h2>${mwin({ page, h: 900 })}<p class="cap">Three namespaces picked. shop has a degraded Deployment whose pods are failing, a Deployment that’s down, and a ConfigMap it mounts that isn’t there; lines into each take its colour. monitoring is healthy. Hovering a card lights its chain both ways, as on the Map tab.</p></section>`
 }
 
@@ -707,11 +775,11 @@ function largeFrame(): string {
       <div class="gi hl2">${icon('layout-grid', 15)}<span><b>Namespace</b><small>A band for each namespace</small></span><span class="ck">${icon('check', 15)}</span></div>
       <div class="gi">${icon('server', 15)}<span><b>Node</b><small>A band for each node, with the pods on it</small></span></div>
       <div class="gi">${icon('tag', 15)}<span><b>App</b><small>By app.kubernetes.io/name, or app</small></span></div></div>`
-  const page = `${toolbar({ count: '38 namespaces · 2,140 objects' })}<div class="note">${icon('info', 14)}A big map: each workload’s pods are counted on its card, and what’s healthy is folded.</div><div class="mz">${colHeads(COLS4, g)}
+  const page = `${toolbar({ count: '8 namespaces · 113 workloads · 265 pods' })}<div class="note">${icon('info', 14)}A big map: each workload’s pods are counted on its card, and what’s healthy is folded.</div><div class="mz">${colHeads(COLS4, g)}
     <section class="mb" style="padding-top:2px">${folded('argocd', '7 workloads · 19 pods · 9 services')}${folded('cert-manager', '3 workloads · 3 pods · 2 services')}${folded('ingress-nginx', '1 workload · 2 pods · 2 services')}${folded('kube-system', '14 workloads · 41 pods · 6 services')}${folded('monitoring', '9 workloads · 23 pods · 11 services')}</section>
     <section class="mb">${head({ glyph: 'layout-grid', name: 'payments', counts: '7 workloads · 16 pods · 7 services', health: health(1) })}${body(pay, g)}</section>
     <section class="mb">${head({ glyph: 'layout-grid', name: 'shop', counts: '24 workloads · 65 pods · 21 services', health: health(2, 1) })}${body(shopBig, g)}</section>
-    <section class="mb">${folded('staging', '12 workloads · 18 pods · 12 services')}</section></div>`
+    <section class="mb">${folded('staging', '48 workloads · 96 pods · 44 services')}</section></div>`
 
   const nodeBand: BandBody = {
     cards: [
@@ -784,7 +852,7 @@ function largeFrame(): string {
   const strips = `<div class="rowx" style="display:flex;flex-direction:column;gap:12px">
     <div class="mstrip"><section class="mb">${head({ glyph: 'server', name: 'ip-10-0-3-17', after: pill('warning', 'Memory pressure'), counts: '31 pods of 14 workloads', health: health(1, 1) })}${body(nodeBand, g)}</section></div>
     <div class="mstrip"><section class="mb">${head({ glyph: 'tag', name: 'checkout', after: '<span class="in">in shop and staging</span>', counts: '· 3 workloads · 7 pods · 4 services', health: health(0, 1) })}${body(appBand, g)}</section></div></div>`
-  return `<section class="blk"><h2>A big map<i>all 38 namespaces: pods counted on their workloads, healthy bands folded, the Group by menu open</i></h2>${mwin({ page, h: 1090, ns: 'All namespaces', extra: menu })}<p class="cap">Past about 400 cards. Five healthy namespaces are one card each; payments and shop show what’s unwell with its chain, and fold the rest into one card at their end.</p></section>
+  return `<section class="blk"><h2>A big map<i>all namespaces: pods counted on their workloads, healthy bands folded, the Group by menu open</i></h2>${mwin({ page, h: 1090, ns: 'All namespaces', extra: menu })}<p class="cap">Ten namespaces, eight with a band: kube-node-lease and kube-public hold only Leases and kube-root-ca.crt, which aren’t drawn. Past about 400 cards. Six healthy namespaces are one card each; payments and shop show what’s unwell with its chain, and fold the rest into one card at their end.</p></section>
   <section class="blk"><h2>Grouped by node, and by app<i>a band’s head and first row each</i></h2>${strips}<p class="cap"><b>By node</b>, the node’s own trouble is a pill by its name, and a workload is drawn in each node it has pods on: “2 here” are this node’s. <b>By app</b>, the head says which namespaces the app is in.</p></section>`
 }
 
@@ -793,7 +861,7 @@ function searchFrame(): string {
   for (const c of shop().cards) l[c.id] = 'dim'
   for (const id of ['s2', 'd2', 'p2', 'c2']) l[id] = 'hit'
   l.i1 = undefined
-  const page = `${toolbar({ count: '3 namespaces · 52 objects', q: 'checkout', found: '4 found' })}<div class="mz">${colHeads(COLS5, G5)}
+  const page = `${toolbar({ count: COUNT, q: 'checkout', found: '4 found' })}<div class="mz">${colHeads(COLS5, G5)}
     <section class="mb">${head({ ...SHOP_HEAD, health: health(2, 1) })}${body(looks(shop(), l, 'checkout'), G5)}</section>
     <section class="mb">${head({ ...MON_HEAD, open: false, health: NO_MATCH })}</section>
     <section class="mb">${head({ ...KS_HEAD, open: false, health: NO_MATCH })}</section></div>`
@@ -813,7 +881,7 @@ function searchFrame(): string {
   const grp = (name: string, counts: string, h: string) =>
     `<div class="grp">${icon('chevron-down', 14)}${icon('layout-grid', 14)}<b>${name}</b><span class="bc">${counts}</span><span class="hl">${h}</span></div>`
   const k = (kind: string, name: string) => `<small>${kind}</small> ${name}`
-  const list = `${toolbar({ count: '3 namespaces · 52 objects', list: true })}
+  const list = `${toolbar({ count: COUNT, list: true })}
     <div class="th" style="grid-template-columns:${cols}"><span>Workload</span><span>Status</span><span>Pods</span><span>Reached by</span><span>Uses</span></div>
     ${grp('shop', SHOP_HEAD.counts, health(2, 1))}
     ${row({ name: 'storefront', kind: 'Deployment', st: pill('healthy', 'Ready'), pods: [3, 0, 0], via: `${k('Ingress', 'storefront')} · ${k('Service', 'storefront')}`, uses: 'storefront-config' })}
@@ -833,7 +901,7 @@ function narrowFrame(): string {
   const g = G1024
   const shop4 = countedBand(shop())
   const mon4 = countedBand(monitoring())
-  const plain = `${toolbar({ count: '3 namespaces · 52 objects', field: 180 })}<div class="mz">${colHeads(COLS4, g)}
+  const plain = `${toolbar({ count: COUNT, field: 180 })}<div class="mz">${colHeads(COLS4, g)}
     <section class="mb">${head({ ...SHOP_HEAD, counts: '5 workloads · 10 pods', health: health(2, 1) })}${body(shop4, g, 0, true)}</section>
     <section class="mb">${head({ ...MON_HEAD, counts: '2 workloads · 2 pods', health: health() })}${body(mon4, g, 0, true)}</section></div>`
 
@@ -852,7 +920,7 @@ function narrowFrame(): string {
     on: 'Overview',
   })}<div class="ov"><dl class="kv"><dt>Ready</dt><dd>1 of 3</dd><dt>Strategy</dt><dd>RollingUpdate, 25% surge</dd><dt>Image</dt><dd class="m">ghcr.io/acme/checkout:2.14.1</dd></dl><h4>Pods</h4>
     <div class="pr2"><span>checkout-7c9f8b6d4-hqnnn</span>${pill('critical', 'CrashLoopBackOff')}</div><div class="pr2"><span>checkout-7c9f8b6d4-pwkd2</span>${pill('critical', 'CrashLoopBackOff')}</div><div class="pr2"><span>checkout-7c9f8b6d4-lnk52</span>${pill('healthy', 'Running')}</div></div></div>`
-  const open = `${toolbar({ count: '3 namespaces · 52 objects', field: 180 })}<div class="mz">${colHeads(COLS4, g, shift)}
+  const open = `${toolbar({ count: COUNT, field: 180 })}<div class="mz">${colHeads(COLS4, g, shift)}
     <section class="mb">${head({ ...SHOP_HEAD, counts: '5 workloads · 10 pods', health: health(2, 1) })}${body(opened, g, shift, true)}</section>
     <section class="mb">${head({ ...MON_HEAD, counts: '2 workloads · 2 pods', health: health() })}${body(mon4, g, shift, true)}</section></div>${panel}`
 
@@ -863,10 +931,10 @@ function narrowFrame(): string {
   const phone = `<div class="phs"><div class="pb"><span class="tap">${icon('menu', 20)}</span><b>Map</b><span class="tap">${icon('layout-grid', 18)}</span></div>
     <div class="pbar"><span class="sel3">Group by <b>Namespace</b>${icon('chevron-down', 14)}</span></div><div class="pf">${icon('search', 18)}Find on the map</div>
     ${pgrp('shop', health(2, 1))}${prow('storefront', 'Deployment · 3 pods', pill('healthy', 'Ready'))}${prow('checkout', 'Deployment · 3 pods · <em>2 failing</em>', pill('warning', 'Degraded'))}${prow('cart', 'Deployment · 2 pods', pill('healthy', 'Ready'))}${prow('recommendations', 'Deployment · 1 pod · <em>1 failing</em>', pill('critical', 'Unavailable'))}${prow('orders-db', 'StatefulSet · 1 pod', pill('healthy', 'Ready'))}
-    ${pgrp('monitoring', health())}${prow('grafana', 'Deployment · 1 pod', pill('healthy', 'Ready'))}${prow('prometheus', 'StatefulSet · 1 pod', pill('healthy', 'Ready'))}${pgrp('kube-system', health())}</div>`
+    ${pgrp('monitoring', health())}${prow('grafana', 'Deployment · 1 pod', pill('healthy', 'Ready'))}${prow('prometheus', 'StatefulSet · 1 pod', pill('healthy', 'Ready'))}${pgrp('kube-system', health())}${prow('coredns', 'Deployment · 2 pods', pill('healthy', 'Ready'))}${prow('metrics-server', 'Deployment · 1 pod', pill('healthy', 'Ready'))}${prow('kube-proxy', 'DaemonSet · 6 pods', pill('healthy', 'Ready'))}</div>`
 
-  return `<section class="blk"><h2>At 1024<i>four columns: pods counted on their workloads</i></h2>${mwin({ page: plain, w: 1024, h: 640 })}<p class="cap">Five columns need about 1,100 px of map; at 1024 there are 738, so the pods are counted on their workloads, as on a big map. Each card is 166 px, so it’s compact: the kind is a small icon by the name, and the first line is how it is.</p></section>
-  <section class="blk"><h2>A card opened<i>at 1024: the rows’ panel, over the map, the map scrolled a column so the card stays in view</i></h2>${mwin({ page: open, w: 1024, h: 640 })}</section>
+  return `<section class="blk"><h2>At 1024<i>four columns: pods counted on their workloads</i></h2>${mwin({ page: plain, w: 1024, h: 680 })}<p class="cap">Five columns need 1,082 px of map; at 1024 there are 730, so the pods are counted on their workloads, as on a big map. Each card is 164 px, so it’s compact: the kind is a small icon by the name, and the first line is how it is.</p></section>
+  <section class="blk"><h2>A card opened<i>at 1024: the rows’ panel, over the map, the map scrolled a column so the card stays in view</i></h2>${mwin({ page: open, w: 1024, h: 680 })}</section>
   <section class="blk"><h2>On a phone<i>the list only</i></h2><div class="rowx" style="display:flex;gap:24px">${phone}</div></section>`
 }
 
@@ -874,11 +942,12 @@ const PAGE_RULES = [
   '<b>Map</b> is in the sidebar after Workloads, with the Map tab’s icon, and in the palette and the Go menu. <b>G then Y</b> goes there: G then P is Pods and G then M Namespaces, and Q and Y were the only letters left. The Shortcuts window lists it with the other Go keys. It maps the namespaces picked at the top, as every list does.',
   '<b>It only reads.</b> Nothing on the page changes the cluster. A card opens the rows’ panel, and the object’s own actions are there, as they are for a row.',
   '<b>Columns, left to right</b>: Traffic (Ingresses and Gateway API routes), Services, Workloads, Pods (a workload’s pods as one card, as the Map tab has them), and Config and storage (ConfigMaps, Secrets, volume claims). A namespace grows in number, not in depth, so the map grows down the page, which scrolls, not sideways. The column heads stay at the top.',
-  '<b>Rows follow the chain</b>: a workload’s row holds what routes to it and what it uses, so most lines run straight across. A Service’s line goes to the workload whose pods it selects, and the workload’s goes on to its pods. Lines for what a thing uses or mounts are dashed, as on the Map tab.',
+  '<b>Rows follow the chain</b>: a workload’s row holds what routes to it and what it uses, so most lines run straight across. A Service’s line goes to the workload whose pods it selects, and the workload’s goes on to its pods. (The Map tab draws it to the pods, having no workload column, so docs say the two differ.) Lines for what a thing uses or mounts are dashed, as on the Map tab.',
   '<b>Lines into anything unwell take its colour</b>: red into what’s failing, amber into a warning, grey otherwise. A card says how it is by dot and word (“Degraded”, “1/3 ready”, “Not found”), never by colour alone. Hovering or focusing a card lights its chain both ways and dims the rest, as on the Map tab. Something mounted that isn’t there is a dashed red card.',
   '<b>Bands</b>: one for each namespace, in name order, so a band never moves when its health changes. Its head has the chevron that folds it, the name, and “5 workloads · 10 pods · 5 services”. At the right is its health: “2 failing · 1 warning” in their colours, or “All healthy”, quiet, with a green dot.',
   '<b>What the health counts</b>: each workload as its card says (checkout is Degraded, so it’s a warning, though two of its pods fail), and anything outside a workload on its own, such as a Service with no pods or a ConfigMap that isn’t there (recs-model is shop’s second failing). It reads the same whether pods are drawn or counted, and whether the band is folded or not.',
-  '<b>Nothing to map</b>: a namespace with nothing in it has no band. With nothing at all, the page says “Nothing to map in these namespaces.” under the bar, with the namespace picker’s name as a link.',
+  '<b>What’s left out</b>: ConfigMaps and Secrets that nothing drawn uses or mounts, such as every namespace’s kube-root-ca.crt (put into pods by Kubernetes, never named by a workload) and Helm’s sh.helm.release.v1 Secrets. Their own lists have them, and no count on the page includes them. Service accounts, roles and bindings aren’t drawn either; the Map tab has them. Volume claims are drawn even when nothing mounts them, since they hold data, and a Service with no pods is drawn with its warning.',
+  '<b>Nothing to map</b>: a namespace with nothing left to draw has no band (kube-public, kube-node-lease). With nothing at all, the page says “Nothing to map in these namespaces.” under the bar, with the namespace picker’s name as a link. <b>The bar’s count</b> is the namespaces with a band, their workloads and their pods, each pod once: what the band heads add up to.',
   '<b>Keys</b>: cards are in the tab order band by band, row by row; ↵ opens one beside and Esc closes it. Each card reads as the Map tab’s do: “Deployment checkout, Degraded”, then what it’s connected to.',
 ]
 
@@ -901,8 +970,8 @@ const SEARCH_RULES = [
 ]
 
 const NARROW_RULES = [
-  '<b>At 1024</b>: five columns need about 1,100 px of map. With less, pods are counted on their workloads, as on a big map, and four columns fit down to about 740 px; at 1024 a card is 166 px. Under about 180 px a card is compact: no kind tile or word, but the kind’s small icon before the name; the first line is the status, then the count (“2 failing”, or “3 pods”). A name gets 17 characters or so before it’s cut. The kind and name are in the card’s title and are read out.',
-  '<b>Narrower still</b> (a window under about 1,000 px), the page shows the list. The map button is off, titled “The map needs a wider window”.',
+  '<b>At 1024</b>: five columns need 1,082 px of map (a window about 1,380 px wide). With less, pods are counted on their workloads, as on a big map, and four columns fit down to 728 px; at 1024 there are 730, so a card is 164 px. Under about 180 px a card is compact: no kind tile or word, but the kind’s small icon before the name; the first line is the status, then the count (“2 failing”, or “3 pods”). A name gets 17 characters or so before it’s cut. The kind and name are in the card’s title and are read out.',
+  '<b>Narrower still</b>, under 728 px of map (a window under about 1,020 px), the page shows the list. The map button is off, titled “The map needs a wider window”.',
   '<b>A card opens beside</b>, in the rows’ panel (400 px), on the object’s Overview. The panel lies over the map’s right side with a shadow, because the map can’t narrow without moving every card. The map scrolls sideways so the opened card and the line into it stay in view, and scrolls back when the panel closes. The opened card has the Map tab’s own-object look: an accent border and ring.',
   '<b>Open its map</b> is in a card’s menu (right-click, or the menu key) and goes to the per-object map: the panel on its Map tab.',
   '<b>On a phone</b>, the page is the list only, as the Map tab isn’t on a phone either, so there’s no toggle. It’s in the menu after Workloads. Group by and the field are as on the desktop, 40 and 44 px high. Bands are group rows with their health, and each row is two lines: the name, then the kind and pods, “Deployment · 3 pods · 2 failing”, the failing part in red. A row opens the object’s page.',
