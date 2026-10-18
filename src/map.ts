@@ -81,11 +81,7 @@ svg.mln { position: absolute; inset: 0; overflow: visible; }
 .cd .l2 small em { font-style: normal; font-weight: 500; color: var(--critical-text); }
 .cd mark { border-radius: 3px; background: color-mix(in srgb, var(--accent) 22%, transparent); color: inherit; }
 .cd .bar { position: absolute; right: 12px; bottom: 6px; left: 12px; display: flex; height: 3px; gap: 1px; overflow: hidden; border-radius: 999px; }
-.cd.nar .l1 .st { margin-left: 0; padding-left: 0; }
-.cd.nar .l1 .cn { flex: none; margin-left: auto; padding-left: 8px; font-size: 11px; color: var(--text-3); }
-.cd.nar .l1 .cn em { font-style: normal; font-weight: 500; color: var(--critical-text); }
-.cd.nar .l2 { align-items: center; gap: 5px; }
-.cd.nar .l2 svg.i { color: var(--text-3); }
+.cd.nar .l1 .k { flex-shrink: 1; }
 .cd.miss { border-style: dashed; border-color: color-mix(in srgb, var(--critical) 45%, transparent); background: color-mix(in srgb, var(--critical) 5%, var(--surface)); box-shadow: none; }
 .cd.dim { opacity: 0.35; }
 .cd.hit { border-color: var(--accent); }
@@ -221,12 +217,12 @@ function card(c: Card, g: Geo, shift = 0, short = false): string {
   const cls = ['cd', c.missing ? 'miss' : '', c.look ?? '', short ? 'nar' : '']
     .filter(Boolean)
     .join(' ')
-  // Narrow, the kind's tile and word give way to a small icon by the name, and the first line is
-  // how it is: its status, then its count, or a ConfigMap's keys where there's no status.
+  // Narrow, as built: no tile and no detail; the status wins and the kind word gives way to it, and
+  // the name stays whole, its count beside it only where both fit.
   if (short) {
-    const lead =
-      st || (c.meta && c.kind !== 'Service' ? `<span class="mt">${escape(c.meta)}</span>` : '')
-    return `<div class="${cls}" style="left:${x}px;top:${y}px;width:${g.cw}px" title="${c.kind} ${escape(c.name)}"><span class="tx"><span class="l1">${lead}${c.count ? `<small class="cn">${counted(c.count, true)}</small>` : ''}</span><span class="l2">${icon(c.glyph, 13)}<b>${name}</b></span></span>${c.bar ? bar(c.bar) : ''}</div>`
+    const cn = c.count ? counted(c.count) : ''
+    const fits = c.name.length + cn.replace(/<[^>]+>/g, '').length <= 22
+    return `<div class="${cls}" style="left:${x}px;top:${y}px;width:${g.cw}px" title="${c.kind} ${escape(c.name)}"><span class="tx"><span class="l1"><span class="k">${c.kind}</span>${st}</span><span class="l2"><b>${name}</b>${cn && fits ? `<small>${cn}</small>` : ''}</span></span>${c.bar ? bar(c.bar) : ''}</div>`
   }
   return `<div class="${cls}" style="left:${x}px;top:${y}px;width:${g.cw}px"><span class="kt">${icon(c.glyph, 15)}</span><span class="tx"><span class="l1"><span class="k">${c.kind}</span>${c.meta && c.kind !== 'Service' ? `<span class="mt">&nbsp;· ${escape(c.meta)}</span>` : ''}${st}</span><span class="l2"><b>${name}</b>${c.count ? `<small>${counted(c.count, short)}</small>` : ''}</span></span>${c.bar ? bar(c.bar) : ''}</div>`
 }
@@ -933,7 +929,7 @@ function narrowFrame(): string {
     ${pgrp('shop', health(2, 1))}${prow('storefront', 'Deployment · 3 pods', pill('healthy', 'Ready'))}${prow('checkout', 'Deployment · 3 pods · <em>2 failing</em>', pill('warning', 'Degraded'))}${prow('cart', 'Deployment · 2 pods', pill('healthy', 'Ready'))}${prow('recommendations', 'Deployment · 1 pod · <em>1 failing</em>', pill('critical', 'Unavailable'))}${prow('orders-db', 'StatefulSet · 1 pod', pill('healthy', 'Ready'))}
     ${pgrp('monitoring', health())}${prow('grafana', 'Deployment · 1 pod', pill('healthy', 'Ready'))}${prow('prometheus', 'StatefulSet · 1 pod', pill('healthy', 'Ready'))}${pgrp('kube-system', health())}${prow('coredns', 'Deployment · 2 pods', pill('healthy', 'Ready'))}${prow('metrics-server', 'Deployment · 1 pod', pill('healthy', 'Ready'))}${prow('kube-proxy', 'DaemonSet · 6 pods', pill('healthy', 'Ready'))}</div>`
 
-  return `<section class="blk"><h2>At 1024<i>four columns: pods counted on their workloads</i></h2>${mwin({ page: plain, w: 1024, h: 680 })}<p class="cap">Five columns need 1,082 px of map; at 1024 there are 730, so the pods are counted on their workloads, as on a big map. Each card is 164 px, so it’s compact: the kind is a small icon by the name, and the first line is how it is.</p></section>
+  return `<section class="blk"><h2>At 1024<i>four columns: pods counted on their workloads</i></h2>${mwin({ page: plain, w: 1024, h: 680 })}<p class="cap">Five columns need 1,082 px of map; at 1024 there are 730, so the pods are counted on their workloads, as on a big map. Each card is 164 px, so it’s compact: no kind tile, the status before the kind word, and the name whole.</p></section>
   <section class="blk"><h2>A card opened<i>at 1024: the rows’ panel, over the map, the map scrolled a column so the card stays in view</i></h2>${mwin({ page: open, w: 1024, h: 680 })}</section>
   <section class="blk"><h2>On a phone<i>the list only</i></h2><div class="rowx" style="display:flex;gap:24px">${phone}</div></section>`
 }
@@ -954,9 +950,9 @@ const PAGE_RULES = [
 const LARGE_RULES = [
   '<b>A big map</b>, past about 400 cards: each workload’s pods are counted on its card, the Pods column goes, and the other four widen. The count ends the card’s second line: “2 of 3 failing” in red, or “3 pods” when none are. The bar along its foot is the pods by health, as on a Pods card, so the share shows without reading. A Service card drops its type and ports here, which don’t fit beside its status; its panel has them. The line under the bar says what’s happened.',
   '<b>A healthy band folds to one card</b>: its name, counts and “All healthy”, with Show at the end. The whole card is the button. Show unfolds it until the page is left, and its head’s chevron folds it again. Folded bands keep their place in name order.',
-  '<b>A band with something unwell</b> draws what’s unwell with its chain, everything leading to it and from it. The rest folds into one dashed card at the band’s end: “22 more workloads, all healthy, with their 19 services and 61 pods”, and “Show them”. Anything unwell never folds, and neither does its chain. A line into something folded ends at that card.',
+  '<b>A band with something unwell</b> draws what’s unwell with its chain, everything leading to it and from it. The rest folds into one dashed card at the band’s end: “22 more workloads, all healthy, with their 19 services and 61 pods”, and “Show them”. Anything unwell never folds, and neither does its chain. Only workloads fold, with what’s theirs: a Service with no pods, or a claim no pod holds, is always drawn. A line into something folded ends at that card.',
   '<b>Group by</b>: Namespace (the default), Node or App, kept for each cluster. Each grouping keeps the same columns, bands and health.',
-  '<b>By node</b>, a band is a node: its name, a pill for its own trouble when it has one (NotReady, Memory pressure, Disk pressure), and “31 pods of 14 workloads”. A workload is drawn in each node it has pods on, its count saying how many are on this one: “2 here, 2 failing”. Services, config and storage go with the pods they serve. Its health counts the node too. Pods not yet on a node are in “Not scheduled” at the end.',
+  '<b>By node</b>, a band is a node: its name, a pill for its own trouble when it has one (NotReady, Memory pressure, Disk pressure), and “31 pods of 14 workloads”. A workload is drawn in each node it has pods on, its count saying how many are on this one: “2 here, 2 failing”. Services, config and storage go with the pods they serve. A card keeps its workload’s status, but the band’s health counts this node’s pods and the node itself, so a node whose pods are all ready is All healthy. The bar still counts each workload once. Pods not yet on a node, and Services with no pods, are in “No node” at the end.',
   '<b>By app</b>, a band is the value of app.kubernetes.io/name, or app where that’s not set, and its head says which namespaces it’s in. Something with neither label goes with what it’s connected to, when that’s all one app; otherwise it’s in “No app label” at the end.',
 ]
 
@@ -970,7 +966,7 @@ const SEARCH_RULES = [
 ]
 
 const NARROW_RULES = [
-  '<b>At 1024</b>: five columns need 1,082 px of map (a window about 1,380 px wide). With less, pods are counted on their workloads, as on a big map, and four columns fit down to 728 px; at 1024 there are 730, so a card is 164 px. Under about 180 px a card is compact: no kind tile or word, but the kind’s small icon before the name; the first line is the status, then the count (“2 failing”, or “3 pods”). A name gets 17 characters or so before it’s cut. The kind and name are in the card’s title and are read out.',
+  '<b>At 1024</b>: five columns need 1,082 px of map (a window about 1,380 px wide). With less, pods are counted on their workloads, as on a big map, and four columns fit down to 728 px; at 1024 there are 730, so a card is 164 px. Under about 180 px a card is compact: no kind tile and no detail; the first line is the kind word and the status, and the status wins (“Deploy… ● Unavailable”). The name stays whole, with its count beside it only where both fit (“checkout 2 of 3 failing”). The kind and name are in the card’s title and are read out.',
   '<b>Narrower still</b>, under 728 px of map (a window under about 1,020 px), the page shows the list. The map button is off, titled “The map needs a wider window”.',
   '<b>A card opens beside</b>, in the rows’ panel (400 px), on the object’s Overview. The panel lies over the map’s right side with a shadow, because the map can’t narrow without moving every card. The map scrolls sideways so the opened card and the line into it stay in view, and scrolls back when the panel closes. The opened card has the Map tab’s own-object look: an accent border and ring.',
   '<b>Open its map</b> is in a card’s menu (right-click, or the menu key) and goes to the per-object map: the panel on its Map tab.',
