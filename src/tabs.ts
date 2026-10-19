@@ -27,7 +27,9 @@ const CSS = `${WINDOW}
 .rules li b { font-weight: 600; color: var(--text-1); }
 /* The row: the tabs that fit, then More. */
 .itabs.fit { overflow: visible; }
-.itabs .tmore { position: relative; display: flex; align-items: center; gap: 4px; }
+.itabs.fit { gap: 4px; padding: 0 20px; }
+.itabs.fit > span { padding-right: 10px; padding-left: 10px; }
+.itabs .tmore { position: relative; display: flex; align-items: center; gap: 6px; }
 .itabs .tmore svg.i { color: var(--text-3); }
 .itabs .tmore.open { color: var(--text-1); }
 .itabs .tmore.ring { border-radius: 4px; box-shadow: 0 0 0 2px var(--accent-soft), 0 0 0 1px var(--accent); }
@@ -161,9 +163,9 @@ const strip = (lab: string, width: number, tabs: string) =>
 function podFrame(): string {
   const picking = window1024(
     row({
-      shown: POD_TABS.slice(0, 6),
+      shown: POD_TABS.slice(0, 5),
       on: 'Overview',
-      more: ['Audit', 'YAML'],
+      more: ['Events', 'Audit', 'YAML'],
       open: true,
       hl: 'YAML',
     }),
@@ -173,49 +175,54 @@ function podFrame(): string {
     row({ shown: [...POD_TABS.slice(0, 5), 'YAML'], on: 'YAML', more: ['Events', 'Audit'] }),
     YAML,
   )
-  return `<section class="blk"><h2>The pod panel at 1024<i>a 489 px panel: six tabs fit, two go into More</i></h2><div class="pair"><div>${picking}<p class="cap"><b>More, opened</b> with a click, or ↓ on it from the row. It holds what doesn’t fit, in the row’s order: Audit and YAML. The pointer is on YAML.</p></div><div>${picked}<p class="cap"><b>YAML picked.</b> The open tab always has a place in the row: YAML takes the last one, before More, and Events, which no longer fits, goes into More. The rest keep their order, so a tab never jumps ahead of one it follows.</p></div></div></section>`
+  return `<section class="blk"><h2>The pod panel at 1024<i>a 489 px panel: five tabs and More fit, three tabs go into it</i></h2><div class="pair"><div>${picking}<p class="cap"><b>More, opened</b> with a click, or ↓ on it from the row. It holds what doesn’t fit, in the row’s order: Events, Audit and YAML. The pointer is on YAML.</p></div><div>${picked}<p class="cap"><b>YAML picked.</b> The open tab always has a place in the row: YAML takes the last one, before More. It’s narrower than Events, so it fits where Events didn’t; Events and Audit stay in More. Back on Overview, YAML goes back into More and the row is as it was.</p></div></div></section>`
 }
 
 function stripsFrame(): string {
   const s = [
     strip(
-      '<b>A Deployment</b>, at 489: Pods takes Shell’s place, so Audit and YAML go into More.',
+      '<b>A Deployment</b>, at 489: Overview to Map, and More with Events, Audit and YAML.',
       PANEL,
-      row({ shown: DEPLOY_TABS.slice(0, 6), on: 'Overview', more: ['Audit', 'YAML'] }),
+      row({ shown: DEPLOY_TABS.slice(0, 5), on: 'Overview', more: ['Events', 'Audit', 'YAML'] }),
     ),
     strip(
-      '<b>A plugin’s tab</b> (Trivy’s Findings, LMV-351) comes after Lumovi’s own, so it is the first to go into More.',
+      '<b>A plugin’s tab</b> (Trivy’s Findings, LMV-351) keeps its place, after Audit and before YAML, in More as in the row.',
       PANEL,
-      row({ shown: DEPLOY_TABS.slice(0, 6), on: 'Pods', more: ['Audit', 'YAML', 'Findings'] }),
+      row({
+        shown: DEPLOY_TABS.slice(0, 5),
+        on: 'Pods',
+        more: ['Events', 'Audit', 'Findings', 'YAML'],
+        open: true,
+      }),
     ),
     strip(
       '<b>From the keyboard</b>: → past the last tab lands on More; ↓, Enter or Space opens it, and the first item is lit.',
       PANEL,
       row({
-        shown: POD_TABS.slice(0, 6),
+        shown: POD_TABS.slice(0, 5),
         on: 'Overview',
-        more: ['Audit', 'YAML'],
+        more: ['Events', 'Audit', 'YAML'],
         open: true,
-        hl: 'Audit',
+        hl: 'Events',
         ring: true,
       }),
     ),
     strip(
-      '<b>Room for all</b>: the panel expanded, or a window wide enough. With nothing left over, there is no More.',
+      '<b>Room for all</b>: the panel expanded, or a window wide enough. When every tab fits, there is no More.',
       720,
       row({ shown: POD_TABS, on: 'Overview' }),
     ),
   ]
-  return `<section class="blk"><h2>Any kind’s panel<i>the same rule wherever a row of tabs is drawn</i></h2><div class="pair" style="flex-wrap:wrap;row-gap:56px">${s.join('')}</div></section>`
+  return `<section class="blk"><h2>Any kind’s panel<i>the same rule wherever a row of tabs is drawn</i></h2><div class="pair" style="flex-wrap:wrap;row-gap:150px">${s.join('')}</div></section>`
 }
 
 const RULES = [
-  '<b>Tabs never scroll, wrap or get cut.</b> The tabs that fit stay in the row in their order; the rest go into <b>More</b>, the row’s last item, which opens a menu of them in the same order. A row that scrolls sideways hides tabs with nothing to click, and a mouse without a trackpad can’t reach them.',
-  '<b>The open tab always has a place in the row.</b> When it would be in More, it takes the row’s last place before More, and whatever no longer fits goes into More. Picking a tab from More opens it there; nothing else moves.',
-  '<b>Which tabs fit is measured</b>, not counted: the row fills from the start until the next tab and More wouldn’t both fit. It’s worked out again when the panel or window is resized, or a plugin adds a tab; nothing animates.',
-  '<b>More</b> looks like a tab, in the tabs’ type and colour, with a small chevron. It’s never underlined. While its menu is open it’s in the text colour. If a hidden tab carries a count, the menu carries it too.',
+  '<b>Tabs never scroll, wrap or get cut.</b> When every tab fits, they’re all in the row and there’s no More. Otherwise the tabs that fit stay in the row in their order, and the rest go into <b>More</b>, the row’s last item, which opens a menu of them in the same order. A row that scrolls sideways hides tabs with nothing to click, and a mouse without a trackpad can’t reach them.',
+  '<b>The open tab always has a place in the row.</b> When it would be in More, it takes the row’s last place before More, and whatever no longer fits goes into More; nothing changes order. Going back to a tab in the row puts the picked one back into More, and the row is as it was before.',
+  '<b>Which tabs fit is measured</b>, not counted: with no room for all, the row fills from the start while the next tab and More both still fit. It’s worked out again when the panel or window is resized, or a plugin adds a tab; nothing animates.',
+  '<b>More</b> is drawn as a tab is (the same padding, type and colour), with a 14 px chevron 6 px after the word. It’s never underlined. While its menu is open it’s in the text colour. If a hidden tab carries a count, the menu carries it too.',
   '<b>From the keyboard</b>, More is the last stop in the tab row (→ from the last tab, End); ↓, Enter or Space opens the menu with its first item lit; ↑ ↓ move, Enter opens the tab and puts focus on it in the row, Esc closes the menu and returns to More. Any key that opens a tab still opens it when it’s in More.',
-  '<b>Everywhere a row of tabs is drawn</b>: the detail panel for every kind, an object open on its own, a tab kept in the dock, and on a phone (where More opens as a sheet, as every menu there does). A plugin’s tabs come after Lumovi’s own, so they’re the first to go into More.',
+  '<b>Everywhere a row of tabs is drawn</b>: the detail panel for every kind, an object open on its own, a tab kept in the dock, and on a phone (where More opens as a sheet, as every menu there does). A plugin’s tabs keep their place, after Audit and before YAML, in the row and in More.',
   '<b>Words</b>: one new, “More”, read out as “More tabs”. No tab is renamed or shortened to fit.',
 ]
 
