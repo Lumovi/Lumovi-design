@@ -32,7 +32,7 @@ const CSS = `${WINDOW}
 .itabs .tmore { position: relative; display: flex; align-items: center; gap: 6px; }
 .itabs .tmore svg.i { color: var(--text-3); }
 .itabs .tmore.open { color: var(--text-1); }
-.itabs .tmore.ring { border-radius: 4px; box-shadow: 0 0 0 2px var(--accent-soft), 0 0 0 1px var(--accent); }
+.itabs .tmore.ring { border-radius: 6px; background: var(--surface-3); color: var(--text-1); }
 .tmenu { position: absolute; top: calc(100% + 4px); right: -8px; z-index: 2; width: 168px; padding: 4px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-pop); font-weight: 400; color: var(--text-1); }
 .tmenu .tmi { display: flex; height: 30px; align-items: center; padding: 0 10px; border-radius: 6px; }
 .tmenu .tmi.hl { background: var(--surface-3); color: var(--text-1); }
@@ -221,9 +221,9 @@ const RULES = [
   '<b>The open tab always has a place in the row.</b> When it would be in More, it takes the row’s last place before More, and whatever no longer fits goes into More; nothing changes order. Going back to a tab in the row puts the picked one back into More, and the row is as it was before.',
   '<b>Which tabs fit is measured</b>, not counted: with no room for all, the row fills from the start while the next tab and More both still fit. It’s worked out again when the panel or window is resized, or a plugin adds a tab; nothing animates.',
   '<b>More</b> is drawn as a tab is (the same padding, type and colour), with a 14 px chevron 6 px after the word. It’s never underlined. While its menu is open it’s in the text colour. If a hidden tab carries a count, the menu carries it too.',
-  '<b>From the keyboard</b>, More is the last stop in the tab row (→ from the last tab, End); ↓, Enter or Space opens the menu with its first item lit; ↑ ↓ move, Enter opens the tab and puts focus on it in the row, Esc closes the menu and returns to More. Any key that opens a tab still opens it when it’s in More.',
-  '<b>Everywhere a row of tabs is drawn</b>: the detail panel for every kind, an object open on its own, a tab kept in the dock, and on a phone (where More opens as a sheet, as every menu there does). A plugin’s tabs keep their place, after Audit and before YAML, in the row and in More.',
-  '<b>Words</b>: one new, “More”, read out as “More tabs”. No tab is renamed or shortened to fit.',
+  '<b>From the keyboard</b>, More is the last stop in the tab row (→ from the last tab, End); ↓, Enter or Space opens the menu with its first item lit; ↑ ↓ move, Enter opens the tab and puts focus on it in the row, Esc closes the menu and returns to More. Focused, More has a tab’s own focus, the fill, not a ring. Any key that opens a tab still opens it when it’s in More.',
+  '<b>Everywhere a row of tabs is drawn</b>: the detail panel for every kind, an object open on its own, a page’s own tabs (Helm’s Releases, Charts and Repositories), a tab kept in the dock, and on a phone (where More opens as a sheet, as every menu there does). A plugin’s tabs keep their place, after Audit and before YAML, in the row and in More.',
+  '<b>Words</b>: one new, “More”, read out as “More tabs”; on a phone, the sheet it opens is titled “More tabs”. No tab is renamed or shortened to fit.',
 ]
 
 const rules = (list: string[]) =>
