@@ -35,7 +35,7 @@ const CSS = `${WINDOW}
 .itabs .tmore.ring { border-radius: 4px; box-shadow: 0 0 0 2px var(--accent-soft), 0 0 0 1px var(--accent); }
 .tmenu { position: absolute; top: calc(100% + 4px); right: -8px; z-index: 2; width: 168px; padding: 4px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-pop); font-weight: 400; color: var(--text-1); }
 .tmenu .tmi { display: flex; height: 30px; align-items: center; padding: 0 10px; border-radius: 6px; }
-.tmenu .tmi.hl { background: var(--accent); color: #fff; }
+.tmenu .tmi.hl { background: var(--surface-3); color: var(--text-1); }
 .tmenu .tmi small { margin-left: auto; font-size: 11.5px; color: var(--text-3); }
 /* The panel's body: a pod's details, or its YAML. */
 .pbody { flex: 1; min-height: 0; overflow: hidden; padding: 16px 20px; }
