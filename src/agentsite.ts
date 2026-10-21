@@ -77,6 +77,7 @@ h1 .dim { display: block; }
 .pop { background: var(--surface); border-radius: 14px; box-shadow: var(--pop); }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
 .phone .grid2 { grid-template-columns: 1fr; gap: 36px; }
+.grid2 > *, .cols > *, .vs > * { min-width: 0; }
 .cols { display: grid; gap: 20px; }
 .phone .cols { grid-template-columns: 1fr !important; }
 .pt { display: flex; gap: 12px; font-size: 15px; line-height: 1.5; color: var(--text-2); }
@@ -135,6 +136,7 @@ h1 .dim { display: block; }
 .chat .wait { color: var(--accent-strong); padding-left: 14px; }
 /* Permissions, as the AI assistants page's rules */
 .rules .r { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px 18px; border-top: 1px solid var(--line); }
+.phone .rules .r { grid-template-columns: 1fr; gap: 8px; justify-items: start; }
 .rules .r:first-of-type { border-top: 0; }
 .rules .r b { font-weight: 600; display: block; } .rules .r span { font-size: 12px; color: var(--text-3); }
 .seg { display: inline-flex; padding: 2px; border-radius: 8px; background: var(--surface-3); font-size: 12px; }
@@ -335,8 +337,8 @@ const A: Sec[] = [
       ['new', 'The waiting change'],
     ],
     html: (d, s) =>
-      `<section style="background:var(--glow)">${nav(['How it works', 'Your rules', 'Dashboard', 'Docs'], 'Download', ph(d))}<div class="wrap" style="text-align:${ph(d) ? 'left' : 'center'};padding-top:${ph(d) ? 40 : 88}px">${release}${heading('Let AI agents onto your clusters.', 'Keep the keys.', 'h1')}<p class="lead" style="${ph(d) ? '' : 'margin-left:auto;margin-right:auto'}">${LINE} Your agent acts as you, never past your access, and by default every change waits for your approval.</p><div class="ctas" style="justify-content:center">${button('download', true, 'For macOS, Windows and Linux.')}${button('cluster', false, 'One Helm chart, for your whole team.')}</div></div>
-<div class="wrap" style="position:relative;margin-top:${ph(d) ? 24 : 8}px;padding-bottom:${ph(d) ? 40 : 96}px">${scene('hero', d, s, ph(d) ? 'height:230px;object-fit:cover;object-position:50% 38%' : 'width:880px;margin:0 0 0 40px')}<div style="${ph(d) ? 'margin-top:-40px;position:relative' : 'position:absolute;right:40px;top:120px'}">${approval({ width: ph(d) ? 358 : 440 })}</div></div></section>`,
+      `<section style="background:var(--glow)">${nav(['How it works', 'Your rules', 'Dashboard', 'Docs'], 'Download', ph(d))}<div class="wrap" style="text-align:${ph(d) ? 'left' : 'center'};padding-top:${ph(d) ? 40 : 44}px">${release}${heading('Let AI agents onto your clusters.', 'Keep the keys.', 'h1')}<p class="lead" style="${ph(d) ? '' : 'margin-left:auto;margin-right:auto'}">${LINE} Your agent acts as you, never past your access, and by default every change waits for your approval.</p><div class="ctas" style="justify-content:center">${button('download', true, 'For macOS, Windows and Linux.')}${button('cluster', false, 'One Helm chart, for your whole team.')}</div></div>
+<div class="wrap" style="position:relative;margin-top:${ph(d) ? 24 : -96}px;padding-bottom:${ph(d) ? 40 : 96}px">${scene('hero', d, s, ph(d) ? 'margin:-24px 0 -48px' : 'width:940px;margin:0 0 0 0')}<div style="${ph(d) ? 'margin-top:-40px;position:relative' : 'position:absolute;right:40px;top:300px'}">${approval({ width: ph(d) ? 358 : 440 })}</div></div></section>`,
   },
   {
     id: 'A2 · The problem',
@@ -389,7 +391,7 @@ const A: Sec[] = [
       ['flag', 'Film: needs a re-cut'],
     ],
     html: (d) =>
-      `<section class="pad band"><div class="wrap"><div style="position:relative;max-width:960px;margin:0 auto;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,var(--surface-3),var(--bg));box-shadow:var(--panel);display:grid;place-items:center"><span class="film-flag">film: needs a re-cut (wording, product name)</span><div style="transform:scale(${ph(d) ? 0.62 : 0.82})">${approval({ width: 500 })}</div><div style="position:absolute;left:0;right:0;bottom:0;height:44px;background:linear-gradient(transparent,rgb(0 0 0/.55));display:flex;align-items:center;gap:12px;padding:0 16px;color:#fff;font-size:12px">${icon('play', 16)}<span>0:00</span><span style="flex:1;height:3px;border-radius:2px;background:rgb(255 255 255/.35)"></span><span>1:26</span></div></div><p style="max-width:960px;margin:14px auto 0;font-size:14px;color:var(--text-2)"><b style="color:var(--text-1)">It asked first</b> · An agent’s change, from its question to your approval.</p></div></section>`,
+      `<section class="pad band"><div class="wrap"><div style="position:relative;max-width:960px;margin:0 auto;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,var(--surface-3),var(--bg));box-shadow:var(--panel);display:grid;place-items:center"><span class="film-flag">film: needs a re-cut (wording, product name)</span>${ph(d) ? `<div style="position:absolute;left:50%;top:52px;transform:translateX(-50%)">${approval({ width: 310 })}</div>` : `<div style="transform:scale(0.82)">${approval({ width: 500 })}</div>`}<div style="position:absolute;left:0;right:0;bottom:0;height:44px;background:linear-gradient(transparent,rgb(0 0 0/.55));display:flex;align-items:center;gap:12px;padding:0 16px;color:#fff;font-size:12px">${icon('play', 16)}<span>0:00</span><span style="flex:1;height:3px;border-radius:2px;background:rgb(255 255 255/.35)"></span><span>1:26</span></div></div><p style="max-width:960px;margin:14px auto 0;font-size:14px;color:var(--text-2)"><b style="color:var(--text-1)">It asked first</b> · An agent’s change, from its question to your approval.</p></div></section>`,
   },
   {
     id: 'A5 · Your rules',
@@ -462,7 +464,7 @@ const B: Sec[] = [
       ['new', 'The audit log over it'],
     ],
     html: (d, s) =>
-      `<section style="background:var(--glow)">${nav(['Guarantees', 'Audit log', 'For teams', 'Dashboard', 'Docs'], 'Run in your cluster', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Every change an agent makes,', 'on the record.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Agents act as the person, within your rules, and wait for approval, by default everywhere.</p><div class="ctas">${button('cluster', true, 'One Helm chart. Everyone signs in as themselves.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:900px'}">${scene('team', d, s, ph(d) ? '' : 'width:660px')}<div style="${ph(d) ? 'margin-top:12px;position:relative' : 'position:absolute;right:-24px;top:250px'}">${audit({ width: ph(d) ? 358 : 470, short: ph(d) })}</div></div></div></section>`,
+      `<section style="background:var(--glow)">${nav(['Guarantees', 'Audit log', 'For teams', 'Dashboard', 'Docs'], 'Run in your cluster', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Every change an agent makes,', 'on the record.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Agents act as the person, within your rules, and wait for approval, by default everywhere.</p><div class="ctas">${button('cluster', true, 'One Helm chart. Everyone signs in as themselves.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:1000px'}">${scene('team', d, s, ph(d) ? '' : 'width:660px')}<div style="${ph(d) ? 'margin-top:12px;position:relative' : 'position:absolute;right:-24px;top:400px'}">${audit({ width: ph(d) ? 358 : 470, short: ph(d) })}</div></div></div></section>`,
   },
   {
     id: 'B2 · Four guarantees',
@@ -627,7 +629,7 @@ const C: Sec[] = [
       ['keep', 'Conversation + approval, from AI assistants'],
     ],
     html: (d, s) =>
-      `<section style="background:var(--glow)">${nav(['Connect', 'What it reads', 'Dashboard', 'Docs'], 'Download', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Your agent, on your clusters.', 'With you in charge.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Connect your agent in a minute: it reads with your access, and by default asks first.</p><div class="ctas">${button('connect', true, 'Turn it on, paste one line, ask what’s failing.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:860px'}">${ph(d) ? `${chat(358)}<div style="margin-top:-8px">${scene('hero', d, s, 'height:230px;object-fit:cover;object-position:50% 38%')}</div><div style="margin-top:-60px;position:relative">${approval({ width: 358, compact: true, waits: '4:59' })}</div>` : `${scene('hero', d, s, 'position:absolute;right:-50px;top:-30px;width:720px')}<div style="position:absolute;left:-20px;top:290px">${chat(380)}</div><div style="position:absolute;right:-84px;top:520px">${approval({ width: 370, compact: true, waits: '4:59' })}</div>`}</div></div></section>`,
+      `<section style="background:var(--glow)">${nav(['Connect', 'What it reads', 'Dashboard', 'Docs'], 'Download', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Your agent, on your clusters.', 'With you in charge.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Connect your agent in a minute: it reads with your access, and by default asks first.</p><div class="ctas">${button('connect', true, 'Turn it on, paste one line, ask what’s failing.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:1020px'}">${ph(d) ? `${chat(358)}<div style="margin-top:-8px">${scene('hero', d, s, 'margin:-24px 0 -48px')}</div><div style="margin-top:-60px;position:relative">${approval({ width: 358, compact: true, waits: '4:59' })}</div>` : `${scene('hero', d, s, 'position:absolute;right:-50px;top:-30px;width:720px')}<div style="position:absolute;left:-20px;top:420px">${chat(380)}</div><div style="position:absolute;right:-84px;top:640px">${approval({ width: 370, compact: true, waits: '4:59' })}</div>`}</div></div></section>`,
   },
   {
     id: 'C2 · Three steps',
@@ -908,7 +910,26 @@ ${col(VERSIONS.c.name, VERSIONS.c.angle, 'c-desk', `<ul>${li('keep', 'Hero clust
 </div></div>`
 }
 
+/** What a visitor sees first at 1440 (1440 × 900), today's and each version's, at half size: the live scenes are judged here. */
+function first(scheme: Scheme): string {
+  const shot = (file: string, title: string, sub: string) => {
+    const u = new URL(`thumbs/${file}-first-${scheme}.png`, REVIEW)
+    return `<figure><figcaption><b>${title}</b><span>${sub}</span></figcaption>${existsSync(u) ? `<img src="${png(u)}">` : '<div class="miss"></div>'}</figure>`
+  }
+  return `<div class="sm fs"><h1>The first screen, side by side</h1><p class="sub">What a visitor sees first at 1440 × 900, at half size. Today’s live scenes are drawn as the site draws them; the new pages place the same scenes, captured from lumovi.dev, so their feel is the site’s own.</p><div class="g">
+${shot('today', 'Today', 'Your clusters, at a glance: the hero cluster, live, with Pod health over it')}
+${shot('a', VERSIONS.a.name, 'The hero cluster under the headline, an agent’s change waiting on it')}
+${shot('b', VERSIONS.b.name, 'The team scene beside the words, the audit log over it; the hero cluster moves to /dashboard')}
+${shot('c', VERSIONS.c.name, 'The hero cluster beside the words, the conversation and its change over it')}
+</div></div>`
+}
+
 const CMP_CSS = `
+.fs .g { display: grid; grid-template-columns: 720px 720px; gap: 40px 24px; }
+.fs figure { margin: 0; }
+.fs figcaption { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; font-size: 13px; color: var(--text-3); }
+.fs figcaption b { font-size: 16px; color: var(--text-1); }
+.fs img, .fs .miss { display: block; width: 720px; height: 450px; border-radius: 10px; box-shadow: var(--panel); }
 .cmp .row { display: flex; gap: 40px; align-items: flex-start; }
 .cc { width: 330px; display: flex; flex-direction: column; gap: 6px; }
 .cc > b { font-size: 16px; } .cc > span { font-size: 13px; color: var(--text-3); margin-bottom: 8px; }
@@ -918,7 +939,7 @@ const CMP_CSS = `
 
 /* ——— Frames ——— */
 
-export type AgentSiteFrame = `${Version}-${Dev}` | 'sitemap' | 'compare'
+export type AgentSiteFrame = `${Version}-${Dev}` | 'sitemap' | 'compare' | 'first'
 
 export const AGENTSITE_FRAMES: { id: AgentSiteFrame; title: string; size: Size }[] = [
   ...(['a', 'b', 'c'] as Version[]).flatMap((v) =>
@@ -930,6 +951,7 @@ export const AGENTSITE_FRAMES: { id: AgentSiteFrame; title: string; size: Size }
   ),
   { id: 'sitemap', title: 'The sitemap', size: { width: 1700, height: 1200 } },
   { id: 'compare', title: 'Side by side with today', size: { width: 1700, height: 1200 } },
+  { id: 'first', title: 'The first screen, side by side', size: { width: 1560, height: 1200 } },
 ]
 
 /** One of the frames, in one theme. */
@@ -938,13 +960,15 @@ export function agentSiteFrame(id: AgentSiteFrame, scheme: Scheme): string {
   const inner =
     id === 'sitemap'
       ? sitemap()
-      : id === 'compare'
-        ? compare(scheme)
-        : (() => {
-            const [v, d] = id.split('-') as [Version, Dev]
-            const V = VERSIONS[v]
-            return `<header class="vh"><b>${V.name}</b><span>${V.angle} · for ${V.who} · ${d === 'desk' ? '1440 wide' : '390 wide'} · copy: marketing, LMV-377</span></header>${versionPage(v, d, scheme)}`
-          })()
+      : id === 'first'
+        ? first(scheme)
+        : id === 'compare'
+          ? compare(scheme)
+          : (() => {
+              const [v, d] = id.split('-') as [Version, Dev]
+              const V = VERSIONS[v]
+              return `<header class="vh"><b>${V.name}</b><span>${V.angle} · for ${V.who} · ${d === 'desk' ? '1440 wide' : '390 wide'} · copy: marketing, LMV-377</span></header>${versionPage(v, d, scheme)}`
+            })()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${TOKENS[scheme]} }
