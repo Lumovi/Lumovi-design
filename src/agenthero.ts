@@ -120,7 +120,7 @@ const MARK_ROWS = [
 ]
 const MARK = `<svg class="ccmark" viewBox="0 0 17 12.5" shape-rendering="crispEdges">${MARK_ROWS.flatMap((row, y) => [...row].map((ch, x) => (ch === '.' ? '' : `<rect x="${x}" y="${y * 2.5}" width="1.02" height="2.52" fill="${ch === 'o' ? '#000' : '#d77757'}"/>`))).join('')}</svg>`
 
-/** The same on a desktop and a phone: a phone's narrower lines fold away on the same beats. */
+/** The same on a desktop and a phone: a phone's narrower lines fill it sooner, so its top scrolls off sooner. */
 function terminal(c: Clock): string {
   const line = (t: number, html: string, cls = '', gone?: number) =>
     `<div class="tl ${cls}" style="${c.show(t, gone, true)}">${html}</div>`
@@ -136,16 +136,16 @@ function terminal(c: Clock): string {
       [t[1] + 0.01, 'opacity:1'],
       [T, 'opacity:1'],
     ])}"></span><span class="tx"><b>lumovi - ${tool}</b> (MCP)(${args})</span></div><div class="tl res" style="${c.show(t[1], gone, true)}"><span class="el">⎿</span><span class="tx">${result}</span></div>`
-  // Lines fold away at the top as later ones come, as the conversation scrolls under the start screen.
-  const ask = `<div class="tl ask" style="${c.show(AT.sent, 6.4, true)}"><span class="gt">&gt;</span><span>why is checkout failing in production?</span></div>`
+  // A terminal's scrollback: the top scrolls off only once it's full (justify-content: flex-end, with a spacer that fills the room until then).
+  const ask = `<div class="tl ask" style="${c.show(AT.sent, undefined, true)}"><span class="gt">&gt;</span><span>why is checkout failing in production?</span></div>`
   return `<div class="term"><div class="tbar"><i></i><i></i><i></i><span>shop — claude</span></div><div class="tbody">
-<div class="tl mut"><span class="prm">❯</span><span class="tx">claude</span></div>
-<div class="cch">${MARK}<div><b>Claude Code</b> <span class="d">v2.1.301</span><br><span class="d">Opus 5.5 with xhigh effort</span><br><span class="d">~/shop</span></div></div>
-<div class="tscroll">${ask}
-${line(AT.checking, '<span class="dot say"></span><span class="tx">Checking what’s failing in shop.</span>', '', 7.25)}
-${call([AT.problems[0], AT.problems[1]], 'find_problems', 'cluster: "production", namespace: "shop"', 'Deployment checkout: 0 of 3 ready · CrashLoopBackOff, 14 restarts', AT.apply)}
-${call([AT.logs[0], AT.logs[1]], 'get_logs', 'cluster: "production", namespace: "shop", pod: "checkout-7d9f8-x2k4q", previous: true', '<span class="bad">panic: PAYMENTS_API_KEY is not set</span>', 11.9)}
-${call([AT.history[0], AT.history[1]], 'get_rollout_history', 'cluster: "production", kind: "Deployment", namespace: "shop", name: "checkout"', 'revision 7 · checkout:v1.14.0 · 2 hours ago (now)<br>revision 6 · checkout:v1.13.2 · ran 9 days', 11.9)}
+<div class="tscroll"><div class="tl mut"><span class="prm">❯</span><span class="tx">claude</span></div>
+<div class="cch">${MARK}<div><b>Claude Code</b> <span class="d">v2.1.301</span><br><span class="d">~/shop</span></div></div>
+${ask}
+${line(AT.checking, '<span class="dot say"></span><span class="tx">Checking what’s failing in shop.</span>', '')}
+${call([AT.problems[0], AT.problems[1]], 'find_problems', 'cluster: "production", namespace: "shop"', 'Deployment checkout: 0 of 3 ready · CrashLoopBackOff, 14 restarts')}
+${call([AT.logs[0], AT.logs[1]], 'get_logs', 'cluster: "production", namespace: "shop", pod: "checkout-7d9f8-x2k4q", previous: true', '<span class="bad">panic: PAYMENTS_API_KEY is not set</span>')}
+${call([AT.history[0], AT.history[1]], 'get_rollout_history', 'cluster: "production", kind: "Deployment", namespace: "shop", name: "checkout"', 'revision 7 · checkout:v1.14.0 · 2 hours ago (now)<br>revision 6 · checkout:v1.13.2 · ran 9 days')}
 ${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes on start: PAYMENTS_API_KEY isn’t set. v1.13.2 ran fine, so I’ll ask you in Lumovi to roll back.</span>')}
 <div class="tl" style="${c.show(AT.apply, undefined, true)}"><span class="dot run" style="${c.kf([
     [0, 'opacity:1'],
@@ -160,7 +160,7 @@ ${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes
   ])}"></span><span class="tx"><b>lumovi - apply_manifest</b> (MCP)(cluster: "production", manifest: "apiVersion: apps/v1…", reason: "v1.14.0 panics on start…")</span></div>
 <div class="tl res" style="${c.show(AT.changed, undefined, true)}"><span class="el">⎿</span><span class="tx">Changed deployment checkout, approved in Lumovi. The kubectl command that does the same: <span class="cm">kubectl apply --server-side … --context production</span></span></div>
 ${line(AT.done, '<span class="dot say"></span><span class="tx">checkout is back on v1.13.2, 3 of 3 ready. v1.14.0 needs PAYMENTS_API_KEY before it ships again.</span>')}
-</div>
+<div class="sp"></div></div>
 <div class="tin"><span class="pr2">❯</span><span class="typed" style="${c.kf([
     [0, 'clip-path:inset(0 100% 0 0);opacity:1'],
     [AT.ask[0], `clip-path:inset(0 100% 0 0);opacity:1;animation-timing-function:steps(38,end)`],
@@ -396,7 +396,8 @@ const STAGE_CSS = `
 .tbar i, .lbar i { width: 11px; height: 11px; border-radius: 50%; background: #3a3a3c; }
 .tbar span { margin-left: auto; margin-right: auto; padding-right: 50px; font-size: 12px; color: #8a8a8e; }
 .tbody { height: 466px; padding: 12px 16px 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 19px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
-.tscroll { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; overflow: hidden; padding-top: 4px; }
+.tscroll { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; overflow: hidden; }
+.tscroll .sp { flex: 1 0 0; }
 .cch { display: flex; gap: 12px; align-items: flex-start; flex: none; padding-bottom: 6px; }
 .cch .ccmark { width: 61px; height: 45px; flex: none; margin-top: 2px; }
 .cch b { font-weight: 700; color: #cdd6f4; } .cch .d { color: #9a9aa3; }
