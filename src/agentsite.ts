@@ -12,8 +12,8 @@ import { type Scheme } from './colors.ts'
 import { icon } from './lucide.ts'
 import { FONTS } from './scene.ts'
 
-type Version = 'a' | 'b' | 'c'
-type Dev = 'desk' | 'phone'
+export type Version = 'a' | 'b' | 'c'
+export type Dev = 'desk' | 'phone'
 
 const REVIEW = new URL('../../.review/lmv-376/', import.meta.url)
 const png = (url: URL) => `data:image/png;base64,${readFileSync(url).toString('base64')}`
@@ -22,12 +22,12 @@ const cap = (name: string, dev: Dev, scheme: Scheme) =>
   png(new URL(`today/${name}-${dev}-${scheme}.png`, REVIEW))
 const MARK = `data:image/svg+xml;base64,${readFileSync(new URL('../../Lumovi-website/public/favicon.svg', import.meta.url)).toString('base64')}`
 
-const TOKENS: Record<Scheme, string> = {
+export const TOKENS: Record<Scheme, string> = {
   light: `--bg:#f5f5f5;--surface:#fff;--surface-2:#fafafa;--surface-3:#f0f0f0;--line:rgb(0 0 0/.08);--line-strong:rgb(0 0 0/.14);--text-1:#0a0a0a;--text-2:#525252;--text-3:#6b6b6b;--dim:#737373;--accent:#2675d3;--accent-strong:#1c5cab;--accent-soft:rgb(38 117 211/.1);--good:#009e00;--good-text:#00732b;--good-soft:rgb(0 158 0/.08);--warn-text:#8a5a00;--warn-soft:rgb(250 178 25/.14);--critical:#d03b3b;--critical-text:#b42318;--code-bg:#fbfbfb;--diff-add:#116329;--diff-add-bg:rgb(26 127 55/.1);--diff-del:#a40e26;--diff-del-bg:rgb(207 34 46/.08);--glow:radial-gradient(60% 80% at 60% 40%,#fff,transparent 60%);--pop:0 16px 48px -8px rgb(0 0 0/.14),0 0 0 1px rgb(0 0 0/.06);--panel:0 0 0 1px rgb(0 0 0/.06),0 8px 24px -12px rgb(0 0 0/.12);--gut:#e8e8e6;--note:#b45309;--note-soft:rgb(180 83 9/.1);--keep:#00732b;--move:#1c5cab;--gone:#737373;--new:#7c3aed;`,
   dark: `--bg:#0a0a0a;--surface:#121212;--surface-2:#181818;--surface-3:#212121;--line:rgb(255 255 255/.07);--line-strong:rgb(255 255 255/.12);--text-1:#ededed;--text-2:#a3a3a3;--text-3:#8f8f8f;--dim:#8f8f8f;--accent:#2675d3;--accent-strong:#5ea2f0;--accent-soft:rgb(57 135 229/.16);--good:#009e00;--good-text:#3fb950;--good-soft:rgb(63 185 80/.1);--warn-text:#e3a008;--warn-soft:rgb(250 178 25/.12);--critical:#d03b3b;--critical-text:#fc554c;--code-bg:#0e0e0e;--diff-add:#7ee08a;--diff-add-bg:rgb(63 185 80/.12);--diff-del:#ff8f88;--diff-del-bg:rgb(248 81 73/.12);--glow:radial-gradient(60% 80% at 60% 40%,#1d1d1d,transparent 60%);--pop:0 16px 48px -8px rgb(0 0 0/.7),0 0 0 1px rgb(255 255 255/.08);--panel:0 0 0 1px rgb(255 255 255/.06),0 8px 24px -12px rgb(0 0 0/.6);--gut:#151515;--note:#fb923c;--note-soft:rgb(251 146 60/.12);--keep:#3fb950;--move:#5ea2f0;--gone:#8f8f8f;--new:#a78bfa;`,
 }
 
-const CSS = `
+export const CSS = `
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--gut); font-family: 'Inter', sans-serif; color: var(--text-1); -webkit-font-smoothing: antialiased; font-feature-settings: 'cv11', 'ss01'; }
 svg.i { display: block; flex: none; }
@@ -199,7 +199,7 @@ const CTA = {
   ],
   connect: ['Connect your agent', 'Turn it on, paste one line, ask what’s failing.', 'plug'],
 } as const
-type Cta = keyof typeof CTA
+export type Cta = keyof typeof CTA
 const PROOF = 'Free and open source (Apache 2.0). No telemetry, no account.'
 const LINE = 'Lumovi is a Kubernetes dashboard with a built-in MCP server.'
 
@@ -215,16 +215,16 @@ const cmd = (text: string) =>
 const i = (name: Parameters<typeof icon>[0], size = 16, cls = '') =>
   cls ? `<span class="${cls}">${icon(name, size)}</span>` : icon(name, size)
 
-const nav = (links: string[], cta: string, phone: boolean) =>
+export const nav = (links: string[], cta: string, phone: boolean) =>
   `<div class="wrap nav"><span class="brand"><img src="${MARK}">Lumovi</span>${phone ? i('menu', 20) : `${links.map((l) => `<span>${l}</span>`).join('')}<span class="gh">GitHub</span><span class="btn pri" style="height:34px;font-size:14px;padding:0 14px">${cta}</span>`}</div>`
 
-const heading = (strong: string, dim = '', tag = 'h2') =>
+export const heading = (strong: string, dim = '', tag = 'h2') =>
   `<${tag}>${strong}${dim ? ` <span class="dim">${dim}</span>` : ''}</${tag}>`
 
-const button = (c: Cta, primary: boolean, under?: string) =>
+export const button = (c: Cta, primary: boolean, under?: string) =>
   `<div class="cta"><span class="btn ${primary ? 'pri' : 'sec'}">${icon(CTA[c][2], 16)}${CTA[c][0]}${c === 'download' && primary ? '<small>1.22.1</small>' : ''}</span>${under ? `<span>${under}</span>` : ''}</div>`
 
-const release = `<span class="release"><i>${icon('circle-check', 12)}Running</i>Version 1.22.1 is out ${icon('arrow-right', 13)}</span>`
+export const release = `<span class="release"><i>${icon('circle-check', 12)}Running</i>Version 1.22.1 is out ${icon('arrow-right', 13)}</span>`
 
 const ctaCards = (order: Cta[]) =>
   `<div class="ctacards">${order.map((c, n) => `<div class="card${n === 0 ? ' first' : ''}"><span class="ic">${icon(CTA[c][2], 20)}</span><b>${CTA[c][0]}</b><p>${CTA[c][1]}</p>${n === 0 ? `<span class="btn pri" style="align-self:flex-start">${CTA[c][0]}</span>` : `<span class="link">${CTA[c][0]} ${icon('arrow-right', 14)}</span>`}</div>`).join('')}</div>`
@@ -715,7 +715,7 @@ const C: Sec[] = [
   },
 ]
 
-const VERSIONS: Record<Version, { name: string; angle: string; who: string; secs: Sec[] }> = {
+export const VERSIONS: Record<Version, { name: string; angle: string; who: string; secs: Sec[] }> = {
   a: {
     name: 'A · Let agents in, safely',
     angle: 'The story of one change',
