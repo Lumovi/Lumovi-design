@@ -146,7 +146,7 @@ ${line(AT.checking, '<span class="dot say"></span><span class="tx">Checking what
 ${call([AT.problems[0], AT.problems[1]], 'find_problems', 'cluster: "production", namespace: "shop"', 'Deployment checkout: 0 of 3 ready · CrashLoopBackOff, 14 restarts', AT.apply)}
 ${call([AT.logs[0], AT.logs[1]], 'get_logs', 'cluster: "production", namespace: "shop", pod: "checkout-7d9f8-x2k4q", previous: true', '<span class="bad">panic: PAYMENTS_API_KEY is not set</span>', 11.9)}
 ${call([AT.history[0], AT.history[1]], 'get_rollout_history', 'cluster: "production", kind: "Deployment", namespace: "shop", name: "checkout"', 'revision 7 · checkout:v1.14.0 · 2 hours ago (now)<br>revision 6 · checkout:v1.13.2 · ran 9 days', 11.9)}
-${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes on start: PAYMENTS_API_KEY isn’t set. v1.13.2 ran fine, so I’ll ask to roll back.</span>')}
+${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes on start: PAYMENTS_API_KEY isn’t set. v1.13.2 ran fine, so I’ll ask you in Lumovi to roll back.</span>')}
 <div class="tl" style="${c.show(AT.apply, undefined, true)}"><span class="dot run" style="${c.kf([
     [0, 'opacity:1'],
     [AT.changed, 'opacity:1'],
