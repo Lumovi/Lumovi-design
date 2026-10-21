@@ -108,6 +108,7 @@ h1 .dim { display: block; }
 .ui .b { height: 30px; padding: 0 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 550; }
 .ui .b.p { background: var(--accent); color: #fff; } .ui .b.s { color: var(--text-1); box-shadow: inset 0 0 0 1px var(--line-strong); background: var(--surface-2); }
 .ui .kb { font-size: 11px; opacity: .8; }
+.phone .mk.r { right: auto !important; left: -13px; }
 .mk { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 650; display: grid; place-items: center; box-shadow: 0 0 0 4px var(--bg); }
 /* The audit log */
 .audit .top { display: flex; align-items: center; padding: 16px 18px 4px; }
@@ -232,10 +233,10 @@ const ctaCards = (order: Cta[]) =>
 function approval(
   o: { marks?: boolean; width?: number; waits?: string; compact?: boolean } = {},
 ): string {
-  const m = (n: number, style: string) =>
-    o.marks ? `<span class="mk" style="${style}">${n}</span>` : ''
+  const m = (n: number, style: string, cls = '') =>
+    o.marks ? `<span class="mk ${cls}" style="${style}">${n}</span>` : ''
   return `<div class="pop ui" style="position:relative;width:${o.width ?? 460}px;max-width:100%">
-${m(1, 'left:-13px;top:18px')}${m(2, 'left:-13px;top:184px')}${m(3, 'right:-13px;bottom:20px')}
+${m(1, 'left:-13px;top:18px')}${m(2, 'left:-13px;top:184px')}${m(3, 'right:-13px;bottom:20px', 'r')}
 <div class="hd"><span class="ico">${icon('rotate-cw', 17)}</span><div><span class="ask">${icon('sparkles', 12)}Your agent asks</span><div class="ttl">Restart Deployment worker</div><div class="sub">Deployment · batch · production <span class="prod">PRODUCTION</span></div></div></div>
 <div class="why"><span class="lbl">Why</span>Its pods lost redis at 14:02 and never reconnected. A restart reconnects them.</div>
 ${
@@ -381,7 +382,7 @@ const A: Sec[] = [
         )
         .join(
           '',
-        )}</div><div style="display:flex;gap:${ph(d) ? 20 : 40}px;margin-top:${ph(d) ? 36 : 64}px;align-items:flex-start;justify-content:center;flex-wrap:wrap">${approval({ marks: true, width: ph(d) ? 358 : 500 })}<div style="position:relative">${ph(d) ? '' : '<span class="mk" style="left:-13px;top:18px;z-index:2">4</span>'}${audit({ width: ph(d) ? 358 : 500, short: true })}</div></div></div></section>`,
+        )}</div><div style="display:flex;gap:${ph(d) ? 20 : 40}px;margin-top:${ph(d) ? 36 : 64}px;align-items:flex-start;justify-content:center;flex-wrap:wrap">${approval({ marks: true, width: ph(d) ? 330 : 500 })}<div style="position:relative">${ph(d) ? '' : '<span class="mk" style="left:-13px;top:18px;z-index:2">4</span>'}${audit({ width: ph(d) ? 358 : 500, short: true })}</div></div></div></section>`,
   },
   {
     id: 'A4 · The film',
@@ -918,9 +919,9 @@ function first(scheme: Scheme): string {
   }
   return `<div class="sm fs"><h1>The first screen, side by side</h1><p class="sub">What a visitor sees first at 1440 × 900, at half size. Today’s live scenes are drawn as the site draws them; the new pages place the same scenes, captured from lumovi.dev, so their feel is the site’s own.</p><div class="g">
 ${shot('today', 'Today', 'Your clusters, at a glance: the hero cluster, live, with Pod health over it')}
-${shot('a', VERSIONS.a.name, 'The hero cluster under the headline, an agent’s change waiting on it')}
-${shot('b', VERSIONS.b.name, 'The team scene beside the words, the audit log over it; the hero cluster moves to /dashboard')}
-${shot('c', VERSIONS.c.name, 'The hero cluster beside the words, the conversation and its change over it')}
+${shot('a', VERSIONS.a.name, 'The hero cluster under the headline, an agent’s change waiting on it. Only its top half is in the first screen: the fold cuts it')}
+${shot('b', VERSIONS.b.name, 'The team scene, whole, beside the words, the audit log under it; the hero cluster moves to /dashboard')}
+${shot('c', VERSIONS.c.name, 'The hero cluster, whole, beside the words, the conversation and its change under it')}
 </div></div>`
 }
 
