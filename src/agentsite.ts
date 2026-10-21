@@ -917,7 +917,7 @@ const FINAL_B: [section: string, fate: Fate][] = [
     'Footer',
     [
       'keep',
-      'Exactly as it is: its links, “Made by Peter Kota”, the Apache line, the Kubernetes trademark notice, the Sevalla link and “Hosted on Sevalla” (whether that credit stays is being asked of Péter)',
+      'Exactly as it is: its links, “Made by Peter Kota”, the Apache line, the Kubernetes trademark notice, the Sevalla link and “Hosted on Sevalla”, as Péter settled it: “footer: keep”',
     ],
   ],
 ]

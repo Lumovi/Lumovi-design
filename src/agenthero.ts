@@ -590,7 +590,7 @@ function finalB(): FinalSec[] {
     ),
     {
       id: 'Footer',
-      note: 'Today’s footer, exactly as it is: its links, “Made by Peter Kota”, the Apache line, the Kubernetes trademark notice, the Sevalla link and “Hosted on Sevalla”. Péter removed the Sevalla section, not the footer; whether its credit stays is being asked.',
+      note: 'Today’s footer, exactly as it is: its links, “Made by Peter Kota”, the Apache line, the Kubernetes trademark notice, the Sevalla link and “Hosted on Sevalla”. Péter removed the Sevalla section, not the footer: “footer: keep”.',
       tags: [['keep', 'As it is']],
       html: (_c, d, s) =>
         `<img class="shot" src="data:image/png;base64,${readFileSync(new URL(`../../.review/lmv-376/today/sec-footer-${d}-${s}.png`, import.meta.url)).toString('base64')}">`,
