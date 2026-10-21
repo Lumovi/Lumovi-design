@@ -21,7 +21,6 @@ import {
   type Dev,
   heading,
   nav,
-  release,
   TOKENS,
   type Version,
   VERSIONS,
@@ -86,7 +85,6 @@ const AT = {
   history: [4.5, 5.1] as const,
   reason: 5.6,
   apply: 6.3,
-  waiting: 6.6,
   dialog: [6.8, 9.25] as const,
   cursor: [8.2, 8.95, 9.1] as const,
   rolled: 9.3,
@@ -125,11 +123,11 @@ function terminal(c: Clock, phone: boolean): string {
     ])}"></span><span class="tx"><b>lumovi - ${tool}</b> (MCP)(${args})</span></div><div class="tl res" style="${c.show(t[1], gone, true)}"><span class="el">⎿</span><span class="tx">${result}</span></div>`
   return `<div class="term"><div class="tbar"><i></i><i></i><i></i><span>shop — claude</span></div><div class="tbody">
 ${line(0, '<span class="pr">❯</span><span class="tx">claude</span>', 'mut', phone ? 4.4 : 6.2)}
-<div class="tl ask" style="${c.show(0.35, out(5.4), true)}"><span class="gt">&gt;</span><span class="typed" style="${c.type(AT.ask[0], AT.ask[1], 38)}">why is checkout failing in production?</span></div>
+<div class="tl ask" style="${c.show(0.35, phone ? 5.4 : 10.6, true)}"><span class="gt">&gt;</span><span class="typed" style="${c.type(AT.ask[0], AT.ask[1], 38)}">why is checkout failing in production?</span></div>
 ${line(AT.checking, '<span class="dot say"></span><span class="tx">Checking what’s failing in shop.</span>', '', phone ? 6.25 : 9.4)}
 ${call([AT.problems[0], AT.problems[1]], 'find_problems', 'cluster: "production", namespace: "shop"', 'Deployment checkout: 0 of 3 ready · CrashLoopBackOff, 14 restarts', out(9.4))}
-${call([AT.logs[0], AT.logs[1]], 'get_logs', 'namespace: "shop", pod: "checkout-7d9f8-x2k4q", previous: true', '<span class="bad">panic: PAYMENTS_API_KEY is not set</span>', out(10.9))}
-${call([AT.history[0], AT.history[1]], 'get_rollout_history', 'kind: "Deployment", name: "checkout"', 'revision 7 · checkout:v1.14.0 · 2 hours ago (now)<br>revision 6 · checkout:v1.13.2 · ran 9 days', out(10.9))}
+${call([AT.logs[0], AT.logs[1]], 'get_logs', 'cluster: "production", namespace: "shop", pod: "checkout-7d9f8-x2k4q", previous: true', '<span class="bad">panic: PAYMENTS_API_KEY is not set</span>', out(10.9))}
+${call([AT.history[0], AT.history[1]], 'get_rollout_history', 'cluster: "production", kind: "Deployment", namespace: "shop", name: "checkout"', 'revision 7 · checkout:v1.14.0 · 2 hours ago (now)<br>revision 6 · checkout:v1.13.2 · ran 9 days', out(10.9))}
 ${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes on start: PAYMENTS_API_KEY isn’t set. v1.13.2 ran fine, so I’ll ask to roll back.</span>')}
 <div class="tl" style="${c.show(AT.apply, undefined, true)}"><span class="dot run" style="${c.kf([
     [0, 'opacity:1'],
@@ -141,13 +139,7 @@ ${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes
     [AT.changed, 'opacity:0'],
     [AT.changed + 0.01, 'opacity:1'],
     [T, 'opacity:1'],
-  ])}"></span><span class="tx"><b>lumovi - apply_manifest</b> (MCP)(cluster: "production", reason: "v1.14.0 panics on start…")</span></div>
-<div class="tl res" style="${c.show(AT.waiting, AT.changed - 0.3, true)}"><span class="el">⎿</span><span class="tx wait">Waiting for the person to approve it in Lumovi <span class="ell" style="${c.kf(
-    [
-      [0, 'opacity:.3'],
-      [T, 'opacity:.3'],
-    ],
-  )}">…</span></span></div>
+  ])}"></span><span class="tx"><b>lumovi - apply_manifest</b> (MCP)(cluster: "production", manifest: "apiVersion: apps/v1…", reason: "v1.14.0 panics on start…")</span></div>
 <div class="tl res" style="${c.show(AT.changed, undefined, true)}"><span class="el">⎿</span><span class="tx">Changed deployment checkout, approved in Lumovi. The kubectl command that does the same: <span class="cm">kubectl apply --server-side … --context production</span></span></div>
 ${line(AT.done, '<span class="dot say"></span><span class="tx">checkout is back on v1.13.2, 3 of 3 ready. v1.14.0 needs PAYMENTS_API_KEY before it ships again.</span>')}
 </div></div>`
@@ -234,8 +226,7 @@ function dialog(c: Clock, phone: boolean): string {
 <header><span class="ico">${icon('file-code-2', 18)}</span><div><p class="asks">${icon('sparkles', 12)} Claude Code asks</p><h3>Change Deployment checkout</h3><p class="sub">Deployment · shop · <b>production</b> <span class="prod">Production</span></p></div>${phone ? '' : `<span class="x">${icon('x', 16)}</span>`}</header>
 <div class="db">
 <figure class="why"><figcaption>Why</figcaption><blockquote>v1.14.0 panics on start: PAYMENTS_API_KEY isn’t set. v1.13.2 ran for 9 days without a restart, so rolling back gets checkout serving again.</blockquote></figure>
-<section><p class="acc"><span>The cluster accepts it</span><span><b class="g">+1</b> <b class="r">−1</b> lines</span></p><div class="diff"><div class="q">⋯ 21 unchanged lines</div><div>      containers:</div><div>        - name: checkout</div><div class="del">-         image: ghcr.io/acme/checkout:v1.14.0</div><div class="add">+         image: ghcr.io/acme/checkout:v1.13.2</div><div class="q">⋯ 30 unchanged lines</div></div></section>
-${phone ? '' : `<p class="man">${icon('chevron-right', 14)}The manifest Claude Code gave</p>`}
+<section><p class="acc"><span>The cluster accepts it</span><span><b class="g">+1</b> <b class="r">−1</b> lines</span></p><div class="diff"><div class="q">⋯ 23 unchanged lines</div><div class="del">-         image: ghcr.io/acme/checkout:v1.14.0</div><div class="add">+         image: ghcr.io/acme/checkout:v1.13.2</div><div class="q">⋯ 30 unchanged lines</div></div></section>
 <section class="eq"><p class="lbl">Equivalent command</p><div class="cmdb"><code>kubectl apply --server-side --force-conflicts --field-manager=lumovi -f checkout.yaml -n shop --context production</code>${icon('copy', 14)}</div></section>
 </div>
 <footer><span class="waits">${icon('clock', 13)}Waits 4:58 more</span><span class="b s">Reject…</span><span class="b p">Approve <span class="kb">⌘↩</span><span class="press" style="${c.kf(
@@ -370,14 +361,14 @@ function stage(c: Clock, phone: boolean): string {
 }
 
 const STAGE_CSS = `
-.stage { position: relative; width: 1160px; height: 560px; margin: 0 auto; }
-.stage .tpos { position: absolute; left: 0; top: 36px; width: 548px; }
+.stage { position: relative; width: 1160px; height: 520px; margin: 0 auto; }
+.stage .tpos { position: absolute; left: 0; top: 20px; width: 548px; }
 .stage .lpos { position: absolute; right: 0; top: 0; width: 596px; }
 .term { background: #0d0d0e; border-radius: 12px; box-shadow: 0 0 0 1px rgb(255 255 255/.1), 0 30px 80px -30px rgb(0 0 0/.55); color: #e6e6e6; overflow: hidden; }
 .tbar { height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 12px; border-bottom: 1px solid rgb(255 255 255/.07); }
 .tbar i, .lbar i { width: 11px; height: 11px; border-radius: 50%; background: #3a3a3c; }
 .tbar span { margin-left: auto; margin-right: auto; padding-right: 50px; font-size: 12px; color: #8a8a8e; }
-.tbody { height: 486px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 19px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+.tbody { height: 466px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 19px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
 .tl { display: flex; flex: none; gap: 8px; overflow: hidden; }
 .tl .tx { min-width: 0; }
 .tl b { font-weight: 700; color: #fff; }
@@ -395,11 +386,11 @@ const STAGE_CSS = `
 .tl > .dot.run + .dot.ok { margin-left: -18px; }
 .lw { position: relative; background: var(--surface); border-radius: 12px; box-shadow: 0 0 0 1px var(--line-strong), 0 30px 80px -30px rgb(0 0 0/.35); overflow: hidden; color: var(--text-1); font-size: 12.5px; }
 .lbar { height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 12px; background: var(--surface-2); border-bottom: 1px solid var(--line); }
-.lapp { display: flex; height: 530px; }
+.lapp { display: flex; height: 490px; }
 .lw aside { width: 150px; flex: none; padding: 10px 8px; background: var(--surface-2); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
 .lw aside .cl { display: flex; gap: 7px; align-items: center; padding: 6px 6px 10px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
 .lw aside .cl i { width: 7px; height: 7px; border-radius: 50%; background: var(--good); flex: none; }
-.lw aside .cl span { display: flex; flex-direction: column; font-size: 10.5px; color: var(--text-3); line-height: 14px; } .lw aside .cl b { font-size: 12.5px; color: var(--text-1); font-weight: 600; }
+.lw aside .cl span { display: flex; flex-direction: column; font-size: 11px; color: var(--text-3); line-height: 14px; } .lw aside .cl b { font-size: 12.5px; color: var(--text-1); font-weight: 600; }
 .ni { display: flex; align-items: center; gap: 8px; padding: 5px 7px; border-radius: 7px; color: var(--text-2); font-size: 12.5px; }
 .ni.on { background: var(--surface-3); color: var(--text-1); font-weight: 550; }
 .ni.ai { margin-top: auto; position: relative; } .ni.ai i { width: 6px; height: 6px; border-radius: 50%; background: var(--good); margin-left: auto; }
@@ -433,10 +424,10 @@ const STAGE_CSS = `
 .audit .ai2 { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); color: var(--good-text); flex: none; }
 .audit b { display: block; font-size: 12.5px; font-weight: 550; }
 .audit .who { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-3); flex-wrap: wrap; }
-.audit .who i { font-style: normal; width: 16px; height: 16px; border-radius: 50%; background: var(--surface-3); font-size: 8px; font-weight: 650; display: grid; place-items: center; color: var(--text-2); }
+.audit .who i { font-style: normal; width: 20px; height: 20px; border-radius: 50%; background: var(--surface-3); font-size: 11px; font-weight: 650; display: grid; place-items: center; color: var(--text-2); }
 .audit .who em { font-style: normal; padding: 0 5px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--text-2); font-size: 11px; }
 .scrim { position: absolute; inset: 0; background: rgb(0 0 0/.22); }
-.dlg { position: absolute; left: 50%; top: 22px; width: 468px; margin-left: -234px; background: var(--surface-2); border-radius: 16px; box-shadow: 0 0 0 1px var(--line-strong), 0 24px 60px -12px rgb(0 0 0/.4); font-size: 12.5px; }
+.dlg { position: absolute; left: 50%; top: 18px; width: 468px; margin-left: -234px; background: var(--surface-2); border-radius: 16px; box-shadow: 0 0 0 1px var(--line-strong), 0 24px 60px -12px rgb(0 0 0/.4); font-size: 12.5px; }
 .dlg header { display: flex; gap: 10px; align-items: flex-start; padding: 16px 16px 4px; }
 .dlg .ico { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-strong); flex: none; }
 .dlg .asks { margin: 0; display: flex; gap: 4px; align-items: center; font-size: 11.5px; font-weight: 550; color: var(--accent-strong); }
@@ -462,7 +453,7 @@ const STAGE_CSS = `
 .dlg .b.s { box-shadow: inset 0 0 0 1px var(--line-strong); background: var(--surface); }
 .dlg .b.p { background: var(--accent); color: #fff; } .dlg .b .kb { font-size: 11px; opacity: .8; }
 .dlg .press { position: absolute; inset: 0; border-radius: 8px; background: rgb(0 0 0/.22); }
-.cur { position: absolute; left: 468px; top: 458px; z-index: 5; }
+.cur { position: absolute; left: 490px; top: 386px; z-index: 5; }
 /* A phone: one pane at a time */
 .stage.ph { width: 358px; height: 600px; overflow: hidden; border-radius: 14px; }
 .stage.ph .pane { position: absolute; inset: 0 0 34px 0; }
@@ -479,10 +470,17 @@ const STAGE_CSS = `
 .dlg.sheet .grab { display: block; width: 36px; height: 4px; border-radius: 2px; background: var(--line-strong); margin: 8px auto 0; }
 .dlg.sheet header { padding-top: 10px; }
 .dlg.sheet .db { gap: 9px; }
-.dlg.sheet .diff div:nth-child(2), .dlg.sheet .diff div:nth-child(3) { display: none; }
 .tap { position: absolute; right: 52px; bottom: 21px; width: 34px; height: 34px; border-radius: 50%; background: rgb(255 255 255/.55); box-shadow: 0 0 0 2px rgb(0 0 0/.25); z-index: 5; }
 .steps { position: absolute; left: 0; right: 0; bottom: 0; height: 26px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; font-weight: 550; color: var(--text-2); }
 .steps i { width: 14px; height: 1px; background: var(--line-strong); }
+.hero2 .hh h1 { font-size: 54px; letter-spacing: -.045em; }
+.hero2 .hh h1 .dim { display: inline; }
+.hero2 .hrow { display: flex; align-items: flex-start; justify-content: space-between; gap: 48px; margin-top: 18px; }
+.hero2 .hrow .lead { margin: 0; font-size: 18px; max-width: 560px; }
+.hero2 .hrow .ctas { margin: 0; flex: none; }
+.phone .hero2 .hh h1 { font-size: 44px; } .phone .hero2 .hh h1 .dim { display: block; }
+.phone .hero2 .hrow { flex-direction: column; gap: 28px; margin-top: 20px; } .phone .hero2 .hrow .lead { font-size: 17px; }
+.phone .hero2 .hrow .ctas { align-self: stretch; }
 .caption { margin: 22px auto 0; text-align: center; font-size: 14px; color: var(--text-3); }
 `
 
@@ -500,7 +498,7 @@ const NAV: Record<Version, [string[], string]> = {
 }
 
 function hero(c: Clock, v: Version, phone: boolean): string {
-  return `<section class="hero2" style="background:var(--glow)">${nav(NAV[v][0], NAV[v][1], phone)}<div class="wrap" style="text-align:${phone ? 'left' : 'center'};padding-top:${phone ? 36 : 40}px">${release}${heading('Your agent does the work.', 'You approve the change.', 'h1')}<p class="lead" style="${phone ? '' : 'margin-left:auto;margin-right:auto'}">Lumovi is a Kubernetes dashboard with a built-in MCP server. Claude Code, or any MCP client, works through it as you; by default, each change waits for you.</p><div class="ctas" style="justify-content:center">${CTAS[v]}</div></div><div class="wrap" style="padding:${phone ? '36px 16px 56px' : '40px 0 96px'}">${stage(c, phone)}<p class="caption">Claude Code asks, the cluster checks, you approve, and it’s recorded.</p></div></section>`
+  return `<section class="hero2" style="background:var(--glow)">${nav(NAV[v][0], NAV[v][1], phone)}<div class="wrap hh" style="padding-top:${phone ? 36 : 28}px">${heading('Your agent does the work.', 'You approve the change.', 'h1')}<div class="hrow"><p class="lead">Lumovi is a Kubernetes dashboard with a built-in MCP server. Claude Code, or any MCP client, works through it as you; by default, each change waits for you.</p><div class="ctas">${CTAS[v]}</div></div></div><div class="wrap" style="padding:${phone ? '32px 16px 56px' : '28px 0 96px'}">${stage(c, phone)}<p class="caption">Claude Code asks, the cluster checks, you approve, and it’s recorded.</p></div></section>`
 }
 
 export type HeroFrame = `hero-${Version}-${Dev}` | 'hero-beats'
