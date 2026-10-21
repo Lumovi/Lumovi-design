@@ -230,7 +230,7 @@ const ctaCards = (order: Cta[]) =>
   `<div class="ctacards">${order.map((c, n) => `<div class="card${n === 0 ? ' first' : ''}"><span class="ic">${icon(CTA[c][2], 20)}</span><b>${CTA[c][0]}</b><p>${CTA[c][1]}</p>${n === 0 ? `<span class="btn pri" style="align-self:flex-start">${CTA[c][0]}</span>` : `<span class="link">${CTA[c][0]} ${icon('arrow-right', 14)}</span>`}</div>`).join('')}</div>`
 
 /** An agent's change, waiting: the app's approval, with its words. Restart, so the diff is the one annotation a restart adds. */
-function approval(
+export function approval(
   o: { marks?: boolean; width?: number; waits?: string; compact?: boolean } = {},
 ): string {
   const m = (n: number, style: string, cls = '') =>
@@ -315,12 +315,12 @@ const band = (scheme: Scheme) =>
     )
     .join('')}</div></div></section>`
 
-const footer = () =>
+export const footer = () =>
   `<footer class="footer"><div class="wrap"><div class="proof">${PROOF}</div><div class="lk"><span>Docs</span><span>GitHub</span><span>The dashboard</span><span>The tour</span><span>Brand</span><span>Privacy</span></div></div></footer>`
 
 /* ——— The three versions: each a list of sections, with what the gutter says of each ——— */
 
-interface Sec {
+export interface Sec {
   id: string
   note: string
   tags: [kind: 'keep' | 'move' | 'gone' | 'new' | 'flag', text: string][]
@@ -715,26 +715,27 @@ const C: Sec[] = [
   },
 ]
 
-export const VERSIONS: Record<Version, { name: string; angle: string; who: string; secs: Sec[] }> = {
-  a: {
-    name: 'A · Let agents in, safely',
-    angle: 'The story of one change',
-    who: 'the engineering lead whose team wants agents on the clusters',
-    secs: [...A, ...SPONSORS],
-  },
-  b: {
-    name: 'B · Every agent change, on the record',
-    angle: 'Proof first',
-    who: 'the platform, security or compliance engineer',
-    secs: [...B, ...SPONSORS],
-  },
-  c: {
-    name: 'C · Connect your agent in a minute',
-    angle: 'Hands on',
-    who: 'the developer or SRE who already uses an agent',
-    secs: [...C, ...SPONSORS],
-  },
-}
+export const VERSIONS: Record<Version, { name: string; angle: string; who: string; secs: Sec[] }> =
+  {
+    a: {
+      name: 'A · Let agents in, safely',
+      angle: 'The story of one change',
+      who: 'the engineering lead whose team wants agents on the clusters',
+      secs: [...A, ...SPONSORS],
+    },
+    b: {
+      name: 'B · Every agent change, on the record',
+      angle: 'Proof first',
+      who: 'the platform, security or compliance engineer',
+      secs: [...B, ...SPONSORS],
+    },
+    c: {
+      name: 'C · Connect your agent in a minute',
+      angle: 'Hands on',
+      who: 'the developer or SRE who already uses an agent',
+      secs: [...C, ...SPONSORS],
+    },
+  }
 
 const GUT: Record<Dev, number> = { desk: 300, phone: 230 }
 const PAGE: Record<Dev, number> = { desk: 1440, phone: 390 }
@@ -869,6 +870,80 @@ function sitemap(): string {
 <h2>Today’s other pages</h2><table class="pg"><tbody>${PAGES_TODAY.map(([p, f]) => `<tr><td><code>${p}</code></td>${cell(f)}</tr>`).join('')}</tbody></table></div>`
 }
 
+/** B, as Péter picked it on 2026-10-22: "go for B, but also add the "It asked first" video, remove sponsor and sevalla sections". */
+const FINAL_B: [section: string, fate: Fate][] = [
+  [
+    'Hero · “Your clusters, at a glance.”',
+    [
+      'move',
+      'Replaced by the new hero, Claude Code asking and Lumovi asking you (B1). Its cluster → the top of /dashboard',
+    ],
+  ],
+  ['Film · Lumovi in a minute', ['move', '→ /dashboard']],
+  ['Clusters', ['move', '→ /dashboard; small in B9']],
+  ['The app (17 tabs, film “It’s 2 a.m.”)', ['move', '→ /dashboard']],
+  ['Map', ['move', '→ /dashboard; small in B9']],
+  ['Rollback', ['move', '→ /dashboard; small in B9']],
+  ['Capacity', ['move', '→ /dashboard; small in B9']],
+  ['Features (palette, problems, logs, Helm)', ['move', '→ /dashboard']],
+  [
+    'AI assistants',
+    [
+      'keep',
+      'Becomes the page: the hero (B1), the guarantees (B2), its film “It asked first” (B3, being re-cut, LMV-379), what an agent can never do (B4)',
+    ],
+  ],
+  [
+    'In your cluster (team scene, film “Monday”)',
+    ['keep', 'Its words in B6; the team scene, the install and “Monday” → /dashboard'],
+  ],
+  ['Fleet', ['move', '→ /dashboard']],
+  ['Access and audit', ['keep', 'Grows into B5 (check the log) and B6 (your whole team)']],
+  ['Every other kind, plugins', ['move', '→ /dashboard']],
+  ['Story (why I built it)', ['move', '→ /dashboard, at its end']],
+  ['Sponsors', ['gone', 'Off the home page, at Péter’s word']],
+  ['Sevalla', ['gone', 'Off the home page, at Péter’s word']],
+  [
+    'Download (#download)',
+    ['keep', 'Under B8’s cards, as it is; the anchor stays where the docs link to it'],
+  ],
+]
+const FINAL_B_ORDER = [
+  'Hero (animated)',
+  'Four guarantees',
+  'The film',
+  'Never',
+  'Check it yourself',
+  'For your whole team',
+  'Security review',
+  'Get started (and Download)',
+  'The dashboard',
+  'Footer',
+]
+
+function finalSitemap(): string {
+  const cell = ([k, t]: Fate) =>
+    `<td><span class="tag ${k}">${{ keep: 'Stays', move: 'Moves', gone: 'Goes', new: 'New' }[k]}</span> ${t}</td>`
+  return `<div class="sm"><h1>B’s sitemap: what stays, moves or goes</h1><p class="sub">Péter picked B on 2026-10-22: “go for B, but also add the “It asked first” video, remove sponsor and sevalla sections”. The home page is one problem, AI agents on your clusters, safe and on the record, in about 9 screens at 1440. Everything else Lumovi is moves, whole, to a new page, <b>/dashboard</b>, with today’s scenes and films. Old anchors (#map, #fleet…) send to the same place on /dashboard with a small script, as a #anchor never reaches the server; <code>#download</code>, the only one the docs link to, stays on the home page.</p>
+<table><thead><tr><th>Today’s home page</th><th>B, as picked</th></tr></thead><tbody>${FINAL_B.map(([s, f]) => `<tr><td>${s}</td>${cell(f)}</tr>`).join('')}<tr><td><b>Navigation</b></td><td>Guarantees · Audit log · For teams · Dashboard · Docs · <b>Run in your cluster</b></td></tr><tr><td><b>The new home page, in order</b></td><td class="ord">${FINAL_B_ORDER.join(' → ')}</td></tr></tbody></table>
+<h2>Today’s other pages</h2><table class="pg"><tbody>${(
+    [
+      ['/tour', ['keep', 'Stays; linked from the dashboard band and /dashboard']],
+      ['/brand', ['keep', 'Stays']],
+      ['/privacy', ['keep', 'Stays']],
+      [
+        '/dashboard',
+        [
+          'new',
+          'New: today’s hero cluster at its top, then today’s home page from Clusters to Story, in today’s order, with the team scene, scenes and films whole',
+        ],
+      ],
+    ] as [string, Fate][]
+  )
+    .map(([p, f]) => `<tr><td><code>${p}</code></td>${cell(f)}</tr>`)
+    .join('')}</tbody></table></div>`
+}
+
 const SM_CSS = `
 .sm { padding: 48px 56px 64px; background: var(--bg); }
 .sm h1 { font-size: 30px; letter-spacing: -.03em; }
@@ -940,7 +1015,7 @@ const CMP_CSS = `
 
 /* ——— Frames ——— */
 
-export type AgentSiteFrame = `${Version}-${Dev}` | 'sitemap' | 'compare' | 'first'
+export type AgentSiteFrame = `${Version}-${Dev}` | 'sitemap' | 'compare' | 'first' | 'sitemap-b'
 
 export const AGENTSITE_FRAMES: { id: AgentSiteFrame; title: string; size: Size }[] = [
   ...(['a', 'b', 'c'] as Version[]).flatMap((v) =>
@@ -953,6 +1028,7 @@ export const AGENTSITE_FRAMES: { id: AgentSiteFrame; title: string; size: Size }
   { id: 'sitemap', title: 'The sitemap', size: { width: 1700, height: 1200 } },
   { id: 'compare', title: 'Side by side with today', size: { width: 1700, height: 1200 } },
   { id: 'first', title: 'The first screen, side by side', size: { width: 1560, height: 1200 } },
+  { id: 'sitemap-b', title: 'B’s sitemap', size: { width: 1400, height: 1200 } },
 ]
 
 /** One of the frames, in one theme. */
@@ -961,15 +1037,17 @@ export function agentSiteFrame(id: AgentSiteFrame, scheme: Scheme): string {
   const inner =
     id === 'sitemap'
       ? sitemap()
-      : id === 'first'
-        ? first(scheme)
-        : id === 'compare'
-          ? compare(scheme)
-          : (() => {
-              const [v, d] = id.split('-') as [Version, Dev]
-              const V = VERSIONS[v]
-              return `<header class="vh"><b>${V.name}</b><span>${V.angle} · for ${V.who} · ${d === 'desk' ? '1440 wide' : '390 wide'} · copy: marketing, LMV-377</span></header>${versionPage(v, d, scheme)}`
-            })()
+      : id === 'sitemap-b'
+        ? finalSitemap()
+        : id === 'first'
+          ? first(scheme)
+          : id === 'compare'
+            ? compare(scheme)
+            : (() => {
+                const [v, d] = id.split('-') as [Version, Dev]
+                const V = VERSIONS[v]
+                return `<header class="vh"><b>${V.name}</b><span>${V.angle} · for ${V.who} · ${d === 'desk' ? '1440 wide' : '390 wide'} · copy: marketing, LMV-377</span></header>${versionPage(v, d, scheme)}`
+              })()
   return `<!doctype html><meta charset="utf-8"><style>
 ${FONTS}
 :root { ${TOKENS[scheme]} }

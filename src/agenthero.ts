@@ -17,8 +17,10 @@ import { type Scheme } from './colors.ts'
 import { icon } from './lucide.ts'
 import { FONTS } from './scene.ts'
 import {
+  approval,
   button,
   CSS as SITE,
+  footer,
   type Dev,
   heading,
   nav,
@@ -537,7 +539,61 @@ function hero(c: Clock, v: Version, phone: boolean): string {
   return `<section class="hero2" style="background:var(--glow)">${nav(NAV[v][0], NAV[v][1], phone)}<div class="wrap hh" style="padding-top:${phone ? 36 : 28}px">${heading('Your agent does the work.', 'You approve the change.', 'h1')}<div class="hrow"><p class="lead">Lumovi is a Kubernetes dashboard with a built-in MCP server. Claude Code, or any MCP client, works through it as you; by default, each change waits for you.</p><div class="ctas">${CTAS[v]}</div></div></div><div class="wrap" style="padding:${phone ? '32px 16px 56px' : '28px 0 96px'}">${stage(c, phone)}<p class="caption">Claude Code asks, the cluster checks, you approve, and it’s recorded.</p></div></section>`
 }
 
-export type HeroFrame = `hero-${Version}-${Dev}` | 'hero-beats' | 'hero-first'
+/* ——— B, as Péter picked it (2026-10-22): "go for B, but also add the "It asked first" video, remove sponsor and sevalla sections" ——— */
+
+/** The film's place: "It asked first", being re-cut (LMV-379) so it no longer says "an MCP server"; drawn with a plain approval still until then. */
+const filmSlot = (phone: boolean) =>
+  `<section class="pad band"><div class="wrap"><div style="position:relative;max-width:960px;margin:0 auto;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:linear-gradient(160deg,var(--surface-3),var(--bg));box-shadow:var(--panel);display:grid;place-items:center"><span class="film-flag">film: being re-cut (LMV-379)</span>${phone ? `<div style="position:absolute;left:50%;top:52px;transform:translateX(-50%)">${approval({ width: 310 })}</div>` : `<div style="transform:scale(0.82)">${approval({ width: 500 })}</div>`}<div style="position:absolute;left:0;right:0;bottom:0;height:44px;background:linear-gradient(transparent,rgb(0 0 0/.55));display:flex;align-items:center;gap:12px;padding:0 16px;color:#fff;font-size:12px">${icon('play', 16)}<span>0:00</span><span style="flex:1;height:3px;border-radius:2px;background:rgb(255 255 255/.35)"></span><span>1:26</span></div></div><p style="max-width:960px;margin:14px auto 0;font-size:14px;color:var(--text-2)"><b style="color:var(--text-1)">It asked first</b> · An agent’s change, from its question to your approval.</p></div></section>`
+
+interface FinalSec {
+  id: string
+  note: string
+  tags: [kind: 'keep' | 'move' | 'gone' | 'new' | 'flag', text: string][]
+  html: (c: Clock, d: Dev, s: Scheme) => string
+}
+
+/** B's sections, numbered as built: the new hero, the film after the guarantees, and no sponsors or Sevalla. */
+function finalB(): FinalSec[] {
+  const was = (id: string) => VERSIONS.b.secs.find((x) => x.id.startsWith(id))!
+  const from = (old: string, id: string, note?: string): FinalSec => {
+    const x = was(old)
+    return { id, note: note ?? x.note, tags: x.tags, html: (_c, d, s) => x.html(d, s) }
+  }
+  return [
+    {
+      id: 'B1 · Hero',
+      note: 'The new hero, animated on a 17 s loop: Claude Code finds why checkout fails and asks to roll back; the change waits in Lumovi’s own dialog; it’s approved, and the audit log has it. Today’s hero cluster moves to the top of /dashboard.',
+      tags: [
+        ['new', 'Animated scenario'],
+        ['move', 'Hero cluster → /dashboard'],
+      ],
+      html: (c, d) => hero(c, 'b', d === 'phone'),
+    },
+    from('B2', 'B2 · Four guarantees'),
+    {
+      id: 'B3 · The film',
+      note: 'Right after the guarantees, the film shows them happen: an agent’s change, asked and approved. Its slot is drawn with a plain approval still while marketing re-cuts it (LMV-379).',
+      tags: [
+        ['keep', 'Film “It asked first”'],
+        ['flag', 'Being re-cut, LMV-379'],
+      ],
+      html: (_c, d) => filmSlot(d === 'phone'),
+    },
+    from('B3', 'B4 · Never'),
+    from('B4', 'B5 · Check it yourself'),
+    from('B5', 'B6 · For your whole team', 'The server, in three points.'),
+    from('B6', 'B7 · Security review'),
+    from('B7', 'B8 · Get started'),
+    from(
+      'B8',
+      'B9 · The dashboard',
+      'Everything else Lumovi is: today’s scenes, small, each opening /dashboard, where the scene is whole.',
+    ),
+    { id: 'Footer', note: 'The proof line.', tags: [['new', 'Proof line']], html: () => footer() },
+  ]
+}
+
+export type HeroFrame = `hero-${Version}-${Dev}` | 'hero-beats' | 'hero-first' | `final-b-${Dev}`
 
 export const HERO_FRAMES: { id: HeroFrame; title: string; width: number }[] = [
   ...(['a', 'b', 'c'] as Version[]).flatMap((v) =>
@@ -549,6 +605,8 @@ export const HERO_FRAMES: { id: HeroFrame; title: string; width: number }[] = [
   ),
   { id: 'hero-beats', title: 'The hero’s beats', width: 2440 },
   { id: 'hero-first', title: 'The first screen, with the new hero', width: 1560 },
+  { id: 'final-b-desk', title: 'B, as picked, at 1440', width: 1740 },
+  { id: 'final-b-phone', title: 'B, as picked, on a phone', width: 620 },
 ]
 
 /**
@@ -559,7 +617,17 @@ export function heroFrame(id: HeroFrame, scheme: Scheme, t?: number): string {
   const f = HERO_FRAMES.find((x) => x.id === id)!
   const c = new Clock()
   let inner: string
-  if (id === 'hero-first') {
+  if (id === 'final-b-desk' || id === 'final-b-phone') {
+    const d: Dev = id === 'final-b-desk' ? 'desk' : 'phone'
+    const rows = finalB()
+      .map(
+        (x) =>
+          `<div class="gut"><b>${x.id}</b>${d === 'desk' ? x.note : ''}<div>${x.tags.map(([k, t]) => `<span class="tag ${k}">${t}</span>`).join('')}</div></div><div class="page ${d}">${x.html(c, d, scheme)}</div>`,
+      )
+      .join('')
+    inner = `<header class="vh"><b>B · Every agent change, on the record — as picked</b><span>Péter, 2026-10-22: “go for B, but also add the “It asked first” video, remove sponsor and sevalla sections”. For LMV-378. Copy: marketing, LMV-377. ${d === 'desk' ? '1440 wide' : '390 wide'}${t === undefined ? '' : `, stopped at ${t} s`}.</span></header><div class="frame" style="display:grid;grid-template-columns:${d === 'desk' ? '300px 1440px' : '230px 390px'}">${rows}</div>`
+    if (t !== undefined) inner = `<div class="frz" style="--t:-${t}s">${inner}</div>`
+  } else if (id === 'hero-first') {
     // Today's first screen (with its nav) and each version's with the new hero, stopped at 9.0 s, as rendered at 1440 × 900.
     const REVIEW = new URL('../../.review/lmv-376/', import.meta.url)
     const shot = (path: string, title: string, sub: string) => {
@@ -573,7 +641,7 @@ ${(['a', 'b', 'c'] as Version[]).map((v) => shot(`hero/first-screen-${v}-${schem
   } else if (id === 'hero-beats') {
     const cell = (b: (typeof BEATS)[number], phone: boolean) =>
       `<figure><figcaption><b>${b.t.toFixed(1)} s</b> ${b.name}</figcaption><div class="frz" style="--t:-${b.t}s">${stage(c, phone)}</div></figure>`
-    inner = `<div class="beats"><h1>The hero’s beats</h1><p>One 16 s loop: it reads, it asks in Lumovi, you approve, and it’s done and on the record; then it fades and starts again. On a phone it steps: Claude Code, Lumovi, Claude Code.</p><div class="bd">${BEATS.map((b) => cell(b, false)).join('')}</div><div class="bp">${BEATS.map((b) => cell(b, true)).join('')}</div></div>`
+    inner = `<div class="beats"><h1>The hero’s beats</h1><p>One 17 s loop: Claude Code starts, it reads, it asks in Lumovi, you approve, and it’s done and on the record; then it fades and starts again. On a phone it steps: Claude Code, Lumovi, Claude Code.</p><div class="bd">${BEATS.map((b) => cell(b, false)).join('')}</div><div class="bp">${BEATS.map((b) => cell(b, true)).join('')}</div></div>`
   } else {
     const [, v, d] = id.split('-') as [string, Version, Dev]
     const phone = d === 'phone'
@@ -587,6 +655,8 @@ ${FONTS}
 ${SITE}${STAGE_CSS}
 ${c.styles}
 html, body { width: ${f.width}px; margin: 0; background: var(--bg); }
+.vh { padding: 22px 28px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-3); background: var(--gut); } .vh b { font-size: 20px; color: var(--text-1); letter-spacing: -.02em; }
+.frame { background: var(--gut); }
 .page { border: 0; }
 .frz, .frz * { animation-delay: var(--t) !important; animation-play-state: paused !important; }
 .beats { padding: 40px 48px 56px; background: var(--bg); }
