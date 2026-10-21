@@ -187,7 +187,8 @@ const D_CSS = `
   /* The headline on one line, as large as the column allows, up to 57 px. */
   .ah h1 { font-size: min(calc((100vw - 2 * var(--gutter)) / 21.6), 3.59rem) !important; white-space: nowrap; }
   .ah .row { display: block !important; margin-top: 16px !important; }
-  .ah .lead { max-width: none; white-space: nowrap; }
+  /* One line where it fits (1200 px and up); under that it wraps to two, never past the column. */
+  .ah .lead { max-width: none; }
   .ah .ctas { margin-top: 24px; }
 }
 /* A short screen (1280×800): closer, so the record stays in view. */
@@ -207,7 +208,7 @@ const D_CSS = `
 const D_SCRIPT = `
 (() => {
   document.querySelector('.ah .lead').textContent =
-    'Lumovi is a Kubernetes dashboard with a built-in MCP server. Your agent works through it, as you.'
+    'Lumovi is a Kubernetes dashboard with a built-in MCP server. Your agent works through it as you, and by default each change waits for you.'
   const ctas = document.querySelector('.ah .ctas')
   ctas.querySelector('.btn-secondary').classList.add('quiet')
   if (!ctas.querySelector('.other')) {
@@ -285,7 +286,7 @@ export const VARIANTS: Variant[] = [
       'The caption under the picture (as A).',
     ],
     moves: [
-      'The lead becomes one line: “Lumovi is a Kubernetes dashboard with a built-in MCP server. Your agent works through it, as you.” (design’s wording, for marketing to settle).',
+      'The lead becomes one line from 1200 px up: “Lumovi is a Kubernetes dashboard with a built-in MCP server. Your agent works through it as you, and by default each change waits for you.” (marketing’s wording, 2026-10-21).',
       '“Other platforms” becomes a small link right after Download.',
     ],
     quiets: [
