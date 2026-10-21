@@ -27,7 +27,7 @@ import {
   VERSIONS,
 } from './agentsite.ts'
 
-const T = 16
+const T = 17
 
 /** The clock's keyframes, made as the page is drawn: each moving part gets its own. */
 class Clock {
@@ -79,35 +79,49 @@ class Clock {
 
 /* ——— The beats, in seconds ——— */
 const AT = {
-  ask: [0.5, 1.7] as const,
-  checking: 2.0,
-  problems: [2.5, 3.1] as const,
-  logs: [3.5, 4.1] as const,
-  history: [4.5, 5.1] as const,
-  reason: 5.6,
-  apply: 6.3,
-  dialog: [6.8, 9.25] as const,
-  cursor: [8.2, 8.95, 9.1] as const,
-  rolled: 9.3,
-  pods: [9.6, 10.0, 10.4] as const,
-  changed: 9.5,
-  audit: 10.2,
-  done: 11.0,
-  fade: [15.3, 15.9] as const,
+  ask: [1.5, 2.6] as const,
+  sent: 2.9,
+  checking: 3.1,
+  problems: [3.5, 4.1] as const,
+  logs: [4.5, 5.1] as const,
+  history: [5.5, 6.1] as const,
+  reason: 6.6,
+  apply: 7.3,
+  dialog: [7.8, 10.25] as const,
+  cursor: [9.2, 9.95, 10.1] as const,
+  rolled: 10.3,
+  pods: [10.6, 11.0, 11.4] as const,
+  changed: 10.5,
+  audit: 11.2,
+  done: 12.0,
+  fade: [16.3, 16.9] as const,
 }
 /** Stills: the reads, the ask, the approval, and done. */
 export const BEATS = [
-  { t: 4.6, name: 'It reads' },
-  { t: 7.8, name: 'It asks, in Lumovi' },
-  { t: 9.02, name: 'You approve' },
-  { t: 12.5, name: 'Done, and on the record' },
+  { t: 1.2, name: 'Claude Code starts' },
+  { t: 5.6, name: 'It reads' },
+  { t: 8.8, name: 'It asks, in Lumovi' },
+  { t: 10.02, name: 'You approve' },
+  { t: 13.5, name: 'Done, and on the record' },
 ]
 
 /* ——— The terminal: Claude Code ——— */
 
-function terminal(c: Clock, phone: boolean): string {
-  // On a phone the pane is short, so early lines fold away as later ones come, as a terminal scrolls.
-  const out = (t: number) => (phone ? t : undefined)
+/**
+ * Claude Code's mark, as its start screen draws it (Péter's screenshot of 2.1.301): 17 half-cells
+ * by 5 half-lines in #d77757, its eyes black.
+ */
+const MARK_ROWS = [
+  '..#############..',
+  '..##o#######o##..',
+  '#################',
+  '..#############..',
+  '..#.#.......#.#..',
+]
+const MARK = `<svg class="ccmark" viewBox="0 0 17 12.5" shape-rendering="crispEdges">${MARK_ROWS.flatMap((row, y) => [...row].map((ch, x) => (ch === '.' ? '' : `<rect x="${x}" y="${y * 2.5}" width="1.02" height="2.52" fill="${ch === 'o' ? '#000' : '#d77757'}"/>`))).join('')}</svg>`
+
+/** The same on a desktop and a phone: a phone's narrower lines fold away on the same beats. */
+function terminal(c: Clock): string {
   const line = (t: number, html: string, cls = '', gone?: number) =>
     `<div class="tl ${cls}" style="${c.show(t, gone, true)}">${html}</div>`
   const call = (t: [number, number], tool: string, args: string, result: string, gone?: number) =>
@@ -122,13 +136,16 @@ function terminal(c: Clock, phone: boolean): string {
       [t[1] + 0.01, 'opacity:1'],
       [T, 'opacity:1'],
     ])}"></span><span class="tx"><b>lumovi - ${tool}</b> (MCP)(${args})</span></div><div class="tl res" style="${c.show(t[1], gone, true)}"><span class="el">⎿</span><span class="tx">${result}</span></div>`
+  // Lines fold away at the top as later ones come, as the conversation scrolls under the start screen.
+  const ask = `<div class="tl ask" style="${c.show(AT.sent, 6.4, true)}"><span class="gt">&gt;</span><span>why is checkout failing in production?</span></div>`
   return `<div class="term"><div class="tbar"><i></i><i></i><i></i><span>shop — claude</span></div><div class="tbody">
-${line(0, '<span class="pr">❯</span><span class="tx">claude</span>', 'mut', phone ? 4.4 : 6.2)}
-<div class="tl ask" style="${c.show(0.35, phone ? 5.4 : 10.6, true)}"><span class="gt">&gt;</span><span class="typed" style="${c.type(AT.ask[0], AT.ask[1], 38)}">why is checkout failing in production?</span></div>
-${line(AT.checking, '<span class="dot say"></span><span class="tx">Checking what’s failing in shop.</span>', '', phone ? 6.25 : 9.4)}
-${call([AT.problems[0], AT.problems[1]], 'find_problems', 'cluster: "production", namespace: "shop"', 'Deployment checkout: 0 of 3 ready · CrashLoopBackOff, 14 restarts', out(9.4))}
-${call([AT.logs[0], AT.logs[1]], 'get_logs', 'cluster: "production", namespace: "shop", pod: "checkout-7d9f8-x2k4q", previous: true', '<span class="bad">panic: PAYMENTS_API_KEY is not set</span>', out(10.9))}
-${call([AT.history[0], AT.history[1]], 'get_rollout_history', 'cluster: "production", kind: "Deployment", namespace: "shop", name: "checkout"', 'revision 7 · checkout:v1.14.0 · 2 hours ago (now)<br>revision 6 · checkout:v1.13.2 · ran 9 days', out(10.9))}
+<div class="tl mut"><span class="prm">❯</span><span class="tx">claude</span></div>
+<div class="cch">${MARK}<div><b>Claude Code</b> <span class="d">v2.1.301</span><br><span class="d">Opus 5.5 with xhigh effort</span><br><span class="d">~/shop</span></div></div>
+<div class="tscroll">${ask}
+${line(AT.checking, '<span class="dot say"></span><span class="tx">Checking what’s failing in shop.</span>', '', 7.25)}
+${call([AT.problems[0], AT.problems[1]], 'find_problems', 'cluster: "production", namespace: "shop"', 'Deployment checkout: 0 of 3 ready · CrashLoopBackOff, 14 restarts', AT.apply)}
+${call([AT.logs[0], AT.logs[1]], 'get_logs', 'cluster: "production", namespace: "shop", pod: "checkout-7d9f8-x2k4q", previous: true', '<span class="bad">panic: PAYMENTS_API_KEY is not set</span>', 11.9)}
+${call([AT.history[0], AT.history[1]], 'get_rollout_history', 'cluster: "production", kind: "Deployment", namespace: "shop", name: "checkout"', 'revision 7 · checkout:v1.14.0 · 2 hours ago (now)<br>revision 6 · checkout:v1.13.2 · ran 9 days', 11.9)}
 ${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes on start: PAYMENTS_API_KEY isn’t set. v1.13.2 ran fine, so I’ll ask to roll back.</span>')}
 <div class="tl" style="${c.show(AT.apply, undefined, true)}"><span class="dot run" style="${c.kf([
     [0, 'opacity:1'],
@@ -143,6 +160,15 @@ ${line(AT.reason, '<span class="dot say"></span><span class="tx">v1.14.0 crashes
   ])}"></span><span class="tx"><b>lumovi - apply_manifest</b> (MCP)(cluster: "production", manifest: "apiVersion: apps/v1…", reason: "v1.14.0 panics on start…")</span></div>
 <div class="tl res" style="${c.show(AT.changed, undefined, true)}"><span class="el">⎿</span><span class="tx">Changed deployment checkout, approved in Lumovi. The kubectl command that does the same: <span class="cm">kubectl apply --server-side … --context production</span></span></div>
 ${line(AT.done, '<span class="dot say"></span><span class="tx">checkout is back on v1.13.2, 3 of 3 ready. v1.14.0 needs PAYMENTS_API_KEY before it ships again.</span>')}
+</div>
+<div class="tin"><span class="pr2">❯</span><span class="typed" style="${c.kf([
+    [0, 'clip-path:inset(0 100% 0 0);opacity:1'],
+    [AT.ask[0], `clip-path:inset(0 100% 0 0);opacity:1;animation-timing-function:steps(38,end)`],
+    [AT.ask[1], 'clip-path:inset(0 0 0 0);opacity:1'],
+    [AT.sent, 'clip-path:inset(0 0 0 0);opacity:1'],
+    [AT.sent + 0.01, 'opacity:0'],
+    [T, 'opacity:0'],
+  ])}">why is checkout failing in production?</span></div>
 </div></div>`
 }
 
@@ -311,7 +337,7 @@ function stage(c: Clock, phone: boolean): string {
     [T, 'opacity:0'],
   ])
   if (!phone)
-    return `<div class="stage" style="${fade}"><div class="tpos">${terminal(c, false)}</div><div class="lpos">${lumovi(c, false)}</div></div>`
+    return `<div class="stage" style="${fade}"><div class="tpos">${terminal(c)}</div><div class="lpos">${lumovi(c, false)}</div></div>`
   // A phone steps: the terminal, then Lumovi while the change waits and lands, then the terminal again.
   const into = AT.dialog[0] - 0.25
   const back = AT.audit + 0.9
@@ -323,7 +349,7 @@ function stage(c: Clock, phone: boolean): string {
     [back, `transform:translateX(-104%);${ease}`],
     [back + 0.45, 'transform:none'],
     [T, 'transform:none'],
-  ])}">${terminal(c, true)}</div><div class="pane" style="${c.kf([
+  ])}">${terminal(c)}</div><div class="pane" style="${c.kf([
     [0, 'transform:translateX(104%)'],
     [into, `transform:translateX(104%);${ease}`],
     [into + 0.45, 'transform:none'],
@@ -365,23 +391,29 @@ const STAGE_CSS = `
 .stage { position: relative; width: 1160px; height: 520px; margin: 0 auto; }
 .stage .tpos { position: absolute; left: 0; top: 20px; width: 548px; }
 .stage .lpos { position: absolute; right: 0; top: 0; width: 596px; }
-.term { background: #0d0d0e; border-radius: 12px; box-shadow: 0 0 0 1px rgb(255 255 255/.1), 0 30px 80px -30px rgb(0 0 0/.55); color: #e6e6e6; overflow: hidden; }
+.term { background: #1c1c2b; border-radius: 12px; box-shadow: 0 0 0 1px rgb(255 255 255/.1), 0 30px 80px -30px rgb(0 0 0/.55); color: #cdd6f4; overflow: hidden; }
 .tbar { height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 12px; border-bottom: 1px solid rgb(255 255 255/.07); }
 .tbar i, .lbar i { width: 11px; height: 11px; border-radius: 50%; background: #3a3a3c; }
 .tbar span { margin-left: auto; margin-right: auto; padding-right: 50px; font-size: 12px; color: #8a8a8e; }
-.tbody { height: 466px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 19px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+.tbody { height: 466px; padding: 12px 16px 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 19px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+.tscroll { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; overflow: hidden; padding-top: 4px; }
+.cch { display: flex; gap: 12px; align-items: flex-start; flex: none; padding-bottom: 6px; }
+.cch .ccmark { width: 61px; height: 45px; flex: none; margin-top: 2px; }
+.cch b { font-weight: 700; color: #cdd6f4; } .cch .d { color: #9a9aa3; }
+.tin { flex: none; display: flex; gap: 10px; padding: 7px 0; border-top: 1px solid #6c6f85; border-bottom: 1px solid #6c6f85; color: #cdd6f4; min-height: 35px; }
+.tin .pr2 { color: #cdd6f4; }
 .tl { display: flex; flex: none; gap: 8px; overflow: hidden; }
 .tl .tx { min-width: 0; }
-.tl b { font-weight: 700; color: #fff; }
-.tl.mut { color: #8a8a8e; } .tl .pr { color: #3fb950; }
-.tl.ask { background: #1c1c1f; border-radius: 6px; padding: 6px 10px; color: #fff; flex: none; }
+.tl b { font-weight: 700; color: #cdd6f4; }
+.tl.mut { color: #cdd6f4; } .tl .prm { color: #a6e3a1; }
+.tl.ask { background: #2a2a3c; border-radius: 6px; padding: 6px 10px; color: #fff; flex: none; }
 .tl.ask .gt { color: #8a8a8e; }
-.tl.res { color: #a1a1a6; padding-left: 4px; margin-top: -4px; }
+.tl.res { color: #9a9aa3; padding-left: 4px; margin-top: -4px; }
 .tl.res .el { color: #6e6e73; flex: none; }
-.tl .bad { color: #ff8f88; } .tl .wait { color: #d4a72c; } .tl .cm { color: #e6e6e6; }
+.tl .bad { color: #f38ba8; } .tl .cm { color: #cdd6f4; }
 .dot { position: relative; flex: none; width: 10px; height: 19px; }
 .dot::before { content: ''; position: absolute; left: 1px; top: 6px; width: 8px; height: 8px; border-radius: 50%; }
-.dot.say::before { background: #e6e6e6; }
+.dot.say::before { background: #cdd6f4; }
 .dot.ok::before { background: #3fb950; }
 .dot.run::before { background: #8a8a8e; }
 .tl > .dot.run + .dot.ok { margin-left: -18px; }
@@ -459,7 +491,9 @@ const STAGE_CSS = `
 .stage.ph { width: 358px; height: 600px; overflow: hidden; border-radius: 14px; }
 .stage.ph .pane { position: absolute; inset: 0 0 34px 0; }
 .stage.ph .term, .stage.ph .lw { height: 100%; border-radius: 14px; }
-.stage.ph .tbody { height: calc(100% - 34px); font-size: 11px; line-height: 17px; padding: 12px; gap: 5px; justify-content: flex-start; }
+.stage.ph .tbody { height: calc(100% - 34px); font-size: 11px; line-height: 17px; padding: 12px; gap: 5px; }
+.stage.ph .tscroll { gap: 5px; }
+.stage.ph .cch .ccmark { width: 56px; height: 41px; }
 .stage.ph .tbar span { padding-right: 40px; }
 .stage.ph .lapp { height: 100%; }
 .stage.ph .lpage { padding: 14px; }
