@@ -32,6 +32,7 @@ const CSS = `
 body { margin: 0; background: var(--gut); font-family: 'Inter', sans-serif; color: var(--text-1); -webkit-font-smoothing: antialiased; font-feature-settings: 'cv11', 'ss01'; }
 svg.i { display: block; flex: none; }
 code, .mono { font-family: 'JetBrains Mono', monospace; }
+.nw { white-space: nowrap; }
 .frame { display: grid; }
 .sec { position: relative; }
 .gut { padding: 28px 24px 0 28px; font-size: 13px; line-height: 19px; color: var(--text-2); border-top: 1px dashed var(--line-strong); }
@@ -84,7 +85,6 @@ h1 .dim { display: block; }
 .ok { color: var(--good-text); } .no { color: var(--text-3); } .ac { color: var(--accent-strong); } .bad { color: var(--critical-text); }
 .link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: var(--accent-strong); }
 .shot { display: block; width: 100%; height: auto; }
-.shot.sc { -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 72%, transparent 100%); }
 .film-flag { position: absolute; left: 16px; top: 16px; z-index: 2; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--note); background: var(--surface); box-shadow: 0 0 0 1.5px var(--note); }
 /* An app part, drawn as the app draws it */
 .ui { font-size: 13px; line-height: 19px; color: var(--text-1); text-align: left; }
@@ -93,9 +93,9 @@ h1 .dim { display: block; }
 .ui .ask { font-size: 12px; color: var(--accent-strong); font-weight: 500; display: flex; align-items: center; gap: 4px; }
 .ui .ttl { font-weight: 600; font-size: 15px; }
 .ui .sub { font-size: 12px; color: var(--text-3); display: flex; gap: 6px; align-items: center; }
-.ui .prod { font-size: 10.5px; font-weight: 650; letter-spacing: .04em; color: var(--critical-text); background: color-mix(in srgb, var(--critical) 12%, transparent); padding: 0 5px; border-radius: 4px; }
+.ui .prod { font-size: 11px; font-weight: 650; letter-spacing: .04em; color: var(--critical-text); background: color-mix(in srgb, var(--critical) 12%, transparent); padding: 0 5px; border-radius: 4px; }
 .ui .why { margin: 0 18px; padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); border-left: 3px solid var(--accent); }
-.ui .lbl { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; color: var(--text-3); text-transform: uppercase; display: block; margin-bottom: 2px; }
+.ui .lbl { font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--text-3); text-transform: uppercase; display: block; margin-bottom: 2px; }
 .ui .acc { margin: 12px 18px 0; display: flex; justify-content: space-between; color: var(--text-2); font-size: 12.5px; }
 .ui .diff { margin: 6px 18px 0; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); background: var(--code-bg); font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 19px; padding: 6px 0; overflow: hidden; }
 .ui .diff div { padding: 0 12px; white-space: pre; overflow: hidden; text-overflow: ellipsis; }
@@ -106,11 +106,11 @@ h1 .dim { display: block; }
 .ui .ft .sp { margin-right: auto; display: flex; gap: 5px; align-items: center; }
 .ui .b { height: 30px; padding: 0 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 550; }
 .ui .b.p { background: var(--accent); color: #fff; } .ui .b.s { color: var(--text-1); box-shadow: inset 0 0 0 1px var(--line-strong); background: var(--surface-2); }
-.ui .kb { font-size: 10.5px; opacity: .8; }
+.ui .kb { font-size: 11px; opacity: .8; }
 .mk { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 650; display: grid; place-items: center; box-shadow: 0 0 0 4px var(--bg); }
 /* The audit log */
 .audit .top { display: flex; align-items: center; padding: 16px 18px 4px; }
-.audit .top .t { margin-right: auto; } .audit .top .t b { font-size: 16px; display: block; } .audit .top .t span { color: var(--text-3); font-size: 12.5px; }
+.audit .top .t { margin-right: auto; min-width: 0; } .audit .top .b { white-space: nowrap; flex: none; margin-left: 10px; } .audit .top .t b { font-size: 16px; display: block; } .audit .top .t span { color: var(--text-3); font-size: 12.5px; }
 .audit .holds { margin: 10px 18px 6px; padding: 9px 12px; border-radius: 8px; background: var(--good-soft); color: var(--good-text); display: flex; gap: 8px; font-size: 12.5px; line-height: 18px; }
 .audit .holds b { color: var(--good-text); }
 .audit .row { display: grid; grid-template-columns: 62px 22px 1fr; gap: 8px; padding: 9px 18px; border-top: 1px solid var(--line); align-items: start; }
@@ -202,6 +202,13 @@ const LINE = 'Lumovi is a Kubernetes dashboard with a built-in MCP server.'
 
 /* ——— Parts ——— */
 
+/** A command, wrapped only between its words, never inside a flag. */
+const cmd = (text: string) =>
+  text
+    .split(' ')
+    .map((w) => `<span class="nw">${w}</span>`)
+    .join(' ')
+
 const i = (name: Parameters<typeof icon>[0], size = 16, cls = '') =>
   cls ? `<span class="${cls}">${icon(name, size)}</span>` : icon(name, size)
 
@@ -235,7 +242,7 @@ ${
     : `<div class="acc"><span>The cluster accepts it</span><span><span class="ok">+1</span> −0 lines</span></div>
 <div class="diff"><div class="q">  ⋯ 32 unchanged lines</div><div>    metadata:</div><div>      annotations:</div><div class="add">+       kubectl.kubernetes.io/restartedAt: "2026-10-21T14:31:07Z"</div><div class="q">  ⋯ 40 unchanged lines</div></div>`
 }
-<div class="cmd"><span class="lbl">Equivalent command</span>kubectl rollout restart deployment/worker -n batch --context production</div>
+<div class="cmd"><span class="lbl">Equivalent command</span>${cmd('kubectl rollout restart deployment/worker -n batch --context production')}</div>
 <div class="ft"><span class="sp">${icon('clock', 13)}Waits ${o.waits ?? '4:57'} more</span><span class="b s">Reject…</span><span class="b p">Approve <span class="kb">⌘↵</span></span></div></div>`
 }
 
@@ -247,7 +254,7 @@ function audit(o: { width?: number; short?: boolean } = {}): string {
 <div class="top"><div class="t"><b>Audit log</b><span>What was done, by whom, and how it went.</span></div><span class="b s">${icon('shield-check', 14)}Check integrity</span></div>
 <div class="holds">${icon('circle-check', 15)}<span><b>All 214 events hold.</b> Each, from the oldest kept, holds the hash of the one before it.</span></div>
 <div class="row on"><span class="tm">14:31:22</span>${i('rotate-cw', 15, 'ac')}<div><b style="font-weight:600">Restarted Deployment worker</b><div class="w">dev@example.com, through an AI agent · production / batch</div>
-<dl><dt>Asked by</dt><dd>An AI agent, over MCP, as dev@example.com</dd><dt>Approved by</dt><dd>dev@example.com, at 14:31:20</dd><dt>Why</dt><dd>Its pods lost redis at 14:02 and never reconnected.</dd>${o.short ? '' : '<dt>Does the same</dt><dd><code>kubectl rollout restart deployment/worker -n batch --context production</code></dd>'}<dt>In the log</dt><dd><code>Place 214 · hash 9f2c…e81a · after 41ab…07cd</code></dd></dl></div></div>
+<dl><dt>Asked by</dt><dd>An AI agent, over MCP, as dev@example.com</dd><dt>Approved by</dt><dd>dev@example.com, at 14:31:20</dd><dt>Why</dt><dd>Its pods lost redis at 14:02 and never reconnected.</dd>${o.short ? '' : `<dt>Does the same</dt><dd><code>${cmd('kubectl rollout restart deployment/worker -n batch --context production')}</code></dd>`}<dt>In the log</dt><dd><code>Place 214 · hash 9f2c…e81a · after 41ab…07cd</code></dd></dl></div></div>
 ${row('14:30:58', 'scroll-text', 'Read the logs of worker-7d9f6-x2kqp', 'dev@example.com, through an AI agent · production / batch')}
 ${o.short ? '' : row('14:30:41', 'search', 'Asked what’s failing in production', 'dev@example.com, through an AI agent')}
 ${row('14:12:09', 'log-in', 'Signed in with single sign-on', 'dev@example.com')}
@@ -260,7 +267,7 @@ const chat = (
 ) => `<div class="pop chat" style="width:${width}px;max-width:100%"><div class="top"><b><i></i>Your agent</b><span>lumovi, over MCP</span></div><div class="in">
 <div class="you">Anything wrong in production?</div>
 <div class="tool">lumovi · find_problems</div><div class="res">└ worker · batch · 0 of 2 pods ready</div>
-<div class="tool">lumovi · get_logs deployment/worker</div><div class="res">└ 14:02:11 lost connection to redis:6379</div>
+<div class="tool">lumovi · get_logs worker-7d9f6-x2kqp</div><div class="res">└ 14:02:11 lost connection to redis:6379</div>
 <div class="say">One thing. Deployment worker, in batch: 0 of 2 pods ready. Their logs say they lost their connection to redis at 14:02, and never got it back.</div>
 <div class="say">I’d restart worker, so its pods connect again. I’ve asked you in Lumovi.</div>
 <div class="tool">lumovi · restart deployment/worker</div><div class="wait">└ Waiting for your approval in Lumovi…</div></div></div>`
@@ -270,16 +277,16 @@ const rules = (width = 500) => {
   const r = (name: string, where: string, seg: string[], on: number) =>
     `<div class="r"><div><b>${name}</b><span class="mono">${where}</span></div><span class="seg">${seg.map((s, n) => `<i${n === on ? ' class="on"' : ''}>${s}</i>`).join('')}</span></div>`
   return `<div class="pop ui rules" style="width:${width}px;max-width:100%"><div class="h">Rules</div>
-${r('Staging', 'staging / all namespaces', ['Ask me', 'Without asking', 'Never'], 1)}
-${r('Production', 'production / all namespaces', ['Ask me', 'Without asking', 'Never'], 0)}
+${r('Staging', 'staging / all namespaces', ['Ask you', 'Without asking', 'Never'], 1)}
+${r('Production', 'production / all namespaces', ['Ask you', 'Without asking', 'Never'], 0)}
 ${r('System', 'all contexts / kube-system', ['Visible', 'Hidden'], 1)}
 <div class="h" style="border-top:1px solid var(--line)">Defaults</div>
 ${r('Secrets', 'What a Secret shows', ['Values', 'Keys only', 'Hidden'], 1)}
 ${r('Env values', 'In a workload’s spec', ['Show', 'Hide sensitive', 'Hide all'], 1)}
-${r('Deletions', 'Wherever they may change', ['Always ask'], 0)}</div>`
+<div class="h" style="border-top:1px solid var(--line);text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:500;padding:12px 18px 14px;display:flex;gap:6px;align-items:center">${icon('info', 13)}Deletions always ask.</div></div>`
 }
 
-/** A scene from today's site, as it is: its stage, framed by nothing. */
+/** A scene from today's site, as it is: its stage, captured on a transparent ground so it sits on the page with no seam. */
 const scene = (name: string, dev: Dev, scheme: Scheme, style = '') =>
   `<img class="shot sc" style="${style}" src="${cap(name, dev, scheme)}">`
 
@@ -392,7 +399,7 @@ const A: Sec[] = [
       ['new', 'Drawn smaller'],
     ],
     html: () =>
-      `<section class="pad band"><div class="wrap grid2"><div><p class="eyebrow">Your rules</p>${heading('Your rules,', 'per cluster and namespace.')}<p class="body">Let staging change without asking, keep production at “ask me”, and hide kube-system altogether. Hide Secrets’ values, sensitive env values or logs. Deletions always ask, and read-only clusters stay read-only.</p><p style="margin-top:20px"><span class="link">What agents may do ${icon('arrow-up-right', 14)}</span></p></div><div style="display:flex;justify-content:center">${rules(520)}</div></div></section>`,
+      `<section class="pad band"><div class="wrap grid2"><div><p class="eyebrow">Your rules</p>${heading('Your rules,', 'per cluster and namespace.')}<p class="body">Let staging change without asking, keep production at “Ask you”, and hide kube-system altogether. Hide Secrets’ values, sensitive env values or logs. Deletions always ask, and read-only clusters stay read-only.</p><p style="margin-top:20px"><span class="link">What agents may do ${icon('arrow-up-right', 14)}</span></p></div><div style="display:flex;justify-content:center">${rules(520)}</div></div></section>`,
   },
   {
     id: 'A6 · Desktop or server',
@@ -455,7 +462,7 @@ const B: Sec[] = [
       ['new', 'The audit log over it'],
     ],
     html: (d, s) =>
-      `<section style="background:var(--glow)">${nav(['Guarantees', 'Audit log', 'For teams', 'Dashboard', 'Docs'], 'Run in your cluster', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Every change an agent makes,', 'on the record.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Agents act as the person, within your rules, and wait for approval, by default everywhere.</p><div class="ctas">${button('cluster', true, 'One Helm chart. Everyone signs in as themselves.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:820px'}">${scene('team', d, s, ph(d) ? '' : 'width:660px')}<div style="${ph(d) ? 'margin-top:-70px;position:relative' : 'position:absolute;right:-24px;top:300px'}">${audit({ width: ph(d) ? 358 : 470, short: ph(d) })}</div></div></div></section>`,
+      `<section style="background:var(--glow)">${nav(['Guarantees', 'Audit log', 'For teams', 'Dashboard', 'Docs'], 'Run in your cluster', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Every change an agent makes,', 'on the record.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Agents act as the person, within your rules, and wait for approval, by default everywhere.</p><div class="ctas">${button('cluster', true, 'One Helm chart. Everyone signs in as themselves.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:900px'}">${scene('team', d, s, ph(d) ? '' : 'width:660px')}<div style="${ph(d) ? 'margin-top:12px;position:relative' : 'position:absolute;right:-24px;top:250px'}">${audit({ width: ph(d) ? 358 : 470, short: ph(d) })}</div></div></div></section>`,
   },
   {
     id: 'B2 · Four guarantees',
@@ -514,8 +521,9 @@ const B: Sec[] = [
     html: (d) =>
       `<section class="pad band"><div class="wrap grid2">${'<div>'}<p class="eyebrow">The audit log</p>${heading('Check the log', 'yourself.')}<p class="body">Each audit event holds the hash of the one before it, so a changed, removed or inserted event shows. The Audit log page checks the chain for you. Keep the newest hash elsewhere, and a rewrite shows too. Or work out any event’s hash yourself:</p><div class="code"><span class="p">$</span><span>jq -jcS 'del(.hash)' | sha256sum</span><span class="cp">${icon('copy', 15)}</span></div><p style="margin-top:16px"><span class="link">Verify the audit log ${icon('arrow-up-right', 14)}</span></p></div><div style="display:grid;gap:0;justify-items:center">${(
         [
-          ['212', 'Signed in with single sign-on', 'a91c…3f02', '77d0…b915'],
-          ['213', 'Asked what’s failing in production', '41ab…07cd', 'a91c…3f02'],
+          ['211', 'Signed in with single sign-on', 'a91c…3f02', '77d0…b915'],
+          ['212', 'Asked what’s failing in production', '5e0b…c4d1', 'a91c…3f02'],
+          ['213', 'Read the logs of worker-7d9f6-x2kqp', '41ab…07cd', '5e0b…c4d1'],
           ['214', 'Restarted Deployment worker', '9f2c…e81a', '41ab…07cd'],
         ] as const
       )
@@ -619,7 +627,7 @@ const C: Sec[] = [
       ['keep', 'Conversation + approval, from AI assistants'],
     ],
     html: (d, s) =>
-      `<section style="background:var(--glow)">${nav(['Connect', 'What it reads', 'Dashboard', 'Docs'], 'Download', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Your agent, on your clusters.', 'With you in charge.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Connect your agent in a minute: it reads with your access, and by default asks first.</p><div class="ctas">${button('connect', true, 'Turn it on, paste one line, ask what’s failing.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:860px'}">${ph(d) ? `${chat(358)}<div style="margin-top:-8px">${scene('hero', d, s, 'height:230px;object-fit:cover;object-position:50% 38%')}</div><div style="margin-top:-60px;position:relative">${approval({ width: 358, compact: true, waits: '4:59' })}</div>` : `${scene('hero', d, s, 'position:absolute;right:-50px;top:-30px;width:720px')}<div style="position:absolute;left:-20px;top:290px">${chat(410)}</div><div style="position:absolute;right:-64px;top:520px">${approval({ width: 370, compact: true, waits: '4:59' })}</div>`}</div></div></section>`,
+      `<section style="background:var(--glow)">${nav(['Connect', 'What it reads', 'Dashboard', 'Docs'], 'Download', ph(d))}<div class="wrap" style="padding-top:${ph(d) ? 40 : 80}px">${release}${heading('Your agent, on your clusters.', 'With you in charge.', 'h1')}</div><div class="wrap grid2" style="padding-bottom:${ph(d) ? 48 : 96}px;grid-template-columns:${ph(d) ? '1fr' : '0.8fr 1.2fr'};align-items:start"><div style="padding-top:${ph(d) ? 0 : 36}px"><p class="lead" style="margin-top:${ph(d) ? 20 : 0}px">${LINE} Connect your agent in a minute: it reads with your access, and by default asks first.</p><div class="ctas">${button('connect', true, 'Turn it on, paste one line, ask what’s failing.')}${button('download', false, 'For macOS, Windows and Linux.')}</div></div><div style="position:relative;${ph(d) ? '' : 'min-height:860px'}">${ph(d) ? `${chat(358)}<div style="margin-top:-8px">${scene('hero', d, s, 'height:230px;object-fit:cover;object-position:50% 38%')}</div><div style="margin-top:-60px;position:relative">${approval({ width: 358, compact: true, waits: '4:59' })}</div>` : `${scene('hero', d, s, 'position:absolute;right:-50px;top:-30px;width:720px')}<div style="position:absolute;left:-20px;top:290px">${chat(380)}</div><div style="position:absolute;right:-84px;top:520px">${approval({ width: 370, compact: true, waits: '4:59' })}</div>`}</div></div></section>`,
   },
   {
     id: 'C2 · Three steps',
@@ -666,7 +674,7 @@ const C: Sec[] = [
     note: 'The rules, as A5 draws them.',
     tags: [['keep', 'From AI assistants']],
     html: () =>
-      `<section class="pad band"><div class="wrap grid2"><div>${heading('You decide', 'where.')}<p class="body">Let staging change without asking, keep production at “ask me”, and keep it out of kube-system. Deletions always ask. Every change, and every tool it called, is on Lumovi’s audit log.</p></div><div style="display:flex;justify-content:center">${rules(520)}</div></div></section>`,
+      `<section class="pad band"><div class="wrap grid2"><div>${heading('You decide', 'where.')}<p class="body">Let staging change without asking, keep production at “Ask you”, and keep it out of kube-system. Deletions always ask. Every change, and every tool it called, is on Lumovi’s audit log.</p></div><div style="display:flex;justify-content:center">${rules(520)}</div></div></section>`,
   },
   {
     id: 'C6 · When you look yourself',
@@ -892,7 +900,7 @@ function compare(scheme: Scheme): string {
     `<div class="cc"><b>${title}</b><span>${sub} · ${tall(file, scheme).toLocaleString('en')} px, ${(tall(file, scheme) / 900).toFixed(0)} screens</span>${thumb(file)}<div class="cn">${notes}</div></div>`
   const li = (k: Fate[0], t: string) =>
     `<li><span class="tag ${k}">${{ keep: 'Reuses', move: 'Moves', gone: 'Removes', new: 'New' }[k]}</span>${t}</li>`
-  return `<div class="sm cmp"><h1>Today’s home page, and the three, side by side</h1><p class="sub">Each at a tenth of its size at 1440, so their lengths compare: today’s is 26 screens. Nothing of today’s wow is removed: the hero cluster and the team scene stay on the home page in one form or another, and every scene and film stays whole on /dashboard. What leaves the home page is listed under each.</p><div class="row">
+  return `<div class="sm cmp"><h1>Today’s home page, and the three, side by side</h1><p class="sub">Each at a tenth of its size at 1440, so their lengths compare. <b>Today’s live scenes, per version:</b> A keeps the hero cluster (A1) and the team scene (A6) on the home page, and the other four small (A8). B keeps the team scene (B1), the other four small (B8), and moves the hero cluster to the top of /dashboard. C keeps the hero cluster (C1) and Clusters, Map, Rollback and Capacity (C6), and moves the team scene to /dashboard. No scene or film is dropped: every one stays whole on /dashboard. What leaves the home page is listed under each.</p><div class="row">
 ${col('Today', '17 sections', 'today', `<ul>${li('keep', 'Its hero cluster and scenes are drawn live (canvas); the new pages use them as they are.')}</ul>`)}
 ${col(VERSIONS.a.name, VERSIONS.a.angle, 'a-desk', `<ul>${li('keep', 'Hero cluster (A1), team scene (A6), four scenes small (A8), sponsors, Sevalla, Download')}${li('move', 'The app, features, fleet, plugins, story, both films but one → /dashboard')}${li('new', 'The problem, the four steps, the CTA cards')}</ul>`)}
 ${col(VERSIONS.b.name, VERSIONS.b.angle, 'b-desk', `<ul>${li('keep', 'Team scene (B1), four scenes small (B8), sponsors, Sevalla, Download')}${li('move', 'Hero cluster → /dashboard’s top; the app, features, fleet, plugins, story, films → /dashboard')}${li('new', 'Guarantees, never, the chain, security questions')}</ul>`)}
