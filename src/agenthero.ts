@@ -12,6 +12,7 @@
  * Everything moves on one 16 s clock of CSS animations, so it loops cleanly, and a still at any
  * moment is the same page with the clock stopped there.
  */
+import { existsSync, readFileSync } from 'node:fs'
 import { type Scheme } from './colors.ts'
 import { icon } from './lucide.ts'
 import { FONTS } from './scene.ts'
@@ -501,7 +502,7 @@ function hero(c: Clock, v: Version, phone: boolean): string {
   return `<section class="hero2" style="background:var(--glow)">${nav(NAV[v][0], NAV[v][1], phone)}<div class="wrap hh" style="padding-top:${phone ? 36 : 28}px">${heading('Your agent does the work.', 'You approve the change.', 'h1')}<div class="hrow"><p class="lead">Lumovi is a Kubernetes dashboard with a built-in MCP server. Claude Code, or any MCP client, works through it as you; by default, each change waits for you.</p><div class="ctas">${CTAS[v]}</div></div></div><div class="wrap" style="padding:${phone ? '32px 16px 56px' : '28px 0 96px'}">${stage(c, phone)}<p class="caption">Claude Code asks, the cluster checks, you approve, and it’s recorded.</p></div></section>`
 }
 
-export type HeroFrame = `hero-${Version}-${Dev}` | 'hero-beats'
+export type HeroFrame = `hero-${Version}-${Dev}` | 'hero-beats' | 'hero-first'
 
 export const HERO_FRAMES: { id: HeroFrame; title: string; width: number }[] = [
   ...(['a', 'b', 'c'] as Version[]).flatMap((v) =>
@@ -512,6 +513,7 @@ export const HERO_FRAMES: { id: HeroFrame; title: string; width: number }[] = [
     })),
   ),
   { id: 'hero-beats', title: 'The hero’s beats', width: 2440 },
+  { id: 'hero-first', title: 'The first screen, with the new hero', width: 1560 },
 ]
 
 /**
@@ -522,7 +524,18 @@ export function heroFrame(id: HeroFrame, scheme: Scheme, t?: number): string {
   const f = HERO_FRAMES.find((x) => x.id === id)!
   const c = new Clock()
   let inner: string
-  if (id === 'hero-beats') {
+  if (id === 'hero-first') {
+    // Today's first screen (with its nav) and each version's with the new hero, stopped at 9.0 s, as rendered at 1440 × 900.
+    const REVIEW = new URL('../../.review/lmv-376/', import.meta.url)
+    const shot = (path: string, title: string, sub: string) => {
+      const u = new URL(path, REVIEW)
+      return `<figure><figcaption><b>${title}</b><span>${sub}</span></figcaption>${existsSync(u) ? `<img src="data:image/png;base64,${readFileSync(u).toString('base64')}">` : '<div class="miss"></div>'}</figure>`
+    }
+    inner = `<div class="beats fs"><h1>The first screen, with the new hero</h1><p>What a visitor sees first at 1440 × 900, at half size, stopped at 9.0 s, as Approve is pressed. The request, Approve and, a moment later, the audit line are all in it, in each version.</p><div class="g">
+${shot(`today/first-desk-${scheme}.png`, 'Today', 'Your clusters, at a glance: the hero cluster, live')}
+${(['a', 'b', 'c'] as Version[]).map((v) => shot(`hero/first-screen-${v}-${scheme}.png`, VERSIONS[v].name, v === 'c' ? 'The same hero; Connect your agent leads' : 'The same hero; Download leads')).join('\n')}
+</div></div>`
+  } else if (id === 'hero-beats') {
     const cell = (b: (typeof BEATS)[number], phone: boolean) =>
       `<figure><figcaption><b>${b.t.toFixed(1)} s</b> ${b.name}</figcaption><div class="frz" style="--t:-${b.t}s">${stage(c, phone)}</div></figure>`
     inner = `<div class="beats"><h1>The hero’s beats</h1><p>One 16 s loop: it reads, it asks in Lumovi, you approve, and it’s done and on the record; then it fades and starts again. On a phone it steps: Claude Code, Lumovi, Claude Code.</p><div class="bd">${BEATS.map((b) => cell(b, false)).join('')}</div><div class="bp">${BEATS.map((b) => cell(b, true)).join('')}</div></div>`
@@ -545,6 +558,7 @@ html, body { width: ${f.width}px; margin: 0; background: var(--bg); }
 .beats h1 { font-size: 30px; letter-spacing: -.03em; } .beats > p { font-size: 15px; color: var(--text-2); margin: 10px 0 28px; max-width: 900px; }
 .beats .bd { display: grid; grid-template-columns: 1160px 1160px; gap: 36px 24px; }
 .beats .bp { display: flex; gap: 24px; margin-top: 40px; }
-.beats figure { margin: 0; } .beats figcaption { margin-bottom: 12px; font-size: 14px; color: var(--text-2); } .beats figcaption b { color: var(--text-1); }
+.beats figure { margin: 0; }
+.fs .g { display: grid; grid-template-columns: 720px 720px; gap: 36px 24px; } .fs img, .fs .miss { display: block; width: 720px; height: 450px; border-radius: 10px; box-shadow: var(--panel); } .fs figcaption { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; } .fs figcaption span { font-size: 13px; color: var(--text-3); } .beats figcaption { margin-bottom: 12px; font-size: 14px; color: var(--text-2); } .beats figcaption b { color: var(--text-1); }
 </style>${inner}`
 }
