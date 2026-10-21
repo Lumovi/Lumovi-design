@@ -901,11 +901,24 @@ const FINAL_B: [section: string, fate: Fate][] = [
   ['Access and audit', ['keep', 'Grows into B5 (check the log) and B6 (your whole team)']],
   ['Every other kind, plugins', ['move', '→ /dashboard']],
   ['Story (why I built it)', ['move', '→ /dashboard, at its end']],
-  ['Sponsors', ['gone', 'Off the home page, at Péter’s word']],
-  ['Sevalla', ['gone', 'Off the home page, at Péter’s word']],
+  [
+    'Sponsors',
+    ['gone', 'Off the site entirely, at Péter’s word; the tiers’ text changes on GitHub'],
+  ],
+  [
+    'Sevalla',
+    ['gone', 'The section goes, at Péter’s word; the footer keeps its Sevalla link and badge'],
+  ],
   [
     'Download (#download)',
     ['keep', 'Under B8’s cards, as it is; the anchor stays where the docs link to it'],
+  ],
+  [
+    'Footer',
+    [
+      'keep',
+      'Exactly as it is: its links, “Made by Peter Kota”, the Apache line, the Kubernetes trademark notice, the Sevalla link and “Hosted on Sevalla” (whether that credit stays is being asked of Péter)',
+    ],
   ],
 ]
 const FINAL_B_ORDER = [
@@ -918,7 +931,7 @@ const FINAL_B_ORDER = [
   'Security review',
   'Get started (and Download)',
   'The dashboard',
-  'Footer',
+  'Footer, as today',
 ]
 
 function finalSitemap(): string {

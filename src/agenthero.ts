@@ -20,7 +20,6 @@ import {
   approval,
   button,
   CSS as SITE,
-  footer,
   type Dev,
   heading,
   nav,
@@ -589,7 +588,13 @@ function finalB(): FinalSec[] {
       'B9 · The dashboard',
       'Everything else Lumovi is: today’s scenes, small, each opening /dashboard, where the scene is whole.',
     ),
-    { id: 'Footer', note: 'The proof line.', tags: [['new', 'Proof line']], html: () => footer() },
+    {
+      id: 'Footer',
+      note: 'Today’s footer, exactly as it is: its links, “Made by Peter Kota”, the Apache line, the Kubernetes trademark notice, the Sevalla link and “Hosted on Sevalla”. Péter removed the Sevalla section, not the footer; whether its credit stays is being asked.',
+      tags: [['keep', 'As it is']],
+      html: (_c, d, s) =>
+        `<img class="shot" src="data:image/png;base64,${readFileSync(new URL(`../../.review/lmv-376/today/sec-footer-${d}-${s}.png`, import.meta.url)).toString('base64')}">`,
+    },
   ]
 }
 
